@@ -23,7 +23,7 @@ See `memory-bank/projectbrief.md` for scope and `memory-bank/axioms.md` for grou
 - AC-0.2: `axioms.md` covers coherence, LLM-native output, single binary, dependency policy.
 - AC-0.3: Git repo initialized with a checkpoint commit.
 
-## Phase 1 — Scaffold + auth + config
+## Phase 1 — Scaffold + auth + config ✅
 
 **Deliverables:**
 - `go.mod`, `cmd/mcli/main.go`, `internal/cli/root.go` with cobra skeleton.
@@ -159,3 +159,4 @@ Explicitly deferred, each a candidate for its own later plan:
 
 ## Progress log
 - 2026-05-08: Phase 0 complete — axioms + ADR-001/002/003 + this plan.
+- 2026-05-09: Phase 1 complete — scaffold + auth + config. Deps: cobra, yaml.v3. All AC met; go test -race green, golangci-lint clean.
