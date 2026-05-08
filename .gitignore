@@ -1,0 +1,29 @@
+# Build artifacts
+/bin/
+/dist/
+mcli
+mcli.exe
+
+# Go
+*.test
+*.out
+coverage.*
+vendor/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local config
+.env
+.env.local
+
+# Private memory-bank area (per setup-memory-bank convention)
+memory-bank/private/
+
+# Symlinks to external tooling (not part of this repo)
+.claude/
+CLAUDE.md
+AGENTS.md
