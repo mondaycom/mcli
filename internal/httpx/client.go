@@ -3,7 +3,9 @@
 package httpx
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
 	"strconv"
@@ -36,6 +38,21 @@ func (t *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", string(t.token))
 	req.Header.Set("User-Agent", t.userAgent)
 
+	// Ensure the request body can be replayed across retries.
+	// If GetBody is not set but a body is present, buffer it once and install
+	// GetBody so subsequent attempts get a fresh reader.
+	if req.Body != nil && req.GetBody == nil {
+		buf, err := io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("http round-trip: buffer request body: %w", err)
+		}
+		_ = req.Body.Close()
+		req.GetBody = func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(buf)), nil
+		}
+		req.Body, _ = req.GetBody()
+	}
+
 	var (
 		resp *http.Response
 		err  error
@@ -53,6 +70,14 @@ func (t *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 			// and the retry response supersedes it.
 			if resp != nil {
 				_ = resp.Body.Close()
+			}
+
+			// Restore a fresh body for the next attempt.
+			if req.GetBody != nil {
+				req.Body, err = req.GetBody()
+				if err != nil {
+					return nil, fmt.Errorf("http round-trip: restore request body: %w", err)
+				}
 			}
 		}
 
