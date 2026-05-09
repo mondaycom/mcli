@@ -42,6 +42,33 @@ See `memory-bank/projectbrief.md` for scope and `memory-bank/axioms.md` for grou
 - AC-1.3: Config round-trip test: save → load returns structurally identical config.
 - AC-1.4: `golangci-lint run` exits 0.
 
+## Phase 1.5 — Secret-storage retrofit
+
+Driven by ADR-004 and axioms A11 (no plaintext secrets) and A12 (LLM-primary). Phase 1 stored the token in plaintext; this phase replaces that with keychain-default + age-encrypted-file fallback.
+
+**Deliverables:**
+- `internal/secrets/secrets.go` — `Store` interface (`Put`/`Get`/`Delete`/`Available`), `BackendName` enum (`keychain`, `file`), `Open(name) (Store, error)` factory.
+- `internal/secrets/keychain.go` — `zalando/go-keyring` backend; `Available()` probes by attempting a sentinel read.
+- `internal/secrets/file.go` — age passphrase backend; reads `MCLI_PASSPHRASE` env; file at `<config-dir>/credentials.age` mode 0600; refuses to operate when env unset.
+- `internal/secrets/file_test.go` — round-trip encrypt/decrypt; missing-passphrase error.
+- `internal/secrets/keychain_test.go` — table-driven tests against an in-memory fake; one real-keychain test gated by build tag `keychain_real`.
+- `internal/config/config.go` — drop `Token` field; add `SecretStore` (BackendName); `Load` migrates legacy configs by stripping `token:` and emitting a stderr warning.
+- `internal/config/config_test.go` — migration test, `SecretStore` round-trip, `ResolveToken` rewritten to consult a `secrets.Store`.
+- `internal/cli/auth.go` — `auth login --token <t> [--store keychain|file]`; new `auth logout`; new `auth status` (never prints token).
+
+**Acceptance:**
+- AC-1.5.1: `mcli auth login --token T` → `mcli auth status` reports `keychain`; `grep -r T ~/.config/mcli` finds nothing.
+- AC-1.5.2: `MCLI_PASSPHRASE=p mcli auth login --token T --store file` → `credentials.age` exists 0600, contains no occurrence of `T` in raw bytes.
+- AC-1.5.3: `mcli auth logout` clears the secret; subsequent token-needing op returns `AUTH`.
+- AC-1.5.4: `--token` > `MONDAY_API_TOKEN` > backend precedence verified by table-driven test.
+- AC-1.5.5: A pre-existing `config.yaml` with `token:` is rewritten without that field on first read; warning emitted to stderr.
+- AC-1.5.6: All Phase 1 acceptance checks (AC-1.1 .. AC-1.4) still pass.
+- AC-1.5.7: `gofmt -l .`, `go vet ./...`, `golangci-lint run`, `go test -race ./...` all clean.
+
+**Deps added (both permissive):**
+- `github.com/zalando/go-keyring` — MIT.
+- `filippo.io/age` — BSD-3-Clause.
+
 ## Phase 2 — GraphQL client + schema
 
 **Deliverables:**

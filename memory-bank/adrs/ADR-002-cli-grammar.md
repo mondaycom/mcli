@@ -42,7 +42,7 @@ Decisions in this document cover:
 - Global flags (available on every command):
   - `--json` / `--pretty` — force output mode (overrides TTY detection).
   - `--config <path>` — override config file path.
-  - `--token <token>` — override API token (env: `MONDAY_API_TOKEN`).
+  - `--token <token>` — override API token (env: `MONDAY_API_TOKEN`). Token resolution precedence is documented under "Config precedence" below.
   - `--verbose` / `-v` — emit request/response metadata to stderr; include complexity cost.
   - `--no-input` — never prompt; fail instead.
   - `--help` / `-h` — standard cobra help.
@@ -80,7 +80,16 @@ When any command fails and `--json` is active (or stdout is non-TTY), the last l
 - No command reads stdin implicitly without the `-` sentinel — this keeps piping explicit and avoids surprising LLM-generated pipelines.
 
 ### Config precedence
-Flag > env var > config file > built-in default. Documented per-option.
+For non-secret config: flag > env var > config file > built-in default. Documented per-option.
+
+For the API token specifically (per ADR-004): `--token` flag > `MONDAY_API_TOKEN` env > configured secret store (keychain or age-encrypted file). The config file does NOT hold the token; it holds only the `secret_store` selector.
+
+### Documented environment variables
+| Var | Used by | Purpose |
+|---|---|---|
+| `MONDAY_API_TOKEN` | every command | API token override |
+| `MCLI_PASSPHRASE` | file secret backend (ADR-004) only | passphrase for the age-encrypted credential file |
+| `XDG_CONFIG_HOME` | config path resolution | overrides default `~/.config` location |
 
 ## Consequences
 
@@ -96,3 +105,4 @@ Flag > env var > config file > built-in default. Documented per-option.
 
 ---
 Supersedes: none.
+Amended: 2026-05-09 — token-precedence section reflects ADR-004; `MCLI_PASSPHRASE` documented in env-var table.

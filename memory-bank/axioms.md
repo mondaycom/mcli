@@ -67,5 +67,27 @@ Every third-party Go module added is a long-term maintenance cost. Before adding
 2. Confirm the license is permissive (MIT, BSD, Apache-2.0, MPL-2.0). Reject GPL/AGPL unless explicitly approved.
 3. Document the dependency and its role in an ADR or the relevant plan phase.
 
+## A11. Secrets at rest
+
+API tokens and other secrets MUST NOT be persisted to disk in plaintext, even with restrictive file modes (e.g. 0600).
+
+Approved storage backends:
+1. Platform keychain (macOS Keychain, Linux Secret Service, Windows Credential Manager) — default.
+2. Symmetric encryption with a user passphrase — fallback when no keychain is available.
+
+Mode bits alone are not sufficient because they do not protect against backups, cloud sync (iCloud, Dropbox, Google Drive), dotfiles repositories, accidental `cat`/screen-share, or any process running as the same user.
+
+Consequence: any code path that writes a credential to disk goes through `internal/secrets`. Plaintext on disk is a release blocker.
+
+## A12. LLM-primary use
+
+mcli's primary runtime caller is an LLM agent, not a human at a terminal. The expected lifecycle is: a human runs setup once interactively (e.g. `auth login`); LLMs invoke the CLI programmatically thereafter.
+
+Consequence:
+- The read path (every command that is not initial setup) MUST work without TTY interaction — no passphrase prompts, no confirmations, no spinners.
+- All inputs must be expressible via flags + env vars + JSON I/O.
+- Interactive UX is acceptable only at one-time setup steps and must always have a non-interactive equivalent.
+- When trading off "nice for humans" vs "nice for agents", lean toward the agent.
+
 ---
 *Update this file only when a new ground truth is established or an existing one is superseded. Superseded axioms are struck through, not deleted, and reference the ADR that replaced them.*
