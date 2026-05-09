@@ -73,11 +73,7 @@ func (t *RetryTransport) backoffDelay(resp *http.Response, attempt int) time.Dur
 	if resp != nil && resp.StatusCode == http.StatusTooManyRequests {
 		if ra := resp.Header.Get("Retry-After"); ra != "" {
 			if secs, err := strconv.Atoi(ra); err == nil {
-				d := time.Duration(secs) * time.Second
-				if d > maxRetryAfter {
-					d = maxRetryAfter
-				}
-				return d
+				return min(time.Duration(secs)*time.Second, maxRetryAfter)
 			}
 		}
 	}

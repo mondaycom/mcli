@@ -18,10 +18,14 @@ type GlobalFlags struct {
 var globals GlobalFlags
 
 // rootCmd is the base command for the mcli CLI.
+// SilenceErrors / SilenceUsage are true so that error rendering is owned by
+// PrintError (per ADR-002) rather than cobra's default formatter.
 var rootCmd = &cobra.Command{
-	Use:   "mcli",
-	Short: "mcli — monday.com CLI",
-	Long:  "mcli is a command-line interface for the monday.com GraphQL API.",
+	Use:           "mcli",
+	Short:         "mcli — monday.com CLI",
+	Long:          "mcli is a command-line interface for the monday.com GraphQL API.",
+	SilenceErrors: true,
+	SilenceUsage:  true,
 }
 
 func init() {

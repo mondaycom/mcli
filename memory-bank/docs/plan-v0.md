@@ -153,10 +153,14 @@ Explicitly deferred, each a candidate for its own later plan:
 - MCP server wrapper.
 
 ## Open questions
-- Confirm command binary name is `mcli` (vs `monday` / `mnd`). Default assumed: `mcli`.
-- Confirm config path is `~/.config/mcli/` (XDG). Default assumed: yes.
+- ~~Binary name `mcli`~~ — resolved 2026-05-09 (chosen, in production).
+- ~~Config path `~/.config/mcli/`~~ — resolved 2026-05-09 (XDG-aware).
 - JSON-schema generation library for manifest: decide in Phase 2 (candidates: `invopop/jsonschema`).
+
+## Phase 2 prerequisites (carry-overs from Phase 1)
+- **httpx body preservation across retries**: `RetryTransport.RoundTrip` does not preserve the request body across retries. POST requests (all of GraphQL) will silently send an empty body on retry attempts. Must be fixed before Phase 2 wires real GraphQL calls. Fix: snapshot `req.GetBody` (or buffer the body) before the first attempt and replay on each retry. Add a test that posts a non-empty body and verifies the retry receives the same body.
 
 ## Progress log
 - 2026-05-08: Phase 0 complete — axioms + ADR-001/002/003 + this plan.
 - 2026-05-09: Phase 1 complete — scaffold + auth + config. Deps: cobra, yaml.v3. All AC met; go test -race green, golangci-lint clean.
+- 2026-05-09: Phase 1 review fixes — error output path now honors ADR-002 (JSON to stdout in non-TTY/--json, human to stderr in --pretty/TTY); cobra error/usage rendering silenced; new internal/cli/output.go with TTY detection. R3 (httpx body preservation) carried as Phase 2 prerequisite.
