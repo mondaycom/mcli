@@ -42,7 +42,7 @@ See `memory-bank/projectbrief.md` for scope and `memory-bank/axioms.md` for grou
 - AC-1.3: Config round-trip test: save → load returns structurally identical config.
 - AC-1.4: `golangci-lint run` exits 0.
 
-## Phase 1.5 — Secret-storage retrofit
+## Phase 1.5 — Secret-storage retrofit ✅
 
 Driven by ADR-004 and axioms A11 (no plaintext secrets) and A12 (LLM-primary). Phase 1 stored the token in plaintext; this phase replaces that with keychain-default + age-encrypted-file fallback.
 
@@ -191,3 +191,4 @@ Explicitly deferred, each a candidate for its own later plan:
 - 2026-05-08: Phase 0 complete — axioms + ADR-001/002/003 + this plan.
 - 2026-05-09: Phase 1 complete — scaffold + auth + config. Deps: cobra, yaml.v3. All AC met; go test -race green, golangci-lint clean.
 - 2026-05-09: Phase 1 review fixes — error output path now honors ADR-002 (JSON to stdout in non-TTY/--json, human to stderr in --pretty/TTY); cobra error/usage rendering silenced; new internal/cli/output.go with TTY detection. R3 (httpx body preservation) carried as Phase 2 prerequisite.
+- 2026-05-09: Phase 1.5 complete — secret storage retrofit. internal/secrets (keychain + age file). config no longer holds token; legacy plaintext migration in place. Deps: zalando/go-keyring (MIT), filippo.io/age (BSD-3). All AC met; tests + lint clean.
