@@ -1,0 +1,24 @@
+schema: schema/monday.graphql
+
+operations:
+  - internal/api/queries/*.graphql
+
+generated: internal/api/gen/generated.go
+
+package: gen
+
+bindings:
+  JSON:
+    type: string
+  Date:
+    type: string
+  ISO8601DateTime:
+    type: string
+  CompareValue:
+    type: string
+  File:
+    type: string
+  policy__Policy:
+    type: string
+  ID:
+    type: string

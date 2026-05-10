@@ -1,0 +1,13 @@
+query Me {
+  me {
+    id
+    name
+  }
+}
+
+query BoardByID($ids: [ID!]) {
+  boards(ids: $ids) {
+    id
+    name
+  }
+}
