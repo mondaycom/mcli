@@ -1,0 +1,354 @@
+package cli
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
+	gqlclient "github.com/Khan/genqlient/graphql"
+)
+
+// installBoardFactory sets up boardClientFactory to use the given httptest
+// server URL for the duration of the test, then restores the original value.
+func installBoardFactory(t *testing.T, srvURL string) {
+	t.Helper()
+	orig := boardClientFactory
+	boardClientFactory = func() (gqlclient.Client, error) {
+		return gqlclient.NewClient(srvURL, http.DefaultClient), nil
+	}
+	t.Cleanup(func() { boardClientFactory = orig })
+}
+
+// graphqlResponse is a minimal GraphQL response envelope used in test handlers.
+type graphqlResponse struct {
+	Data json.RawMessage `json:"data"`
+}
+
+// mustMarshal marshals v or panics; used only in test setup.
+func mustMarshal(v any) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+// newTestServer creates an httptest.Server whose handler calls fn.
+// fn receives the decoded body and returns a JSON string for the "data" field.
+func newTestServer(t *testing.T, fn func(body map[string]any) string) *httptest.Server {
+	t.Helper()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "read body", http.StatusBadRequest)
+			return
+		}
+		var body map[string]any
+		if err := json.Unmarshal(raw, &body); err != nil {
+			http.Error(w, "parse body", http.StatusBadRequest)
+			return
+		}
+		dataJSON := fn(body)
+		w.Header().Set("Content-Type", "application/json")
+		resp := graphqlResponse{Data: json.RawMessage(dataJSON)}
+		enc, _ := json.Marshal(resp)
+		_, _ = w.Write(enc)
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+// execBoardList runs 'board list' with the given flags and returns stdout, exit err.
+func execBoardList(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true} // force JSON for deterministic output
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"list"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// execBoardGet runs 'board get <id>' and returns stdout, exit err.
+func execBoardGet(t *testing.T, id string, extraArgs ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"get", id}, extraArgs...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// ---- BoardsList tests ----
+
+func TestBoardList_Empty(t *testing.T) {
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardsList" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardList(t)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	items, _ := result["items"].([]any)
+	if len(items) != 0 {
+		t.Errorf("expected empty items, got %d", len(items))
+	}
+	if result["cursor"] != "" {
+		t.Errorf("expected empty cursor, got %v", result["cursor"])
+	}
+}
+
+func TestBoardList_WithResults_NextPage(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		boards := []map[string]any{
+			{"id": "9832181507", "name": "Test Board", "board_kind": "public", "state": "active", "workspace_id": "42"},
+			{"id": "9832181508", "name": "Dev Board", "board_kind": "private", "state": "active", "workspace_id": "42"},
+		}
+		return mustMarshal(map[string]any{"boards": boards})
+	})
+	installBoardFactory(t, srv.URL)
+
+	// Use --limit 2 so that len(results) == limit → next cursor is emitted.
+	out, err := execBoardList(t, "--limit", "2")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	items, _ := result["items"].([]any)
+	if len(items) != 2 {
+		t.Errorf("expected 2 items, got %d", len(items))
+	}
+	// Cursor should be "2" (next page).
+	if result["cursor"] != "2" {
+		t.Errorf("expected cursor '2', got %v", result["cursor"])
+	}
+}
+
+func TestBoardList_WorkspaceFilter(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardList(t, "--workspace", "99")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars == nil {
+		t.Fatal("no variables captured")
+	}
+	wsIDs, _ := capturedVars["workspaceIds"].([]any)
+	if len(wsIDs) != 1 || wsIDs[0] != "99" {
+		t.Errorf("expected workspaceIds=[99], got %v", wsIDs)
+	}
+}
+
+func TestBoardList_BadCursor_ExitCode1(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardList(t, "--cursor", "notanumber")
+	if err == nil {
+		t.Fatal("expected error for bad cursor")
+	}
+	// Must be a USAGE error (exit code 1).
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE code, got %q", code)
+	}
+}
+
+func TestBoardList_CursorPagePassthrough(t *testing.T) {
+	var capturedPage float64
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedPage, _ = vars["page"].(float64)
+		}
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardList(t, "--cursor", "3")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if capturedPage != 3 {
+		t.Errorf("expected page=3, got %v", capturedPage)
+	}
+}
+
+// ---- BoardGet tests ----
+
+func TestBoardGet_Success(t *testing.T) {
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardGet" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		board := map[string]any{
+			"id":           "9832181507",
+			"name":         "Test Board",
+			"board_kind":   "public",
+			"state":        "active",
+			"description":  "A test board",
+			"workspace_id": "42",
+			"workspace":    map[string]any{"id": "42", "name": "Main WS", "kind": "open"},
+			"owners":       []map[string]any{{"id": "1001", "name": "Alice"}},
+			"groups":       []map[string]any{{"id": "topics", "title": "Group 1", "color": "#579bfc", "position": "0.1"}},
+			"columns": []map[string]any{
+				{"id": "name", "title": "Name", "type": "name", "settings_str": "{}", "width": 200, "archived": false},
+			},
+		}
+		return mustMarshal(map[string]any{"boards": []any{board}})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardGet(t, "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9832181507" {
+		t.Errorf("expected id 9832181507, got %v", result["id"])
+	}
+	if result["name"] != "Test Board" {
+		t.Errorf("expected name 'Test Board', got %v", result["name"])
+	}
+	if result["kind"] != "public" {
+		t.Errorf("expected kind 'public', got %v", result["kind"])
+	}
+}
+
+func TestBoardGet_NotFound_ExitCode2(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		// API returns empty boards list → not found.
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardGet(t, "9999999999")
+	if err == nil {
+		t.Fatal("expected error for missing board")
+	}
+	code := errsCode(err)
+	if code != "NOT_FOUND" {
+		t.Errorf("expected NOT_FOUND, got %q", code)
+	}
+}
+
+func TestBoardGet_NonNumericID_UsageError(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return `{"boards":[]}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardGet(t, "not-a-number")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestBoardGet_WithWorkspaceAndOwners(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		board := map[string]any{
+			"id":           "9832181507",
+			"name":         "Test Board",
+			"board_kind":   "private",
+			"state":        "active",
+			"description":  "",
+			"workspace_id": "55",
+			"workspace":    map[string]any{"id": "55", "name": "WS", "kind": "closed"},
+			"owners": []map[string]any{
+				{"id": "1001", "name": "Alice"},
+				{"id": "1002", "name": "Bob"},
+			},
+			"groups":  []map[string]any{},
+			"columns": []map[string]any{},
+		}
+		return mustMarshal(map[string]any{"boards": []any{board}})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardGet(t, "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	owners, _ := result["owners"].([]any)
+	if len(owners) != 2 {
+		t.Errorf("expected 2 owners, got %d", len(owners))
+	}
+	ws, _ := result["workspace"].(map[string]any)
+	if ws == nil || ws["kind"] != "closed" {
+		t.Errorf("expected workspace kind 'closed', got %v", ws)
+	}
+}
+
+// errsCode extracts the error code string from a structured errs.Error,
+// or returns the raw message if it is not structured.
+func errsCode(err error) string {
+	if err == nil {
+		return ""
+	}
+	// Use fmt.Sprintf because errs.Error formats as "[CODE] msg".
+	msg := fmt.Sprintf("%v", err)
+	// Extract code from "[CODE] msg" format.
+	if len(msg) > 2 && msg[0] == '[' {
+		end := strings.Index(msg, "]")
+		if end > 1 {
+			return msg[1:end]
+		}
+	}
+	return msg
+}

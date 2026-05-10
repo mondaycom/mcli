@@ -1,0 +1,59 @@
+{
+  "id": "9832181507",
+  "name": "Test Board",
+  "kind": "public",
+  "state": "active",
+  "description": "A board for tracking test work",
+  "workspace_id": "42",
+  "workspace": {
+    "id": "42",
+    "name": "Main Workspace",
+    "kind": "open"
+  },
+  "owners": [
+    {
+      "id": "1001",
+      "name": "Alice Smith"
+    }
+  ],
+  "groups": [
+    {
+      "id": "topics",
+      "title": "Group 1",
+      "color": "#579bfc",
+      "position": "0.1"
+    },
+    {
+      "id": "new_group",
+      "title": "Group 2",
+      "color": "#a25ddc",
+      "position": "0.2"
+    }
+  ],
+  "columns": [
+    {
+      "id": "name",
+      "title": "Name",
+      "type": "name",
+      "settings_str": "{}",
+      "width": 200,
+      "archived": false
+    },
+    {
+      "id": "status",
+      "title": "Status",
+      "type": "status",
+      "settings_str": "{\"labels\":{\"0\":\"Working on it\",\"1\":\"Done\",\"2\":\"Stuck\"}}",
+      "width": 150,
+      "archived": false
+    },
+    {
+      "id": "date",
+      "title": "Due Date",
+      "type": "date",
+      "settings_str": "{}",
+      "width": 130,
+      "archived": false
+    }
+  ]
+}

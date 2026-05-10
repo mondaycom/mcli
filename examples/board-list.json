@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": "9832181507",
+      "name": "Test Board",
+      "kind": "public",
+      "state": "active",
+      "workspace_id": "42"
+    },
+    {
+      "id": "9832181508",
+      "name": "Dev Board",
+      "kind": "private",
+      "state": "active",
+      "workspace_id": "42"
+    }
+  ],
+  "cursor": "2"
+}

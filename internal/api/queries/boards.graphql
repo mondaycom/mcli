@@ -1,0 +1,53 @@
+# BoardsList fetches a page of boards.
+#
+# Pagination note: monday.com boards use page/limit (integer page numbers),
+# not cursor-based pagination. The CLI surface exposes --cursor as a string
+# for API uniformity; the cursor is encoded as the decimal page number. Page 1
+# is the first page. When results fill the limit there may be more pages; the
+# caller receives the next page number encoded as a string cursor. When fewer
+# results than limit are returned, the cursor is empty (no more pages).
+# @genqlient(omitempty: true)
+query BoardsList($limit: Int, $page: Int, $workspaceIds: [ID]) {
+  boards(limit: $limit, page: $page, workspace_ids: $workspaceIds) {
+    id
+    name
+    state
+    board_kind
+    workspace_id
+  }
+}
+
+# BoardGet fetches a single board by ID with full detail.
+query BoardGet($id: ID!) {
+  boards(ids: [$id]) {
+    id
+    name
+    state
+    board_kind
+    description
+    workspace_id
+    workspace {
+      id
+      name
+      kind
+    }
+    owners {
+      id
+      name
+    }
+    groups {
+      id
+      title
+      color
+      position
+    }
+    columns {
+      id
+      title
+      type
+      settings_str
+      width
+      archived
+    }
+  }
+}

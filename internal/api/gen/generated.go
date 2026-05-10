@@ -34,6 +34,368 @@ type BoardByIDResponse struct {
 // GetBoards returns BoardByIDResponse.Boards, and is useful for accessing the field via an interface.
 func (v *BoardByIDResponse) GetBoards() []BoardByIDBoardsBoard { return v.Boards }
 
+// BoardGetBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardGetBoardsBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+	// The board's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board's kind (public / private / share).
+	Board_kind BoardKind `json:"board_kind"`
+	// The board's description.
+	Description string `json:"description"`
+	// The board's workspace unique identifier (null for main workspace).
+	Workspace_id string `json:"workspace_id"`
+	// The workspace that contains this board (null for main workspace).
+	Workspace BoardGetBoardsBoardWorkspace `json:"workspace"`
+	// List of user board owners
+	Owners []BoardGetBoardsBoardOwnersUser `json:"owners"`
+	// The board's visible groups.
+	Groups []BoardGetBoardsBoardGroupsGroup `json:"groups"`
+	// The board's visible columns.
+	Columns []BoardGetBoardsBoardColumnsColumn `json:"columns"`
+}
+
+// GetId returns BoardGetBoardsBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetId() string { return v.Id }
+
+// GetName returns BoardGetBoardsBoard.Name, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetName() string { return v.Name }
+
+// GetState returns BoardGetBoardsBoard.State, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetState() State { return v.State }
+
+// GetBoard_kind returns BoardGetBoardsBoard.Board_kind, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetBoard_kind() BoardKind { return v.Board_kind }
+
+// GetDescription returns BoardGetBoardsBoard.Description, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetDescription() string { return v.Description }
+
+// GetWorkspace_id returns BoardGetBoardsBoard.Workspace_id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetWorkspace_id() string { return v.Workspace_id }
+
+// GetWorkspace returns BoardGetBoardsBoard.Workspace, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetWorkspace() BoardGetBoardsBoardWorkspace { return v.Workspace }
+
+// GetOwners returns BoardGetBoardsBoard.Owners, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetOwners() []BoardGetBoardsBoardOwnersUser { return v.Owners }
+
+// GetGroups returns BoardGetBoardsBoard.Groups, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetGroups() []BoardGetBoardsBoardGroupsGroup { return v.Groups }
+
+// GetColumns returns BoardGetBoardsBoard.Columns, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoard) GetColumns() []BoardGetBoardsBoardColumnsColumn { return v.Columns }
+
+// BoardGetBoardsBoardColumnsColumn includes the requested fields of the GraphQL type Column.
+type BoardGetBoardsBoardColumnsColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+	// The column's width.
+	Width int `json:"width"`
+	// Is the column archived or not.
+	Archived bool `json:"archived"`
+}
+
+// GetId returns BoardGetBoardsBoardColumnsColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardGetBoardsBoardColumnsColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetTitle() string { return v.Title }
+
+// GetType returns BoardGetBoardsBoardColumnsColumn.Type, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetType() ColumnType { return v.Type }
+
+// GetSettings_str returns BoardGetBoardsBoardColumnsColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetSettings_str() string { return v.Settings_str }
+
+// GetWidth returns BoardGetBoardsBoardColumnsColumn.Width, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetWidth() int { return v.Width }
+
+// GetArchived returns BoardGetBoardsBoardColumnsColumn.Archived, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetArchived() bool { return v.Archived }
+
+// BoardGetBoardsBoardGroupsGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGetBoardsBoardGroupsGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+	// The group's color.
+	Color string `json:"color"`
+	// The group's position in the board.
+	Position string `json:"position"`
+}
+
+// GetId returns BoardGetBoardsBoardGroupsGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardGroupsGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGetBoardsBoardGroupsGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardGroupsGroup) GetTitle() string { return v.Title }
+
+// GetColor returns BoardGetBoardsBoardGroupsGroup.Color, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardGroupsGroup) GetColor() string { return v.Color }
+
+// GetPosition returns BoardGetBoardsBoardGroupsGroup.Position, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardGroupsGroup) GetPosition() string { return v.Position }
+
+// BoardGetBoardsBoardOwnersUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type BoardGetBoardsBoardOwnersUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's name.
+	Name string `json:"name"`
+}
+
+// GetId returns BoardGetBoardsBoardOwnersUser.Id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardOwnersUser) GetId() string { return v.Id }
+
+// GetName returns BoardGetBoardsBoardOwnersUser.Name, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardOwnersUser) GetName() string { return v.Name }
+
+// BoardGetBoardsBoardWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type BoardGetBoardsBoardWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+	// The workspace's kind (open / closed / template).
+	Kind WorkspaceKind `json:"kind"`
+}
+
+// GetId returns BoardGetBoardsBoardWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardWorkspace) GetId() string { return v.Id }
+
+// GetName returns BoardGetBoardsBoardWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardWorkspace) GetName() string { return v.Name }
+
+// GetKind returns BoardGetBoardsBoardWorkspace.Kind, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardWorkspace) GetKind() WorkspaceKind { return v.Kind }
+
+// BoardGetResponse is returned by BoardGet on success.
+type BoardGetResponse struct {
+	// Get a collection of boards.
+	Boards []BoardGetBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns BoardGetResponse.Boards, and is useful for accessing the field via an interface.
+func (v *BoardGetResponse) GetBoards() []BoardGetBoardsBoard { return v.Boards }
+
+// The board kinds available.
+type BoardKind string
+
+const (
+	// Private boards.
+	BoardKindPrivate BoardKind = "private"
+	// Public boards.
+	BoardKindPublic BoardKind = "public"
+	// Shareable boards.
+	BoardKindShare BoardKind = "share"
+)
+
+var AllBoardKind = []BoardKind{
+	BoardKindPrivate,
+	BoardKindPublic,
+	BoardKindShare,
+}
+
+// BoardsListBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardsListBoardsBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+	// The board's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board's kind (public / private / share).
+	Board_kind BoardKind `json:"board_kind"`
+	// The board's workspace unique identifier (null for main workspace).
+	Workspace_id string `json:"workspace_id"`
+}
+
+// GetId returns BoardsListBoardsBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardsListBoardsBoard) GetId() string { return v.Id }
+
+// GetName returns BoardsListBoardsBoard.Name, and is useful for accessing the field via an interface.
+func (v *BoardsListBoardsBoard) GetName() string { return v.Name }
+
+// GetState returns BoardsListBoardsBoard.State, and is useful for accessing the field via an interface.
+func (v *BoardsListBoardsBoard) GetState() State { return v.State }
+
+// GetBoard_kind returns BoardsListBoardsBoard.Board_kind, and is useful for accessing the field via an interface.
+func (v *BoardsListBoardsBoard) GetBoard_kind() BoardKind { return v.Board_kind }
+
+// GetWorkspace_id returns BoardsListBoardsBoard.Workspace_id, and is useful for accessing the field via an interface.
+func (v *BoardsListBoardsBoard) GetWorkspace_id() string { return v.Workspace_id }
+
+// BoardsListResponse is returned by BoardsList on success.
+type BoardsListResponse struct {
+	// Get a collection of boards.
+	Boards []BoardsListBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns BoardsListResponse.Boards, and is useful for accessing the field via an interface.
+func (v *BoardsListResponse) GetBoards() []BoardsListBoardsBoard { return v.Boards }
+
+// Types of columns supported by the API
+type ColumnType string
+
+const (
+	// Number items according to their order in the group/board
+	ColumnTypeAutoNumber ColumnType = "auto_number"
+	// Connect data from other boards
+	ColumnTypeBoardRelation ColumnType = "board_relation"
+	// Perform actions on items by clicking a button
+	ColumnTypeButton ColumnType = "button"
+	// Check off items and see what's done at a glance
+	ColumnTypeCheckbox ColumnType = "checkbox"
+	// Manage a design system using a color palette
+	ColumnTypeColorPicker ColumnType = "color_picker"
+	// Choose a country
+	ColumnTypeCountry ColumnType = "country"
+	// Add the item's creator and creation date automatically
+	ColumnTypeCreationLog ColumnType = "creation_log"
+	// Add dates like deadlines to ensure you never drop the ball
+	ColumnTypeDate ColumnType = "date"
+	// Set up dependencies between items in the board
+	ColumnTypeDependency ColumnType = "dependency"
+	// Document your work and increase collaboration
+	ColumnTypeDoc ColumnType = "doc"
+	// Create a dropdown list of options
+	ColumnTypeDropdown ColumnType = "dropdown"
+	// Email team members and clients directly from your board
+	ColumnTypeEmail ColumnType = "email"
+	// Add files & docs to your item
+	ColumnTypeFile ColumnType = "file"
+	// Use functions to manipulate data across multiple columns
+	ColumnTypeFormula ColumnType = "formula"
+	ColumnTypeGroup   ColumnType = "group"
+	// Add times to manage and schedule tasks, shifts and more
+	ColumnTypeHour ColumnType = "hour"
+	// Integration is really cool...
+	ColumnTypeIntegration ColumnType = "integration"
+	// Show all item's assignees
+	ColumnTypeItemAssignees ColumnType = "item_assignees"
+	// Show a unique ID for each item
+	ColumnTypeItemId ColumnType = "item_id"
+	// Add the person that last updated the item and the date
+	ColumnTypeLastUpdated ColumnType = "last_updated"
+	// Simply hyperlink to any website
+	ColumnTypeLink ColumnType = "link"
+	// Place multiple locations on a geographic map
+	ColumnTypeLocation ColumnType = "location"
+	// Add large amounts of text without changing column width
+	ColumnTypeLongText ColumnType = "long_text"
+	// Show and edit columns' data from connected boards
+	ColumnTypeMirror ColumnType = "mirror"
+	// Add revenue, costs, time estimations and more
+	ColumnTypeNumbers ColumnType = "numbers"
+	// Assign people to improve team work
+	ColumnTypePeople ColumnType = "people"
+	// Call your contacts directly from monday.com
+	ColumnTypePhone ColumnType = "phone"
+	// Show progress by combining status columns in a battery
+	ColumnTypeProgress ColumnType = "progress"
+	// Rate or rank anything visually
+	ColumnTypeRating ColumnType = "rating"
+	// Get an instant overview of where things stand
+	ColumnTypeStatus ColumnType = "status"
+	// Add tags to categorize items across multiple boards
+	ColumnTypeTags ColumnType = "tags"
+	// Assign a full team to an item
+	ColumnTypeTeam ColumnType = "team"
+	// Add textual information e.g. addresses, names or keywords
+	ColumnTypeText ColumnType = "text"
+	// Visualize your item’s duration, with a start and end date
+	ColumnTypeTimeline ColumnType = "timeline"
+	// Easily track time spent on each item, group, and board
+	ColumnTypeTimeTracking ColumnType = "time_tracking"
+	// Vote on an item e.g. pick a new feature or a favorite lunch place
+	ColumnTypeVote ColumnType = "vote"
+	// Select the week on which each item should be completed
+	ColumnTypeWeek ColumnType = "week"
+	// Keep track of the time anywhere in the world
+	ColumnTypeWorldClock ColumnType = "world_clock"
+	// Unsupported column type
+	ColumnTypeUnsupported ColumnType = "unsupported"
+	// Name is really cool...
+	ColumnTypeName ColumnType = "name"
+	// Assign a person to increase ownership and accountability (deprecated)
+	ColumnTypePerson ColumnType = "person"
+	// Document your work and increase collaboration
+	ColumnTypeDirectDoc ColumnType = "direct_doc"
+	// Use the subtasks column to create another level of tasks
+	ColumnTypeSubtasks ColumnType = "subtasks"
+)
+
+var AllColumnType = []ColumnType{
+	ColumnTypeAutoNumber,
+	ColumnTypeBoardRelation,
+	ColumnTypeButton,
+	ColumnTypeCheckbox,
+	ColumnTypeColorPicker,
+	ColumnTypeCountry,
+	ColumnTypeCreationLog,
+	ColumnTypeDate,
+	ColumnTypeDependency,
+	ColumnTypeDoc,
+	ColumnTypeDropdown,
+	ColumnTypeEmail,
+	ColumnTypeFile,
+	ColumnTypeFormula,
+	ColumnTypeGroup,
+	ColumnTypeHour,
+	ColumnTypeIntegration,
+	ColumnTypeItemAssignees,
+	ColumnTypeItemId,
+	ColumnTypeLastUpdated,
+	ColumnTypeLink,
+	ColumnTypeLocation,
+	ColumnTypeLongText,
+	ColumnTypeMirror,
+	ColumnTypeNumbers,
+	ColumnTypePeople,
+	ColumnTypePhone,
+	ColumnTypeProgress,
+	ColumnTypeRating,
+	ColumnTypeStatus,
+	ColumnTypeTags,
+	ColumnTypeTeam,
+	ColumnTypeText,
+	ColumnTypeTimeline,
+	ColumnTypeTimeTracking,
+	ColumnTypeVote,
+	ColumnTypeWeek,
+	ColumnTypeWorldClock,
+	ColumnTypeUnsupported,
+	ColumnTypeName,
+	ColumnTypePerson,
+	ColumnTypeDirectDoc,
+	ColumnTypeSubtasks,
+}
+
 // MeMeUser includes the requested fields of the GraphQL type User.
 // The GraphQL type's documentation follows.
 //
@@ -60,6 +422,45 @@ type MeResponse struct {
 // GetMe returns MeResponse.Me, and is useful for accessing the field via an interface.
 func (v *MeResponse) GetMe() MeMeUser { return v.Me }
 
+// The possible states for a board or item.
+type State string
+
+const (
+	// Active only (Default).
+	StateActive State = "active"
+	// Active, Archived and Deleted.
+	StateAll State = "all"
+	// Archived only.
+	StateArchived State = "archived"
+	// Deleted only.
+	StateDeleted State = "deleted"
+)
+
+var AllState = []State{
+	StateActive,
+	StateAll,
+	StateArchived,
+	StateDeleted,
+}
+
+// The workspace kinds available.
+type WorkspaceKind string
+
+const (
+	// Closed workspace, available to enterprise only.
+	WorkspaceKindClosed WorkspaceKind = "closed"
+	// Open workspace.
+	WorkspaceKindOpen WorkspaceKind = "open"
+	// Template workspace.
+	WorkspaceKindTemplate WorkspaceKind = "template"
+)
+
+var AllWorkspaceKind = []WorkspaceKind{
+	WorkspaceKindClosed,
+	WorkspaceKindOpen,
+	WorkspaceKindTemplate,
+}
+
 // __BoardByIDInput is used internally by genqlient
 type __BoardByIDInput struct {
 	Ids []string `json:"ids"`
@@ -67,6 +468,30 @@ type __BoardByIDInput struct {
 
 // GetIds returns __BoardByIDInput.Ids, and is useful for accessing the field via an interface.
 func (v *__BoardByIDInput) GetIds() []string { return v.Ids }
+
+// __BoardGetInput is used internally by genqlient
+type __BoardGetInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __BoardGetInput.Id, and is useful for accessing the field via an interface.
+func (v *__BoardGetInput) GetId() string { return v.Id }
+
+// __BoardsListInput is used internally by genqlient
+type __BoardsListInput struct {
+	Limit        int      `json:"limit,omitempty"`
+	Page         int      `json:"page,omitempty"`
+	WorkspaceIds []string `json:"workspaceIds,omitempty"`
+}
+
+// GetLimit returns __BoardsListInput.Limit, and is useful for accessing the field via an interface.
+func (v *__BoardsListInput) GetLimit() int { return v.Limit }
+
+// GetPage returns __BoardsListInput.Page, and is useful for accessing the field via an interface.
+func (v *__BoardsListInput) GetPage() int { return v.Page }
+
+// GetWorkspaceIds returns __BoardsListInput.WorkspaceIds, and is useful for accessing the field via an interface.
+func (v *__BoardsListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
 
 // The query executed by BoardByID.
 const BoardByID_Operation = `
@@ -92,6 +517,119 @@ func BoardByID(
 	}
 
 	data_ = &BoardByIDResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by BoardGet.
+const BoardGet_Operation = `
+query BoardGet ($id: ID!) {
+	boards(ids: [$id]) {
+		id
+		name
+		state
+		board_kind
+		description
+		workspace_id
+		workspace {
+			id
+			name
+			kind
+		}
+		owners {
+			id
+			name
+		}
+		groups {
+			id
+			title
+			color
+			position
+		}
+		columns {
+			id
+			title
+			type
+			settings_str
+			width
+			archived
+		}
+	}
+}
+`
+
+// BoardGet fetches a single board by ID with full detail.
+func BoardGet(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *BoardGetResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGet",
+		Query:  BoardGet_Operation,
+		Variables: &__BoardGetInput{
+			Id: id,
+		},
+	}
+
+	data_ = &BoardGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by BoardsList.
+const BoardsList_Operation = `
+query BoardsList ($limit: Int, $page: Int, $workspaceIds: [ID]) {
+	boards(limit: $limit, page: $page, workspace_ids: $workspaceIds) {
+		id
+		name
+		state
+		board_kind
+		workspace_id
+	}
+}
+`
+
+// BoardsList fetches a page of boards.
+//
+// Pagination note: monday.com boards use page/limit (integer page numbers),
+// not cursor-based pagination. The CLI surface exposes --cursor as a string
+// for API uniformity; the cursor is encoded as the decimal page number. Page 1
+// is the first page. When results fill the limit there may be more pages; the
+// caller receives the next page number encoded as a string cursor. When fewer
+// results than limit are returned, the cursor is empty (no more pages).
+func BoardsList(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	limit int,
+	page int,
+	workspaceIds []string,
+) (data_ *BoardsListResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardsList",
+		Query:  BoardsList_Operation,
+		Variables: &__BoardsListInput{
+			Limit:        limit,
+			Page:         page,
+			WorkspaceIds: workspaceIds,
+		},
+	}
+
+	data_ = &BoardsListResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
