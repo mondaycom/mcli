@@ -15,14 +15,13 @@ import (
 )
 
 // newMeCmd returns the hidden 'mcli me' command used for smoke-testing the
-// GraphQL client end-to-end. It is not shown in help output.
+// GraphQL client end-to-end.
 func newMeCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "me",
-		Short:  "Print the authenticated user's id and name",
-		Hidden: true,
-		Args:   cobra.NoArgs,
-		RunE:   runMe,
+		Use:   "me",
+		Short: "Print the authenticated user's id and name",
+		Args:  cobra.NoArgs,
+		RunE:  runMe,
 	}
 	return cmd
 }
