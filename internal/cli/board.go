@@ -69,6 +69,7 @@ func newBoardCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newBoardListCmd())
 	cmd.AddCommand(newBoardGetCmd())
+	cmd.AddCommand(newBoardCreateCmd())
 	return cmd
 }
 
@@ -249,6 +250,106 @@ func newBoardGetCmd() *cobra.Command {
 			return runBoardGet(cmd, args[0])
 		},
 	}
+}
+
+// boardCreateOutput is the JSON shape for 'mcli board create'.
+// It mirrors the minimal slice returned by 'mcli board get'.
+type boardCreateOutput struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Kind        string `json:"kind"`
+	State       string `json:"state"`
+	WorkspaceID string `json:"workspace_id"`
+	Description string `json:"description"`
+}
+
+// validBoardKinds maps the lowercase CLI-accepted kind strings to their
+// gen.BoardKind constants. Only the three canonical values are accepted.
+var validBoardKinds = map[string]gen.BoardKind{
+	"public":  gen.BoardKindPublic,
+	"private": gen.BoardKindPrivate,
+	"share":   gen.BoardKindShare,
+}
+
+func newBoardCreateCmd() *cobra.Command {
+	var (
+		name        string
+		workspaceID string
+		kind        string
+		description string
+		empty       bool
+	)
+
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a new board",
+		Long:  "Create a new monday.com board with the given name and options.",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return runBoardCreate(cmd, name, workspaceID, kind, description, empty)
+		},
+	}
+
+	cmd.Flags().StringVar(&name, "name", "", "board name (required)")
+	cmd.Flags().StringVar(&workspaceID, "workspace", "", "workspace ID (optional)")
+	cmd.Flags().StringVar(&kind, "kind", "public", "board kind: public|private|share")
+	cmd.Flags().StringVar(&description, "description", "", "board description (optional)")
+	cmd.Flags().BoolVar(&empty, "empty", false, "create board without default items")
+	_ = cmd.MarkFlagRequired("name")
+
+	return cmd
+}
+
+func runBoardCreate(cmd *cobra.Command, name, workspaceID, kind, description string, empty bool) error {
+	if name == "" {
+		return errs.Usage("--name is required")
+	}
+
+	boardKind, ok := validBoardKinds[kind]
+	if !ok {
+		return errs.Usage("invalid --kind %q: must be one of public, private, share", kind)
+	}
+
+	gql, err := newBoardClient()
+	if err != nil {
+		return err
+	}
+
+	resp, err := gen.BoardCreate(context.Background(), gql, name, boardKind, workspaceID, description, empty)
+	if err != nil {
+		return err
+	}
+
+	b := resp.Create_board
+	if b.Id == "" {
+		return errs.API("create_board returned no board")
+	}
+
+	out := boardCreateOutput{
+		ID:          b.Id,
+		Name:        b.Name,
+		Kind:        string(b.Board_kind),
+		State:       string(b.State),
+		WorkspaceID: b.Workspace_id,
+		Description: b.Description,
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Created board %s: %s\n", out.ID, out.Name)
+	return err
 }
 
 func runBoardGet(cmd *cobra.Command, id string) error {

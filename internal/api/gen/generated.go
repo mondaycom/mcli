@@ -34,6 +34,52 @@ type BoardByIDResponse struct {
 // GetBoards returns BoardByIDResponse.Boards, and is useful for accessing the field via an interface.
 func (v *BoardByIDResponse) GetBoards() []BoardByIDBoardsBoard { return v.Boards }
 
+// BoardCreateCreate_boardBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardCreateCreate_boardBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+	// The board's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board's kind (public / private / share).
+	Board_kind BoardKind `json:"board_kind"`
+	// The board's workspace unique identifier (null for main workspace).
+	Workspace_id string `json:"workspace_id"`
+	// The board's description.
+	Description string `json:"description"`
+}
+
+// GetId returns BoardCreateCreate_boardBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetId() string { return v.Id }
+
+// GetName returns BoardCreateCreate_boardBoard.Name, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetName() string { return v.Name }
+
+// GetState returns BoardCreateCreate_boardBoard.State, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetState() State { return v.State }
+
+// GetBoard_kind returns BoardCreateCreate_boardBoard.Board_kind, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetBoard_kind() BoardKind { return v.Board_kind }
+
+// GetWorkspace_id returns BoardCreateCreate_boardBoard.Workspace_id, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetWorkspace_id() string { return v.Workspace_id }
+
+// GetDescription returns BoardCreateCreate_boardBoard.Description, and is useful for accessing the field via an interface.
+func (v *BoardCreateCreate_boardBoard) GetDescription() string { return v.Description }
+
+// BoardCreateResponse is returned by BoardCreate on success.
+type BoardCreateResponse struct {
+	// Create a new board.
+	Create_board BoardCreateCreate_boardBoard `json:"create_board"`
+}
+
+// GetCreate_board returns BoardCreateResponse.Create_board, and is useful for accessing the field via an interface.
+func (v *BoardCreateResponse) GetCreate_board() BoardCreateCreate_boardBoard { return v.Create_board }
+
 // BoardGetBoardsBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
 //
@@ -469,6 +515,30 @@ type __BoardByIDInput struct {
 // GetIds returns __BoardByIDInput.Ids, and is useful for accessing the field via an interface.
 func (v *__BoardByIDInput) GetIds() []string { return v.Ids }
 
+// __BoardCreateInput is used internally by genqlient
+type __BoardCreateInput struct {
+	Name        string    `json:"name"`
+	Kind        BoardKind `json:"kind"`
+	WorkspaceId string    `json:"workspaceId,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Empty       bool      `json:"empty,omitempty"`
+}
+
+// GetName returns __BoardCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__BoardCreateInput) GetName() string { return v.Name }
+
+// GetKind returns __BoardCreateInput.Kind, and is useful for accessing the field via an interface.
+func (v *__BoardCreateInput) GetKind() BoardKind { return v.Kind }
+
+// GetWorkspaceId returns __BoardCreateInput.WorkspaceId, and is useful for accessing the field via an interface.
+func (v *__BoardCreateInput) GetWorkspaceId() string { return v.WorkspaceId }
+
+// GetDescription returns __BoardCreateInput.Description, and is useful for accessing the field via an interface.
+func (v *__BoardCreateInput) GetDescription() string { return v.Description }
+
+// GetEmpty returns __BoardCreateInput.Empty, and is useful for accessing the field via an interface.
+func (v *__BoardCreateInput) GetEmpty() bool { return v.Empty }
+
 // __BoardGetInput is used internally by genqlient
 type __BoardGetInput struct {
 	Id string `json:"id"`
@@ -517,6 +587,54 @@ func BoardByID(
 	}
 
 	data_ = &BoardByIDResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardCreate.
+const BoardCreate_Operation = `
+mutation BoardCreate ($name: String!, $kind: BoardKind!, $workspaceId: ID, $description: String, $empty: Boolean) {
+	create_board(board_name: $name, board_kind: $kind, workspace_id: $workspaceId, description: $description, empty: $empty) {
+		id
+		name
+		state
+		board_kind
+		workspace_id
+		description
+	}
+}
+`
+
+// BoardCreate creates a new board.
+func BoardCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+	kind BoardKind,
+	workspaceId string,
+	description string,
+	empty bool,
+) (data_ *BoardCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardCreate",
+		Query:  BoardCreate_Operation,
+		Variables: &__BoardCreateInput{
+			Name:        name,
+			Kind:        kind,
+			WorkspaceId: workspaceId,
+			Description: description,
+			Empty:       empty,
+		},
+	}
+
+	data_ = &BoardCreateResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

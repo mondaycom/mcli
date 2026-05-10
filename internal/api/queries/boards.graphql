@@ -17,6 +17,27 @@ query BoardsList($limit: Int, $page: Int, $workspaceIds: [ID]) {
   }
 }
 
+# BoardCreate creates a new board.
+mutation BoardCreate(
+  $name: String!,
+  $kind: BoardKind!,
+  # @genqlient(omitempty: true)
+  $workspaceId: ID,
+  # @genqlient(omitempty: true)
+  $description: String,
+  # @genqlient(omitempty: true)
+  $empty: Boolean,
+) {
+  create_board(board_name: $name, board_kind: $kind, workspace_id: $workspaceId, description: $description, empty: $empty) {
+    id
+    name
+    state
+    board_kind
+    workspace_id
+    description
+  }
+}
+
 # BoardGet fetches a single board by ID with full detail.
 query BoardGet($id: ID!) {
   boards(ids: [$id]) {

@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
+
+	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
 )
 
 // installBoardFactory sets up boardClientFactory to use the given httptest
@@ -332,6 +334,217 @@ func TestBoardGet_WithWorkspaceAndOwners(t *testing.T) {
 	ws, _ := result["workspace"].(map[string]any)
 	if ws == nil || ws["kind"] != "closed" {
 		t.Errorf("expected workspace kind 'closed', got %v", ws)
+	}
+}
+
+// execBoardCreate runs 'board create' with the given flags and returns stdout, exit err.
+func execBoardCreate(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"create"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// newErrorTestServer creates an httptest.Server that always returns a 200
+// response with a GraphQL errors payload (no data field).
+func newErrorTestServer(t *testing.T, message string) *httptest.Server {
+	t.Helper()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Consume body so the client doesn't get a broken-pipe.
+		_, _ = io.ReadAll(r.Body)
+		w.Header().Set("Content-Type", "application/json")
+		payload := map[string]any{
+			"errors": []map[string]any{
+				{"message": message},
+			},
+		}
+		enc, _ := json.Marshal(payload)
+		_, _ = w.Write(enc)
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+// ---- BoardCreate tests ----
+
+func TestBoardCreate_Success(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardCreate" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		board := map[string]any{
+			"id":           "9832181507",
+			"name":         "Sprint Board",
+			"board_kind":   "public",
+			"state":        "active",
+			"workspace_id": "",
+			"description":  "",
+		}
+		return mustMarshal(map[string]any{"create_board": board})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardCreate(t, "--name", "Sprint Board", "--kind", "public")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9832181507" {
+		t.Errorf("expected id 9832181507, got %v", result["id"])
+	}
+	if result["name"] != "Sprint Board" {
+		t.Errorf("expected name 'Sprint Board', got %v", result["name"])
+	}
+
+	// Assert required vars are present.
+	if capturedVars["name"] != "Sprint Board" {
+		t.Errorf("expected variables.name='Sprint Board', got %v", capturedVars["name"])
+	}
+	if capturedVars["kind"] != "public" {
+		t.Errorf("expected variables.kind='public', got %v", capturedVars["kind"])
+	}
+
+	// Assert omitempty: optional unset keys must NOT be present in the request.
+	if _, present := capturedVars["workspaceId"]; present {
+		t.Errorf("expected workspaceId absent (omitempty), but it was present: %v", capturedVars["workspaceId"])
+	}
+	if _, present := capturedVars["description"]; present {
+		t.Errorf("expected description absent (omitempty), but it was present: %v", capturedVars["description"])
+	}
+	if _, present := capturedVars["empty"]; present {
+		t.Errorf("expected empty absent (omitempty), but it was present: %v", capturedVars["empty"])
+	}
+}
+
+func TestBoardCreate_MissingName_ExitCode1(t *testing.T) {
+	// No server needed — validation must fail before any network call.
+	called := false
+	srv := newTestServer(t, func(_ map[string]any) string {
+		called = true
+		return `{"create_board":null}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardCreate(t /* no --name flag */)
+	if err == nil {
+		t.Fatal("expected error for missing --name")
+	}
+	if called {
+		t.Error("server should not have been called")
+	}
+	// Cobra marks the flag required, so the error is a USAGE-class error.
+	// The cobra error message won't match the errsCode pattern, but exit is 1.
+	// Accept any non-nil error here as long as the server was not called.
+}
+
+func TestBoardCreate_InvalidKind_ExitCode1(t *testing.T) {
+	called := false
+	srv := newTestServer(t, func(_ map[string]any) string {
+		called = true
+		return `{"create_board":null}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardCreate(t, "--name", "X", "--kind", "bogus")
+	if err == nil {
+		t.Fatal("expected error for invalid --kind")
+	}
+	if called {
+		t.Error("server should not have been called")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE code, got %q", code)
+	}
+}
+
+func TestBoardCreate_WithWorkspaceAndDescription(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		board := map[string]any{
+			"id":           "1234567890",
+			"name":         "Team Board",
+			"board_kind":   "private",
+			"state":        "active",
+			"workspace_id": "77",
+			"description":  "Team planning board",
+		}
+		return mustMarshal(map[string]any{"create_board": board})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardCreate(t,
+		"--name", "Team Board",
+		"--kind", "private",
+		"--workspace", "77",
+		"--description", "Team planning board",
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["workspace_id"] != "77" {
+		t.Errorf("expected workspace_id '77', got %v", result["workspace_id"])
+	}
+	if result["description"] != "Team planning board" {
+		t.Errorf("expected description 'Team planning board', got %v", result["description"])
+	}
+
+	// Variables should contain workspaceId and description since they were set.
+	if capturedVars["workspaceId"] != "77" {
+		t.Errorf("expected variables.workspaceId='77', got %v", capturedVars["workspaceId"])
+	}
+	if capturedVars["description"] != "Team planning board" {
+		t.Errorf("expected variables.description='Team planning board', got %v", capturedVars["description"])
+	}
+}
+
+func TestBoardCreate_APIError_ExitCode2(t *testing.T) {
+	srv := newErrorTestServer(t, "board name already taken")
+
+	// Use a normalising client (apigraphql) so GraphQL errors are mapped to
+	// errs.API before returning to the command. The plain gqlclient.NewClient
+	// seam bypasses normalisation, which is fine for happy-path tests but
+	// wrong for testing the error-code contract.
+	orig := boardClientFactory
+	boardClientFactory = func() (gqlclient.Client, error) {
+		c := apigraphql.New("test-token", "test", apigraphql.WithEndpoint(srv.URL))
+		return c.GQL(), nil
+	}
+	t.Cleanup(func() { boardClientFactory = orig })
+
+	_, err := execBoardCreate(t, "--name", "Taken Board", "--kind", "public")
+	if err == nil {
+		t.Fatal("expected error from API")
+	}
+	code := errsCode(err)
+	if code != "API" {
+		t.Errorf("expected API code, got %q", code)
 	}
 }
 
