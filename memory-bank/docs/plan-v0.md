@@ -88,7 +88,7 @@ Driven by ADR-004 and axioms A11 (no plaintext secrets) and A12 (LLM-primary). P
 - AC-2.2: A forced GraphQL error maps to a structured `APIError` with a stable `Code`.
 - AC-2.3: `go generate` produces no diff in CI.
 
-## Phase 3 — Boards
+## Phase 3 — Boards ✅
 
 **Deliverables:**
 - `mcli board list [--workspace <id>] [--limit <n>] [--cursor <c>]`
@@ -193,3 +193,4 @@ Explicitly deferred, each a candidate for its own later plan:
 - 2026-05-09: Phase 1 review fixes — error output path now honors ADR-002 (JSON to stdout in non-TTY/--json, human to stderr in --pretty/TTY); cobra error/usage rendering silenced; new internal/cli/output.go with TTY detection. R3 (httpx body preservation) carried as Phase 2 prerequisite.
 - 2026-05-09: Phase 1.5 complete — secret storage retrofit. internal/secrets (keychain + age file). config no longer holds token; legacy plaintext migration in place. Deps: zalando/go-keyring (MIT), filippo.io/age (BSD-3). All AC met; tests + lint clean.
 - 2026-05-10: Phase 2 complete — schema introspection (4890 lines, 272 types), genqlient wired (Me + BoardByID bindings), typed graphql client wrapper with error normalisation (COMPLEXITY_BUDGET_EXHAUSTED → RateLimited; auth → Auth) and complexity-budget retry above httpx. Hidden→visible `mcli me` smoke command verified live against real API (AC-2.1). CI no-diff check on internal/api/gen/ (AC-2.3). R3 (httpx body preservation) fixed as prerequisite. Deps: Khan/genqlient (MIT). All AC met.
+- 2026-05-10: Phase 3 complete — mcli board {list,get,create}. Notable: monday's `boards` query without workspace_ids returns empty when the var is sent as null; required `# @genqlient(omitempty: true)` to drop it. Page+limit pagination encoded as decimal-string cursor for surface uniformity. Live smoke: 25-board listing, get of board 9832181507, create of board 18412490770. Examples committed under examples/.
