@@ -26,6 +26,11 @@ jobs:
       - name: Vet
         run: make vet
 
+      - name: Verify generated code is up to date
+        run: |
+          go generate ./...
+          git diff --exit-code internal/api/gen/
+
       - name: Lint
         uses: golangci/golangci-lint-action@v6
         with:
