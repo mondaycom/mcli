@@ -69,7 +69,7 @@ Driven by ADR-004 and axioms A11 (no plaintext secrets) and A12 (LLM-primary). P
 - `github.com/zalando/go-keyring` — MIT.
 - `filippo.io/age` — BSD-3-Clause.
 
-## Phase 2 — GraphQL client + schema
+## Phase 2 — GraphQL client + schema ✅
 
 **Deliverables:**
 - `schema/monday.graphql` — Monday GraphQL schema committed.
@@ -192,3 +192,4 @@ Explicitly deferred, each a candidate for its own later plan:
 - 2026-05-09: Phase 1 complete — scaffold + auth + config. Deps: cobra, yaml.v3. All AC met; go test -race green, golangci-lint clean.
 - 2026-05-09: Phase 1 review fixes — error output path now honors ADR-002 (JSON to stdout in non-TTY/--json, human to stderr in --pretty/TTY); cobra error/usage rendering silenced; new internal/cli/output.go with TTY detection. R3 (httpx body preservation) carried as Phase 2 prerequisite.
 - 2026-05-09: Phase 1.5 complete — secret storage retrofit. internal/secrets (keychain + age file). config no longer holds token; legacy plaintext migration in place. Deps: zalando/go-keyring (MIT), filippo.io/age (BSD-3). All AC met; tests + lint clean.
+- 2026-05-10: Phase 2 complete — schema introspection (4890 lines, 272 types), genqlient wired (Me + BoardByID bindings), typed graphql client wrapper with error normalisation (COMPLEXITY_BUDGET_EXHAUSTED → RateLimited; auth → Auth) and complexity-budget retry above httpx. Hidden→visible `mcli me` smoke command verified live against real API (AC-2.1). CI no-diff check on internal/api/gen/ (AC-2.3). R3 (httpx body preservation) fixed as prerequisite. Deps: Khan/genqlient (MIT). All AC met.
