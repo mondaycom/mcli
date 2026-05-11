@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -70,7 +71,311 @@ func newItemCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newItemListCmd())
 	cmd.AddCommand(newItemGetCmd())
+	cmd.AddCommand(newItemCreateCmd())
+	cmd.AddCommand(newItemUpdateCmd())
 	return cmd
+}
+
+// parseColFlags parses --col flags into a json.RawMessage map, last-wins on duplicates.
+// Each element must be of the form "<id>=<json>". Split is on the FIRST '=' only.
+// Returns errs.Usage on malformed JSON, missing '=', or empty col id.
+func parseColFlags(raw []string) (map[string]json.RawMessage, error) {
+	result := make(map[string]json.RawMessage, len(raw))
+	for _, flag := range raw {
+		colID, colJSON, ok := strings.Cut(flag, "=")
+		if !ok {
+			return nil, errs.Usage("--col %q: must be in <id>=<json> form", flag)
+		}
+		if colID == "" {
+			return nil, errs.Usage("--col flag has empty column id in %q", flag)
+		}
+		if !json.Valid([]byte(colJSON)) {
+			return nil, errs.Usage("--col %s: value is not valid JSON: %s", colID, colJSON)
+		}
+		// Last-wins on duplicate ids.
+		result[colID] = json.RawMessage(colJSON)
+	}
+	return result, nil
+}
+
+// buildColumnValues marshals a column map into the monday wire shape:
+// a JSON-stringified object, e.g. `{"status":{"label":"Done"}}`.
+// Returns an empty string when the map is empty.
+func buildColumnValues(cols map[string]json.RawMessage) (string, error) {
+	if len(cols) == 0 {
+		return "", nil
+	}
+	b, err := json.Marshal(cols)
+	if err != nil {
+		return "", fmt.Errorf("marshal column_values: %w", err)
+	}
+	return string(b), nil
+}
+
+// --- output types for create / update ---
+
+// itemWriteBoard is the board sub-object in create/update output.
+type itemWriteBoard struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// itemWriteGroup is the group sub-object in create/update output.
+type itemWriteGroup struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+}
+
+// itemWriteParent is the parent_item sub-object in subitem create output.
+type itemWriteParent struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// itemWriteOutput is the JSON shape for create and update responses.
+type itemWriteOutput struct {
+	ID         string           `json:"id"`
+	Name       string           `json:"name"`
+	State      string           `json:"state"`
+	Board      *itemWriteBoard  `json:"board,omitempty"`
+	Group      *itemWriteGroup  `json:"group,omitempty"`
+	ParentItem *itemWriteParent `json:"parent_item,omitempty"`
+}
+
+// --- item create ---
+
+func newItemCreateCmd() *cobra.Command {
+	var (
+		boardID  string
+		parentID string
+		name     string
+		groupID  string
+		colFlags []string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create an item (or subitem with --parent)",
+		Long: `Create a monday.com item on a board, or a subitem under a parent item.
+
+Exactly one of --board or --parent must be provided.
+Use --col <id>=<json> to set column values; the JSON must match monday's
+column-value wire shape for the column type. Repeated --col flags are
+order-preserving; if the same column id appears twice, the last value wins.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return runItemCreate(cmd, boardID, parentID, name, groupID, colFlags)
+		},
+	}
+
+	cmd.Flags().StringVar(&boardID, "board", "", "board ID (required unless --parent is given)")
+	cmd.Flags().StringVar(&parentID, "parent", "", "parent item ID; creates a subitem when set")
+	cmd.Flags().StringVar(&name, "name", "", "item name (required)")
+	cmd.Flags().StringVar(&groupID, "group", "", "group ID (optional; ignored when --parent is given)")
+	cmd.Flags().StringArrayVar(&colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+
+	cmd.MarkFlagsMutuallyExclusive("board", "parent")
+	_ = cmd.MarkFlagRequired("name")
+
+	return cmd
+}
+
+func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, colFlags []string) error {
+	if boardID == "" && parentID == "" {
+		return errs.Usage("one of --board or --parent is required")
+	}
+
+	if boardID != "" {
+		if _, err := strconv.ParseUint(boardID, 10, 64); err != nil {
+			return errs.Usage("board id must be a numeric string, got %q", boardID)
+		}
+	}
+	if parentID != "" {
+		if _, err := strconv.ParseUint(parentID, 10, 64); err != nil {
+			return errs.Usage("parent id must be a numeric string, got %q", parentID)
+		}
+	}
+
+	cols, err := parseColFlags(colFlags)
+	if err != nil {
+		return err
+	}
+	colValuesStr, err := buildColumnValues(cols)
+	if err != nil {
+		return err
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	var out itemWriteOutput
+
+	if parentID != "" {
+		resp, apiErr := gen.SubitemCreate(context.Background(), gql, parentID, name, colValuesStr)
+		if apiErr != nil {
+			return apiErr
+		}
+		it := resp.Create_subitem
+		out = itemWriteOutput{
+			ID:    it.Id,
+			Name:  it.Name,
+			State: string(it.State),
+		}
+		if it.Board.Id != "" {
+			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+		}
+		if it.Parent_item.Id != "" {
+			out.ParentItem = &itemWriteParent{ID: it.Parent_item.Id, Name: it.Parent_item.Name}
+		}
+	} else {
+		resp, apiErr := gen.ItemCreate(context.Background(), gql, boardID, name, groupID, colValuesStr)
+		if apiErr != nil {
+			return apiErr
+		}
+		it := resp.Create_item
+		out = itemWriteOutput{
+			ID:    it.Id,
+			Name:  it.Name,
+			State: string(it.State),
+		}
+		if it.Board.Id != "" {
+			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+		}
+		if it.Group.Id != "" {
+			out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+		}
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	kind := "item"
+	if parentID != "" {
+		kind = "subitem"
+	}
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Created %s %s: %s\n", kind, out.ID, out.Name)
+	return err
+}
+
+// --- item update ---
+
+func newItemUpdateCmd() *cobra.Command {
+	var (
+		boardID  string
+		name     string
+		colFlags []string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "update <id>",
+		Short: "Update column values on an item",
+		Long: `Update one or more column values on a monday.com item.
+
+Provide --name to rename the item. Use --col <id>=<json> to update columns;
+the JSON must match monday's column-value wire shape. At least one of --name
+or --col must be given.`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemUpdate(cmd, args[0], boardID, name, colFlags)
+		},
+	}
+
+	cmd.Flags().StringVar(&boardID, "board", "", "board ID (required)")
+	cmd.Flags().StringVar(&name, "name", "", "new item name (optional)")
+	cmd.Flags().StringArrayVar(&colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+	_ = cmd.MarkFlagRequired("board")
+
+	return cmd
+}
+
+func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []string) error {
+	if _, err := strconv.ParseUint(itemID, 10, 64); err != nil {
+		return errs.Usage("item id must be a numeric string, got %q", itemID)
+	}
+	if _, err := strconv.ParseUint(boardID, 10, 64); err != nil {
+		return errs.Usage("board id must be a numeric string, got %q", boardID)
+	}
+
+	if name == "" && len(colFlags) == 0 {
+		return errs.Usage("nothing to update: provide --name and/or at least one --col")
+	}
+
+	cols, err := parseColFlags(colFlags)
+	if err != nil {
+		return err
+	}
+
+	// If --name is provided, inject the name column. Monday expects a bare
+	// JSON string for the "name" column in change_multiple_column_values.
+	if name != "" {
+		nameVal, _ := json.Marshal(name)
+		cols["name"] = json.RawMessage(nameVal)
+	}
+
+	colValuesStr, err := buildColumnValues(cols)
+	if err != nil {
+		return err
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	resp, apiErr := gen.ItemUpdate(context.Background(), gql, boardID, itemID, colValuesStr)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	it := resp.Change_multiple_column_values
+	out := itemWriteOutput{
+		ID:    it.Id,
+		Name:  it.Name,
+		State: string(it.State),
+	}
+	if it.Board.Id != "" {
+		out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+	}
+	if it.Group.Id != "" {
+		out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	o := cmd.OutOrStdout()
+	_, err = fmt.Fprintf(o, "Updated item %s\n", out.ID)
+	if name != "" {
+		_, _ = fmt.Fprintf(o, "  name → %s\n", name)
+	}
+	for _, f := range colFlags {
+		_, _ = fmt.Fprintf(o, "  col  → %s\n", f)
+	}
+	return err
 }
 
 // --- output types ---

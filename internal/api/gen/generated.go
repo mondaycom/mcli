@@ -444,6 +444,81 @@ var AllColumnType = []ColumnType{
 	ColumnTypeSubtasks,
 }
 
+// ItemCreateCreate_itemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemCreateCreate_itemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The group that contains this item.
+	Group ItemCreateCreate_itemItemGroup `json:"group"`
+	// The board that contains this item.
+	Board ItemCreateCreate_itemItemBoard `json:"board"`
+}
+
+// GetId returns ItemCreateCreate_itemItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItem) GetId() string { return v.Id }
+
+// GetName returns ItemCreateCreate_itemItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItem) GetName() string { return v.Name }
+
+// GetState returns ItemCreateCreate_itemItem.State, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItem) GetState() State { return v.State }
+
+// GetGroup returns ItemCreateCreate_itemItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItem) GetGroup() ItemCreateCreate_itemItemGroup { return v.Group }
+
+// GetBoard returns ItemCreateCreate_itemItem.Board, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItem) GetBoard() ItemCreateCreate_itemItemBoard { return v.Board }
+
+// ItemCreateCreate_itemItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemCreateCreate_itemItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemCreateCreate_itemItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItemBoard) GetId() string { return v.Id }
+
+// GetName returns ItemCreateCreate_itemItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItemBoard) GetName() string { return v.Name }
+
+// ItemCreateCreate_itemItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemCreateCreate_itemItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemCreateCreate_itemItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItemGroup) GetId() string { return v.Id }
+
+// GetTitle returns ItemCreateCreate_itemItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemCreateCreate_itemItemGroup) GetTitle() string { return v.Title }
+
+// ItemCreateResponse is returned by ItemCreate on success.
+type ItemCreateResponse struct {
+	// Create a new item.
+	Create_item ItemCreateCreate_itemItem `json:"create_item"`
+}
+
+// GetCreate_item returns ItemCreateResponse.Create_item, and is useful for accessing the field via an interface.
+func (v *ItemCreateResponse) GetCreate_item() ItemCreateCreate_itemItem { return v.Create_item }
+
 // ItemGetItemsItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
 //
@@ -2814,6 +2889,87 @@ type ItemGetResponse struct {
 
 // GetItems returns ItemGetResponse.Items, and is useful for accessing the field via an interface.
 func (v *ItemGetResponse) GetItems() []ItemGetItemsItem { return v.Items }
+
+// ItemUpdateChange_multiple_column_valuesItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemUpdateChange_multiple_column_valuesItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board that contains this item.
+	Board ItemUpdateChange_multiple_column_valuesItemBoard `json:"board"`
+	// The group that contains this item.
+	Group ItemUpdateChange_multiple_column_valuesItemGroup `json:"group"`
+}
+
+// GetId returns ItemUpdateChange_multiple_column_valuesItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItem) GetId() string { return v.Id }
+
+// GetName returns ItemUpdateChange_multiple_column_valuesItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItem) GetName() string { return v.Name }
+
+// GetState returns ItemUpdateChange_multiple_column_valuesItem.State, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItem) GetState() State { return v.State }
+
+// GetBoard returns ItemUpdateChange_multiple_column_valuesItem.Board, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItem) GetBoard() ItemUpdateChange_multiple_column_valuesItemBoard {
+	return v.Board
+}
+
+// GetGroup returns ItemUpdateChange_multiple_column_valuesItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItem) GetGroup() ItemUpdateChange_multiple_column_valuesItemGroup {
+	return v.Group
+}
+
+// ItemUpdateChange_multiple_column_valuesItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemUpdateChange_multiple_column_valuesItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemUpdateChange_multiple_column_valuesItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItemBoard) GetId() string { return v.Id }
+
+// GetName returns ItemUpdateChange_multiple_column_valuesItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItemBoard) GetName() string { return v.Name }
+
+// ItemUpdateChange_multiple_column_valuesItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemUpdateChange_multiple_column_valuesItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemUpdateChange_multiple_column_valuesItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItemGroup) GetId() string { return v.Id }
+
+// GetTitle returns ItemUpdateChange_multiple_column_valuesItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemUpdateChange_multiple_column_valuesItemGroup) GetTitle() string { return v.Title }
+
+// ItemUpdateResponse is returned by ItemUpdate on success.
+type ItemUpdateResponse struct {
+	// Changes the column values of a specific item.
+	Change_multiple_column_values ItemUpdateChange_multiple_column_valuesItem `json:"change_multiple_column_values"`
+}
+
+// GetChange_multiple_column_values returns ItemUpdateResponse.Change_multiple_column_values, and is useful for accessing the field via an interface.
+func (v *ItemUpdateResponse) GetChange_multiple_column_values() ItemUpdateChange_multiple_column_valuesItem {
+	return v.Change_multiple_column_values
+}
 
 // ItemsListByBoardBoardsBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
@@ -8295,6 +8451,87 @@ var AllState = []State{
 	StateDeleted,
 }
 
+// SubitemCreateCreate_subitemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type SubitemCreateCreate_subitemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The parent item of a subitem.
+	Parent_item SubitemCreateCreate_subitemItemParent_itemItem `json:"parent_item"`
+	// The board that contains this item.
+	Board SubitemCreateCreate_subitemItemBoard `json:"board"`
+}
+
+// GetId returns SubitemCreateCreate_subitemItem.Id, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItem) GetId() string { return v.Id }
+
+// GetName returns SubitemCreateCreate_subitemItem.Name, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItem) GetName() string { return v.Name }
+
+// GetState returns SubitemCreateCreate_subitemItem.State, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItem) GetState() State { return v.State }
+
+// GetParent_item returns SubitemCreateCreate_subitemItem.Parent_item, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItem) GetParent_item() SubitemCreateCreate_subitemItemParent_itemItem {
+	return v.Parent_item
+}
+
+// GetBoard returns SubitemCreateCreate_subitemItem.Board, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItem) GetBoard() SubitemCreateCreate_subitemItemBoard {
+	return v.Board
+}
+
+// SubitemCreateCreate_subitemItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type SubitemCreateCreate_subitemItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns SubitemCreateCreate_subitemItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItemBoard) GetId() string { return v.Id }
+
+// GetName returns SubitemCreateCreate_subitemItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItemBoard) GetName() string { return v.Name }
+
+// SubitemCreateCreate_subitemItemParent_itemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type SubitemCreateCreate_subitemItemParent_itemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+}
+
+// GetId returns SubitemCreateCreate_subitemItemParent_itemItem.Id, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItemParent_itemItem) GetId() string { return v.Id }
+
+// GetName returns SubitemCreateCreate_subitemItemParent_itemItem.Name, and is useful for accessing the field via an interface.
+func (v *SubitemCreateCreate_subitemItemParent_itemItem) GetName() string { return v.Name }
+
+// SubitemCreateResponse is returned by SubitemCreate on success.
+type SubitemCreateResponse struct {
+	// Create subitem.
+	Create_subitem SubitemCreateCreate_subitemItem `json:"create_subitem"`
+}
+
+// GetCreate_subitem returns SubitemCreateResponse.Create_subitem, and is useful for accessing the field via an interface.
+func (v *SubitemCreateResponse) GetCreate_subitem() SubitemCreateCreate_subitemItem {
+	return v.Create_subitem
+}
+
 // The workspace kinds available.
 type WorkspaceKind string
 
@@ -8369,6 +8606,26 @@ func (v *__BoardsListInput) GetPage() int { return v.Page }
 // GetWorkspaceIds returns __BoardsListInput.WorkspaceIds, and is useful for accessing the field via an interface.
 func (v *__BoardsListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
 
+// __ItemCreateInput is used internally by genqlient
+type __ItemCreateInput struct {
+	BoardId      string `json:"boardId"`
+	Name         string `json:"name"`
+	GroupId      string `json:"groupId,omitempty"`
+	ColumnValues string `json:"columnValues,omitempty"`
+}
+
+// GetBoardId returns __ItemCreateInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemCreateInput) GetBoardId() string { return v.BoardId }
+
+// GetName returns __ItemCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__ItemCreateInput) GetName() string { return v.Name }
+
+// GetGroupId returns __ItemCreateInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__ItemCreateInput) GetGroupId() string { return v.GroupId }
+
+// GetColumnValues returns __ItemCreateInput.ColumnValues, and is useful for accessing the field via an interface.
+func (v *__ItemCreateInput) GetColumnValues() string { return v.ColumnValues }
+
 // __ItemGetInput is used internally by genqlient
 type __ItemGetInput struct {
 	Id string `json:"id"`
@@ -8376,6 +8633,22 @@ type __ItemGetInput struct {
 
 // GetId returns __ItemGetInput.Id, and is useful for accessing the field via an interface.
 func (v *__ItemGetInput) GetId() string { return v.Id }
+
+// __ItemUpdateInput is used internally by genqlient
+type __ItemUpdateInput struct {
+	BoardId      string `json:"boardId"`
+	ItemId       string `json:"itemId"`
+	ColumnValues string `json:"columnValues"`
+}
+
+// GetBoardId returns __ItemUpdateInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemUpdateInput) GetBoardId() string { return v.BoardId }
+
+// GetItemId returns __ItemUpdateInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemUpdateInput) GetItemId() string { return v.ItemId }
+
+// GetColumnValues returns __ItemUpdateInput.ColumnValues, and is useful for accessing the field via an interface.
+func (v *__ItemUpdateInput) GetColumnValues() string { return v.ColumnValues }
 
 // __ItemsListByBoardInput is used internally by genqlient
 type __ItemsListByBoardInput struct {
@@ -8412,6 +8685,22 @@ func (v *__ItemsListByGroupInput) GetLimit() int { return v.Limit }
 
 // GetCursor returns __ItemsListByGroupInput.Cursor, and is useful for accessing the field via an interface.
 func (v *__ItemsListByGroupInput) GetCursor() string { return v.Cursor }
+
+// __SubitemCreateInput is used internally by genqlient
+type __SubitemCreateInput struct {
+	ParentId     string `json:"parentId"`
+	Name         string `json:"name"`
+	ColumnValues string `json:"columnValues,omitempty"`
+}
+
+// GetParentId returns __SubitemCreateInput.ParentId, and is useful for accessing the field via an interface.
+func (v *__SubitemCreateInput) GetParentId() string { return v.ParentId }
+
+// GetName returns __SubitemCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__SubitemCreateInput) GetName() string { return v.Name }
+
+// GetColumnValues returns __SubitemCreateInput.ColumnValues, and is useful for accessing the field via an interface.
+func (v *__SubitemCreateInput) GetColumnValues() string { return v.ColumnValues }
 
 // The query executed by BoardByID.
 const BoardByID_Operation = `
@@ -8609,6 +8898,57 @@ func BoardsList(
 	return data_, err_
 }
 
+// The mutation executed by ItemCreate.
+const ItemCreate_Operation = `
+mutation ItemCreate ($boardId: ID!, $name: String!, $groupId: String, $columnValues: JSON) {
+	create_item(board_id: $boardId, item_name: $name, group_id: $groupId, column_values: $columnValues) {
+		id
+		name
+		state
+		group {
+			id
+			title
+		}
+		board {
+			id
+			name
+		}
+	}
+}
+`
+
+// ItemCreate creates a top-level item on a board.
+func ItemCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	name string,
+	groupId string,
+	columnValues string,
+) (data_ *ItemCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemCreate",
+		Query:  ItemCreate_Operation,
+		Variables: &__ItemCreateInput{
+			BoardId:      boardId,
+			Name:         name,
+			GroupId:      groupId,
+			ColumnValues: columnValues,
+		},
+	}
+
+	data_ = &ItemCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by ItemGet.
 const ItemGet_Operation = `
 query ItemGet ($id: ID!) {
@@ -8670,6 +9010,56 @@ func ItemGet(
 	}
 
 	data_ = &ItemGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ItemUpdate.
+const ItemUpdate_Operation = `
+mutation ItemUpdate ($boardId: ID!, $itemId: ID!, $columnValues: JSON!) {
+	change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $columnValues) {
+		id
+		name
+		state
+		board {
+			id
+			name
+		}
+		group {
+			id
+			title
+		}
+	}
+}
+`
+
+// ItemUpdate changes one or more column values on an item.
+// Use the column id "name" with value {"name":"..."} to rename.
+func ItemUpdate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	itemId string,
+	columnValues string,
+) (data_ *ItemUpdateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemUpdate",
+		Query:  ItemUpdate_Operation,
+		Variables: &__ItemUpdateInput{
+			BoardId:      boardId,
+			ItemId:       itemId,
+			ColumnValues: columnValues,
+		},
+	}
+
+	data_ = &ItemUpdateResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8832,6 +9222,55 @@ func Me(
 	}
 
 	data_ = &MeResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by SubitemCreate.
+const SubitemCreate_Operation = `
+mutation SubitemCreate ($parentId: ID!, $name: String!, $columnValues: JSON) {
+	create_subitem(parent_item_id: $parentId, item_name: $name, column_values: $columnValues) {
+		id
+		name
+		state
+		parent_item {
+			id
+			name
+		}
+		board {
+			id
+			name
+		}
+	}
+}
+`
+
+// SubitemCreate creates a subitem under a parent item.
+func SubitemCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	parentId string,
+	name string,
+	columnValues string,
+) (data_ *SubitemCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "SubitemCreate",
+		Query:  SubitemCreate_Operation,
+		Variables: &__SubitemCreateInput{
+			ParentId:     parentId,
+			Name:         name,
+			ColumnValues: columnValues,
+		},
+	}
+
+	data_ = &SubitemCreateResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

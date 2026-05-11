@@ -80,3 +80,66 @@ query ItemGet($id: ID!) {
     }
   }
 }
+
+# ItemCreate creates a top-level item on a board.
+mutation ItemCreate(
+  $boardId: ID!,
+  $name: String!,
+  # @genqlient(omitempty: true)
+  $groupId: String,
+  # @genqlient(omitempty: true)
+  $columnValues: JSON,
+) {
+  create_item(
+    board_id: $boardId,
+    item_name: $name,
+    group_id: $groupId,
+    column_values: $columnValues,
+  ) {
+    id
+    name
+    state
+    group { id title }
+    board { id name }
+  }
+}
+
+# SubitemCreate creates a subitem under a parent item.
+mutation SubitemCreate(
+  $parentId: ID!,
+  $name: String!,
+  # @genqlient(omitempty: true)
+  $columnValues: JSON,
+) {
+  create_subitem(
+    parent_item_id: $parentId,
+    item_name: $name,
+    column_values: $columnValues,
+  ) {
+    id
+    name
+    state
+    parent_item { id name }
+    board { id name }
+  }
+}
+
+# ItemUpdate changes one or more column values on an item.
+# Use the column id "name" with value {"name":"..."} to rename.
+mutation ItemUpdate(
+  $boardId: ID!,
+  $itemId: ID!,
+  $columnValues: JSON!,
+) {
+  change_multiple_column_values(
+    board_id: $boardId,
+    item_id: $itemId,
+    column_values: $columnValues,
+  ) {
+    id
+    name
+    state
+    board { id name }
+    group { id title }
+  }
+}

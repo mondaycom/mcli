@@ -1,0 +1,13 @@
+{
+  "id": "7890123456",
+  "name": "Implement OAuth flow",
+  "state": "active",
+  "board": {
+    "id": "9832181507",
+    "name": "Dev Board"
+  },
+  "group": {
+    "id": "topics",
+    "title": "Sprint 2"
+  }
+}

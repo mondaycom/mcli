@@ -6,11 +6,42 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
 )
+
+// execItemCreate runs 'item create' with the given args and returns stdout, exit err.
+func execItemCreate(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"create"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// execItemUpdate runs 'item update <id>' with the given args and returns stdout, exit err.
+func execItemUpdate(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"update"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
 
 // installItemFactory sets up itemClientFactory to use the given httptest
 // server URL for the duration of the test, then restores the original value.
@@ -464,5 +495,427 @@ func TestItemGet_Subitems(t *testing.T) {
 		if sm["state"] != exp {
 			t.Errorf("subitems[%d] state: expected %q, got %q", i, exp, sm["state"])
 		}
+	}
+}
+
+// ---- parseColFlags unit tests ----
+
+func TestParseColFlags_Single(t *testing.T) {
+	m, err := parseColFlags([]string{`status={"label":"Done"}`})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(m) != 1 {
+		t.Fatalf("expected 1 entry, got %d", len(m))
+	}
+	if string(m["status"]) != `{"label":"Done"}` {
+		t.Errorf("unexpected value: %s", m["status"])
+	}
+}
+
+func TestParseColFlags_Multi(t *testing.T) {
+	m, err := parseColFlags([]string{`status={"label":"Done"}`, `due={"date":"2026-05-10"}`})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(m) != 2 {
+		t.Fatalf("expected 2 entries, got %d", len(m))
+	}
+}
+
+func TestParseColFlags_DuplicateLastWins(t *testing.T) {
+	m, err := parseColFlags([]string{`status={"label":"Done"}`, `status={"label":"In Progress"}`})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if string(m["status"]) != `{"label":"In Progress"}` {
+		t.Errorf("expected last value to win, got: %s", m["status"])
+	}
+}
+
+func TestParseColFlags_MalformedJSON(t *testing.T) {
+	_, err := parseColFlags([]string{`status=not-json`})
+	if err == nil {
+		t.Fatal("expected error for malformed JSON")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestParseColFlags_MissingEquals(t *testing.T) {
+	_, err := parseColFlags([]string{`statusonly`})
+	if err == nil {
+		t.Fatal("expected error for missing =")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestParseColFlags_EmptyColID(t *testing.T) {
+	_, err := parseColFlags([]string{`={"label":"Done"}`})
+	if err == nil {
+		t.Fatal("expected error for empty col id")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+// ---- item create tests ----
+
+// sampleItemCreateResponse builds the GraphQL response for ItemCreate.
+func sampleItemCreateResponse(id, name string) map[string]any {
+	return map[string]any{
+		"create_item": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "active",
+			"group": map[string]any{"id": "topics", "title": "Sprint 1"},
+			"board": map[string]any{"id": "9832181507", "name": "Dev Board"},
+		},
+	}
+}
+
+// sampleSubitemCreateResponse builds the GraphQL response for SubitemCreate.
+func sampleSubitemCreateResponse(id, name, parentID string) map[string]any {
+	return map[string]any{
+		"create_subitem": map[string]any{
+			"id":          id,
+			"name":        name,
+			"state":       "active",
+			"parent_item": map[string]any{"id": parentID, "name": "Parent item"},
+			"board":       map[string]any{"id": "9832181507", "name": "Dev Board"},
+		},
+	}
+}
+
+func TestItemCreate_HappyPathBoard(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemCreate" {
+			t.Errorf("expected ItemCreate op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemCreateResponse("111222333", "My Task"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemCreate(t, "--board", "9832181507", "--name", "My Task",
+		"--col", `status={"label":"Done"}`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Verify request shape.
+	if capturedVars["boardId"] != "9832181507" {
+		t.Errorf("expected boardId='9832181507', got %v", capturedVars["boardId"])
+	}
+	if capturedVars["name"] != "My Task" {
+		t.Errorf("expected name='My Task', got %v", capturedVars["name"])
+	}
+	// columnValues should be a stringified JSON object.
+	colVals, _ := capturedVars["columnValues"].(string)
+	if colVals == "" {
+		t.Error("expected columnValues to be non-empty string")
+	}
+	var colMap map[string]any
+	if err := json.Unmarshal([]byte(colVals), &colMap); err != nil {
+		t.Errorf("columnValues is not valid JSON object: %v", err)
+	}
+	if _, ok := colMap["status"]; !ok {
+		t.Error("expected 'status' key in columnValues")
+	}
+
+	// Verify output.
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "111222333" {
+		t.Errorf("expected id='111222333', got %v", result["id"])
+	}
+	if result["state"] != "active" {
+		t.Errorf("expected state='active', got %v", result["state"])
+	}
+}
+
+func TestItemCreate_WithMultipleColFlags(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemCreateResponse("111222333", "Foo"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemCreate(t, "--board", "9832181507", "--name", "Foo",
+		"--col", `status={"label":"Done"}`,
+		"--col", `due={"date":"2026-05-10"}`,
+		"--col", `points=5`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	colVals, _ := capturedVars["columnValues"].(string)
+	var colMap map[string]any
+	if err := json.Unmarshal([]byte(colVals), &colMap); err != nil {
+		t.Fatalf("columnValues is not valid JSON: %v", err)
+	}
+	if len(colMap) != 3 {
+		t.Errorf("expected 3 columns, got %d", len(colMap))
+	}
+}
+
+func TestItemCreate_WithParent(t *testing.T) {
+	var capturedOp string
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		capturedOp, _ = body["operationName"].(string)
+		return mustMarshal(sampleSubitemCreateResponse("999888777", "Sub Task", "1234567890"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemCreate(t, "--parent", "1234567890", "--name", "Sub Task")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if capturedOp != "SubitemCreate" {
+		t.Errorf("expected SubitemCreate operation, got %q", capturedOp)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	parent, _ := result["parent_item"].(map[string]any)
+	if parent == nil {
+		t.Fatal("expected parent_item in subitem output")
+	}
+	if parent["id"] != "1234567890" {
+		t.Errorf("expected parent_item.id='1234567890', got %v", parent["id"])
+	}
+	// group should be omitted for subitems.
+	if _, ok := result["group"]; ok {
+		t.Error("expected no group field in subitem output")
+	}
+}
+
+func TestItemCreate_BothBoardAndParent(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemCreateResponse("1", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemCreate(t, "--board", "9832181507", "--parent", "1234567890", "--name", "x")
+	if err == nil {
+		t.Fatal("expected error when both --board and --parent are given")
+	}
+	// cobra enforces mutual exclusivity; error need not be USAGE-coded but must be non-nil.
+}
+
+func TestItemCreate_NeitherBoardNorParent(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemCreateResponse("1", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemCreate(t, "--name", "x")
+	if err == nil {
+		t.Fatal("expected error when neither --board nor --parent is given")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemCreate_APIError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"errors":[{"message":"access denied","extensions":{"code":"Unauthorized"}}]}`)
+	}))
+	t.Cleanup(srv.Close)
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemCreate(t, "--board", "9832181507", "--name", "Fail")
+	if err == nil {
+		t.Fatal("expected error from API error response")
+	}
+}
+
+// ---- item update tests ----
+
+// sampleItemUpdateResponse builds the GraphQL response for ItemUpdate.
+func sampleItemUpdateResponse(id, name string) map[string]any {
+	return map[string]any{
+		"change_multiple_column_values": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "active",
+			"board": map[string]any{"id": "9832181507", "name": "Dev Board"},
+			"group": map[string]any{"id": "topics", "title": "Sprint 1"},
+		},
+	}
+}
+
+func TestItemUpdate_HappyPathNameAndCol(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemUpdate" {
+			t.Errorf("expected ItemUpdate op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemUpdateResponse("1234567890", "Renamed Task"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemUpdate(t, "1234567890", "--board", "9832181507",
+		"--name", "Renamed Task",
+		"--col", `status={"label":"Done"}`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Verify columnValues includes both name and status.
+	colVals, _ := capturedVars["columnValues"].(string)
+	var colMap map[string]any
+	if err := json.Unmarshal([]byte(colVals), &colMap); err != nil {
+		t.Fatalf("columnValues is not valid JSON: %v", err)
+	}
+	if _, ok := colMap["name"]; !ok {
+		t.Error("expected 'name' key in columnValues for --name flag")
+	}
+	if _, ok := colMap["status"]; !ok {
+		t.Error("expected 'status' key in columnValues")
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "1234567890" {
+		t.Errorf("expected id='1234567890', got %v", result["id"])
+	}
+}
+
+func TestItemUpdate_NameOnly(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemUpdateResponse("1234567890", "New Name"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemUpdate(t, "1234567890", "--board", "9832181507", "--name", "New Name")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	colVals, _ := capturedVars["columnValues"].(string)
+	var colMap map[string]any
+	if err := json.Unmarshal([]byte(colVals), &colMap); err != nil {
+		t.Fatalf("columnValues is not valid JSON: %v", err)
+	}
+	if len(colMap) != 1 {
+		t.Errorf("expected exactly 1 col (name), got %d", len(colMap))
+	}
+	if _, ok := colMap["name"]; !ok {
+		t.Error("expected 'name' key in columnValues")
+	}
+}
+
+func TestItemUpdate_ColOnly(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemUpdateResponse("1234567890", "Unchanged"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemUpdate(t, "1234567890", "--board", "9832181507",
+		"--col", `status={"label":"Done"}`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	colVals, _ := capturedVars["columnValues"].(string)
+	var colMap map[string]any
+	if err := json.Unmarshal([]byte(colVals), &colMap); err != nil {
+		t.Fatalf("columnValues is not valid JSON: %v", err)
+	}
+	if _, ok := colMap["name"]; ok {
+		t.Error("expected no 'name' key when --name not given")
+	}
+	if _, ok := colMap["status"]; !ok {
+		t.Error("expected 'status' key in columnValues")
+	}
+}
+
+func TestItemUpdate_NothingToUpdate(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemUpdateResponse("1234567890", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemUpdate(t, "1234567890", "--board", "9832181507")
+	if err == nil {
+		t.Fatal("expected error when neither --name nor --col given")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemUpdate_MalformedColJSON(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemUpdateResponse("1234567890", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemUpdate(t, "1234567890", "--board", "9832181507",
+		"--col", `status=not-json`)
+	if err == nil {
+		t.Fatal("expected error for malformed JSON in --col")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemUpdate_APIError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"errors":[{"message":"forbidden","extensions":{"code":"Forbidden"}}]}`)
+	}))
+	t.Cleanup(srv.Close)
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemUpdate(t, "1234567890", "--board", "9832181507",
+		"--col", `status={"label":"Done"}`)
+	if err == nil {
+		t.Fatal("expected error from API error response")
 	}
 }
