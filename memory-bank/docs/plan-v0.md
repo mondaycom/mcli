@@ -105,13 +105,13 @@ Driven by ADR-004 and axioms A11 (no plaintext secrets) and A12 (LLM-primary). P
 
 ## Phase 4 — Items + column value normalization
 
-This is the coherence-hard phase. Monday's `column_values` are JSON-string blobs whose shape varies per column type. Our CLI must translate between clean flags and those blobs.
+Monday's `column_values` are JSON-string blobs whose shape varies per column type. Coherence direction (revised 2026-05-11): **write path is JSON-passthrough** — users supply the raw monday column-value JSON via `--col <id>=<json>`, which mcli wraps into the `column_values` map. **Read path normalizes** — we decode known types into clean human/LLM-readable values, falling through to raw JSON for unsupported types. Rationale: monday's column types are too customizable (esp. status/dropdown via settings_str) to expose a stable per-type write syntax in v0; LLMs are well-suited to construct the JSON blobs when handed the type. We can layer a hybrid syntax in a later phase if usage shows common types dominate.
 
 **Deliverables:**
 - `internal/api/items/columns` package:
-  - a registry of supported column types (text, long-text, status, date, datetime, people, dropdown, numeric, link, email, phone, timeline, tags, checkbox),
-  - an `Encode(ColumnType, userValue) (jsonBlob, error)` and `Decode(ColumnType, jsonBlob) (userValue, error)` for each,
-  - clear errors for unsupported column types in v0 (user told to use `mcli query`).
+  - a registry of supported column types for the read path (text, long-text, status, date, datetime, people, dropdown, numeric, link, email, phone, timeline, tags, checkbox),
+  - `Decode(columnType, settingsStr, valueJSON) (any, error)` per type; passthrough (raw JSON string) for unknown types,
+  - no Encode registry in v0 — write path validates each `--col` value as JSON and aggregates into the wire-shape `column_values` string.
 - `mcli item list --board <id> [--group <id>] [--limit <n>] [--cursor <c>]`
 - `mcli item get <id>`
 - `mcli item create --board <id> [--group <id>] --name <name> [--col <col>=<value>]...` with repeated `--col` flags.
@@ -122,8 +122,8 @@ This is the coherence-hard phase. Monday's `column_values` are JSON-string blobs
 
 **Acceptance:**
 - AC-4.1: All item commands work against recorded fixtures.
-- AC-4.2: Every supported column type has a round-trip test.
-- AC-4.3: Unsupported column types fail with a structured error (code `USAGE`, message names the column type, suggests `mcli query`).
+- AC-4.2: Every supported column type has a Decode test against a representative real-shape JSON sample.
+- AC-4.3: Unsupported column types Decode to their raw JSON string (passthrough, no error). Encode side is JSON-passthrough end-to-end so unsupported types are not a special case there.
 - AC-4.4: Subitems created via `--parent` appear under the parent on a subsequent `mcli item get`.
 
 ## Phase 5 — Raw query escape hatch
