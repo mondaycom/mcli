@@ -4,6 +4,8 @@ package gen
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/Khan/genqlient/graphql"
 )
@@ -442,6 +444,7810 @@ var AllColumnType = []ColumnType{
 	ColumnTypeSubtasks,
 }
 
+// ItemGetItemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemGetItemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The item's create date.
+	Created_at string `json:"created_at"`
+	// The item's last update date.
+	Updated_at string `json:"updated_at"`
+	// The item's creator.
+	Creator ItemGetItemsItemCreatorUser `json:"creator"`
+	// The group that contains this item.
+	Group ItemGetItemsItemGroup `json:"group"`
+	// The board that contains this item.
+	Board ItemGetItemsItemBoard `json:"board"`
+	// The parent item of a subitem.
+	Parent_item ItemGetItemsItemParent_itemItem `json:"parent_item"`
+	// The item's subitems.
+	Subitems []ItemGetItemsItemSubitemsItem `json:"subitems"`
+	// The item's column values.
+	Column_values []ItemGetItemsItemColumn_valuesColumnValue `json:"-"`
+}
+
+// GetId returns ItemGetItemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetId() string { return v.Id }
+
+// GetName returns ItemGetItemsItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetName() string { return v.Name }
+
+// GetState returns ItemGetItemsItem.State, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetState() State { return v.State }
+
+// GetCreated_at returns ItemGetItemsItem.Created_at, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetCreated_at() string { return v.Created_at }
+
+// GetUpdated_at returns ItemGetItemsItem.Updated_at, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetUpdated_at() string { return v.Updated_at }
+
+// GetCreator returns ItemGetItemsItem.Creator, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetCreator() ItemGetItemsItemCreatorUser { return v.Creator }
+
+// GetGroup returns ItemGetItemsItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetGroup() ItemGetItemsItemGroup { return v.Group }
+
+// GetBoard returns ItemGetItemsItem.Board, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetBoard() ItemGetItemsItemBoard { return v.Board }
+
+// GetParent_item returns ItemGetItemsItem.Parent_item, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetParent_item() ItemGetItemsItemParent_itemItem { return v.Parent_item }
+
+// GetSubitems returns ItemGetItemsItem.Subitems, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetSubitems() []ItemGetItemsItemSubitemsItem { return v.Subitems }
+
+// GetColumn_values returns ItemGetItemsItem.Column_values, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItem) GetColumn_values() []ItemGetItemsItemColumn_valuesColumnValue {
+	return v.Column_values
+}
+
+func (v *ItemGetItemsItem) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ItemGetItemsItem
+		Column_values []json.RawMessage `json:"column_values"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ItemGetItemsItem = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Column_values
+		src := firstPass.Column_values
+		*dst = make(
+			[]ItemGetItemsItemColumn_valuesColumnValue,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			if len(src) != 0 && string(src) != "null" {
+				err = __unmarshalItemGetItemsItemColumn_valuesColumnValue(
+					src, dst)
+				if err != nil {
+					return fmt.Errorf(
+						"unable to unmarshal ItemGetItemsItem.Column_values: %w", err)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalItemGetItemsItem struct {
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	State State `json:"state"`
+
+	Created_at string `json:"created_at"`
+
+	Updated_at string `json:"updated_at"`
+
+	Creator ItemGetItemsItemCreatorUser `json:"creator"`
+
+	Group ItemGetItemsItemGroup `json:"group"`
+
+	Board ItemGetItemsItemBoard `json:"board"`
+
+	Parent_item ItemGetItemsItemParent_itemItem `json:"parent_item"`
+
+	Subitems []ItemGetItemsItemSubitemsItem `json:"subitems"`
+
+	Column_values []json.RawMessage `json:"column_values"`
+}
+
+func (v *ItemGetItemsItem) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ItemGetItemsItem) __premarshalJSON() (*__premarshalItemGetItemsItem, error) {
+	var retval __premarshalItemGetItemsItem
+
+	retval.Id = v.Id
+	retval.Name = v.Name
+	retval.State = v.State
+	retval.Created_at = v.Created_at
+	retval.Updated_at = v.Updated_at
+	retval.Creator = v.Creator
+	retval.Group = v.Group
+	retval.Board = v.Board
+	retval.Parent_item = v.Parent_item
+	retval.Subitems = v.Subitems
+	{
+
+		dst := &retval.Column_values
+		src := v.Column_values
+		*dst = make(
+			[]json.RawMessage,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			var err error
+			*dst, err = __marshalItemGetItemsItemColumn_valuesColumnValue(
+				&src)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"unable to marshal ItemGetItemsItem.Column_values: %w", err)
+			}
+		}
+	}
+	return &retval, nil
+}
+
+// ItemGetItemsItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemGetItemsItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemGetItemsItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemBoard) GetId() string { return v.Id }
+
+// GetName returns ItemGetItemsItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemBoard) GetName() string { return v.Name }
+
+// ItemGetItemsItemColumn_valuesBatteryValue includes the requested fields of the GraphQL type BatteryValue.
+// The GraphQL type's documentation follows.
+//
+// A value showing status distribution counts
+type ItemGetItemsItemColumn_valuesBatteryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesBatteryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesBatteryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesBatteryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesBatteryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesBatteryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesBatteryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesBoardRelationValue includes the requested fields of the GraphQL type BoardRelationValue.
+type ItemGetItemsItemColumn_valuesBoardRelationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesBoardRelationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesBoardRelationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesBoardRelationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesBoardRelationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesBoardRelationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesBoardRelationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesButtonValue includes the requested fields of the GraphQL type ButtonValue.
+type ItemGetItemsItemColumn_valuesButtonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesButtonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesButtonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesButtonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesButtonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesButtonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesButtonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesButtonValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesCheckboxValue includes the requested fields of the GraphQL type CheckboxValue.
+type ItemGetItemsItemColumn_valuesCheckboxValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesCheckboxValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesCheckboxValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesCheckboxValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesCheckboxValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesCheckboxValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesCheckboxValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesColorPickerValue includes the requested fields of the GraphQL type ColorPickerValue.
+type ItemGetItemsItemColumn_valuesColorPickerValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesColorPickerValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesColorPickerValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesColorPickerValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesColorPickerValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesColorPickerValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesColorPickerValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesColumnValue includes the requested fields of the GraphQL interface ColumnValue.
+//
+// ItemGetItemsItemColumn_valuesColumnValue is implemented by the following types:
+// ItemGetItemsItemColumn_valuesBatteryValue
+// ItemGetItemsItemColumn_valuesBoardRelationValue
+// ItemGetItemsItemColumn_valuesButtonValue
+// ItemGetItemsItemColumn_valuesCheckboxValue
+// ItemGetItemsItemColumn_valuesColorPickerValue
+// ItemGetItemsItemColumn_valuesCountryValue
+// ItemGetItemsItemColumn_valuesCreationLogValue
+// ItemGetItemsItemColumn_valuesDateValue
+// ItemGetItemsItemColumn_valuesDependencyValue
+// ItemGetItemsItemColumn_valuesDirectDocValue
+// ItemGetItemsItemColumn_valuesDocValue
+// ItemGetItemsItemColumn_valuesDropdownValue
+// ItemGetItemsItemColumn_valuesEmailValue
+// ItemGetItemsItemColumn_valuesFileValue
+// ItemGetItemsItemColumn_valuesFormulaValue
+// ItemGetItemsItemColumn_valuesGroupValue
+// ItemGetItemsItemColumn_valuesHourValue
+// ItemGetItemsItemColumn_valuesIntegrationValue
+// ItemGetItemsItemColumn_valuesItemIdValue
+// ItemGetItemsItemColumn_valuesLastUpdatedValue
+// ItemGetItemsItemColumn_valuesLinkValue
+// ItemGetItemsItemColumn_valuesLocationValue
+// ItemGetItemsItemColumn_valuesLongTextValue
+// ItemGetItemsItemColumn_valuesMirrorValue
+// ItemGetItemsItemColumn_valuesNumbersValue
+// ItemGetItemsItemColumn_valuesPeopleValue
+// ItemGetItemsItemColumn_valuesPersonValue
+// ItemGetItemsItemColumn_valuesPhoneValue
+// ItemGetItemsItemColumn_valuesProgressValue
+// ItemGetItemsItemColumn_valuesRatingValue
+// ItemGetItemsItemColumn_valuesStatusValue
+// ItemGetItemsItemColumn_valuesSubtasksValue
+// ItemGetItemsItemColumn_valuesTagsValue
+// ItemGetItemsItemColumn_valuesTeamValue
+// ItemGetItemsItemColumn_valuesTextValue
+// ItemGetItemsItemColumn_valuesTimeTrackingValue
+// ItemGetItemsItemColumn_valuesTimelineValue
+// ItemGetItemsItemColumn_valuesUnsupportedValue
+// ItemGetItemsItemColumn_valuesVoteValue
+// ItemGetItemsItemColumn_valuesWeekValue
+// ItemGetItemsItemColumn_valuesWorldClockValue
+type ItemGetItemsItemColumn_valuesColumnValue interface {
+	implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() string
+	// GetId returns the interface-field "id" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's unique identifier.
+	GetId() string
+	// GetType returns the interface-field "type" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's type.
+	GetType() ColumnType
+	// GetValue returns the interface-field "value" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's raw value in JSON format.
+	GetValue() string
+	// GetText returns the interface-field "text" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// Text representation of the column value. Note: Not all columns support textual value
+	GetText() string
+	// GetColumn returns the interface-field "column" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column that this value belongs to.
+	GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn
+}
+
+func (v *ItemGetItemsItemColumn_valuesBatteryValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesBoardRelationValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesButtonValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesCheckboxValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesColorPickerValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesCountryValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesDateValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesDocValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesEmailValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesFileValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesGroupValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesHourValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesLinkValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesLocationValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesPersonValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesProgressValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesRatingValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesStatusValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesTagsValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesTeamValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesTextValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesVoteValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesWeekValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) implementsGraphQLInterfaceItemGetItemsItemColumn_valuesColumnValue() {
+}
+
+func __unmarshalItemGetItemsItemColumn_valuesColumnValue(b []byte, v *ItemGetItemsItemColumn_valuesColumnValue) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "BatteryValue":
+		*v = new(ItemGetItemsItemColumn_valuesBatteryValue)
+		return json.Unmarshal(b, *v)
+	case "BoardRelationValue":
+		*v = new(ItemGetItemsItemColumn_valuesBoardRelationValue)
+		return json.Unmarshal(b, *v)
+	case "ButtonValue":
+		*v = new(ItemGetItemsItemColumn_valuesButtonValue)
+		return json.Unmarshal(b, *v)
+	case "CheckboxValue":
+		*v = new(ItemGetItemsItemColumn_valuesCheckboxValue)
+		return json.Unmarshal(b, *v)
+	case "ColorPickerValue":
+		*v = new(ItemGetItemsItemColumn_valuesColorPickerValue)
+		return json.Unmarshal(b, *v)
+	case "CountryValue":
+		*v = new(ItemGetItemsItemColumn_valuesCountryValue)
+		return json.Unmarshal(b, *v)
+	case "CreationLogValue":
+		*v = new(ItemGetItemsItemColumn_valuesCreationLogValue)
+		return json.Unmarshal(b, *v)
+	case "DateValue":
+		*v = new(ItemGetItemsItemColumn_valuesDateValue)
+		return json.Unmarshal(b, *v)
+	case "DependencyValue":
+		*v = new(ItemGetItemsItemColumn_valuesDependencyValue)
+		return json.Unmarshal(b, *v)
+	case "DirectDocValue":
+		*v = new(ItemGetItemsItemColumn_valuesDirectDocValue)
+		return json.Unmarshal(b, *v)
+	case "DocValue":
+		*v = new(ItemGetItemsItemColumn_valuesDocValue)
+		return json.Unmarshal(b, *v)
+	case "DropdownValue":
+		*v = new(ItemGetItemsItemColumn_valuesDropdownValue)
+		return json.Unmarshal(b, *v)
+	case "EmailValue":
+		*v = new(ItemGetItemsItemColumn_valuesEmailValue)
+		return json.Unmarshal(b, *v)
+	case "FileValue":
+		*v = new(ItemGetItemsItemColumn_valuesFileValue)
+		return json.Unmarshal(b, *v)
+	case "FormulaValue":
+		*v = new(ItemGetItemsItemColumn_valuesFormulaValue)
+		return json.Unmarshal(b, *v)
+	case "GroupValue":
+		*v = new(ItemGetItemsItemColumn_valuesGroupValue)
+		return json.Unmarshal(b, *v)
+	case "HourValue":
+		*v = new(ItemGetItemsItemColumn_valuesHourValue)
+		return json.Unmarshal(b, *v)
+	case "IntegrationValue":
+		*v = new(ItemGetItemsItemColumn_valuesIntegrationValue)
+		return json.Unmarshal(b, *v)
+	case "ItemIdValue":
+		*v = new(ItemGetItemsItemColumn_valuesItemIdValue)
+		return json.Unmarshal(b, *v)
+	case "LastUpdatedValue":
+		*v = new(ItemGetItemsItemColumn_valuesLastUpdatedValue)
+		return json.Unmarshal(b, *v)
+	case "LinkValue":
+		*v = new(ItemGetItemsItemColumn_valuesLinkValue)
+		return json.Unmarshal(b, *v)
+	case "LocationValue":
+		*v = new(ItemGetItemsItemColumn_valuesLocationValue)
+		return json.Unmarshal(b, *v)
+	case "LongTextValue":
+		*v = new(ItemGetItemsItemColumn_valuesLongTextValue)
+		return json.Unmarshal(b, *v)
+	case "MirrorValue":
+		*v = new(ItemGetItemsItemColumn_valuesMirrorValue)
+		return json.Unmarshal(b, *v)
+	case "NumbersValue":
+		*v = new(ItemGetItemsItemColumn_valuesNumbersValue)
+		return json.Unmarshal(b, *v)
+	case "PeopleValue":
+		*v = new(ItemGetItemsItemColumn_valuesPeopleValue)
+		return json.Unmarshal(b, *v)
+	case "PersonValue":
+		*v = new(ItemGetItemsItemColumn_valuesPersonValue)
+		return json.Unmarshal(b, *v)
+	case "PhoneValue":
+		*v = new(ItemGetItemsItemColumn_valuesPhoneValue)
+		return json.Unmarshal(b, *v)
+	case "ProgressValue":
+		*v = new(ItemGetItemsItemColumn_valuesProgressValue)
+		return json.Unmarshal(b, *v)
+	case "RatingValue":
+		*v = new(ItemGetItemsItemColumn_valuesRatingValue)
+		return json.Unmarshal(b, *v)
+	case "StatusValue":
+		*v = new(ItemGetItemsItemColumn_valuesStatusValue)
+		return json.Unmarshal(b, *v)
+	case "SubtasksValue":
+		*v = new(ItemGetItemsItemColumn_valuesSubtasksValue)
+		return json.Unmarshal(b, *v)
+	case "TagsValue":
+		*v = new(ItemGetItemsItemColumn_valuesTagsValue)
+		return json.Unmarshal(b, *v)
+	case "TeamValue":
+		*v = new(ItemGetItemsItemColumn_valuesTeamValue)
+		return json.Unmarshal(b, *v)
+	case "TextValue":
+		*v = new(ItemGetItemsItemColumn_valuesTextValue)
+		return json.Unmarshal(b, *v)
+	case "TimeTrackingValue":
+		*v = new(ItemGetItemsItemColumn_valuesTimeTrackingValue)
+		return json.Unmarshal(b, *v)
+	case "TimelineValue":
+		*v = new(ItemGetItemsItemColumn_valuesTimelineValue)
+		return json.Unmarshal(b, *v)
+	case "UnsupportedValue":
+		*v = new(ItemGetItemsItemColumn_valuesUnsupportedValue)
+		return json.Unmarshal(b, *v)
+	case "VoteValue":
+		*v = new(ItemGetItemsItemColumn_valuesVoteValue)
+		return json.Unmarshal(b, *v)
+	case "WeekValue":
+		*v = new(ItemGetItemsItemColumn_valuesWeekValue)
+		return json.Unmarshal(b, *v)
+	case "WorldClockValue":
+		*v = new(ItemGetItemsItemColumn_valuesWorldClockValue)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing ColumnValue.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for ItemGetItemsItemColumn_valuesColumnValue: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalItemGetItemsItemColumn_valuesColumnValue(v *ItemGetItemsItemColumn_valuesColumnValue) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *ItemGetItemsItemColumn_valuesBatteryValue:
+		typename = "BatteryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesBatteryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesBoardRelationValue:
+		typename = "BoardRelationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesBoardRelationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesButtonValue:
+		typename = "ButtonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesButtonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesCheckboxValue:
+		typename = "CheckboxValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesCheckboxValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesColorPickerValue:
+		typename = "ColorPickerValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesColorPickerValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesCountryValue:
+		typename = "CountryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesCountryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesCreationLogValue:
+		typename = "CreationLogValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesCreationLogValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesDateValue:
+		typename = "DateValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesDateValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesDependencyValue:
+		typename = "DependencyValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesDependencyValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesDirectDocValue:
+		typename = "DirectDocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesDirectDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesDocValue:
+		typename = "DocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesDropdownValue:
+		typename = "DropdownValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesDropdownValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesEmailValue:
+		typename = "EmailValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesEmailValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesFileValue:
+		typename = "FileValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesFileValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesFormulaValue:
+		typename = "FormulaValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesFormulaValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesGroupValue:
+		typename = "GroupValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesGroupValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesHourValue:
+		typename = "HourValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesHourValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesIntegrationValue:
+		typename = "IntegrationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesIntegrationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesItemIdValue:
+		typename = "ItemIdValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesItemIdValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesLastUpdatedValue:
+		typename = "LastUpdatedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesLastUpdatedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesLinkValue:
+		typename = "LinkValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesLinkValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesLocationValue:
+		typename = "LocationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesLocationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesLongTextValue:
+		typename = "LongTextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesLongTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesMirrorValue:
+		typename = "MirrorValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesMirrorValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesNumbersValue:
+		typename = "NumbersValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesNumbersValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesPeopleValue:
+		typename = "PeopleValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesPeopleValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesPersonValue:
+		typename = "PersonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesPersonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesPhoneValue:
+		typename = "PhoneValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesPhoneValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesProgressValue:
+		typename = "ProgressValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesProgressValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesRatingValue:
+		typename = "RatingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesRatingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesStatusValue:
+		typename = "StatusValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesStatusValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesSubtasksValue:
+		typename = "SubtasksValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesSubtasksValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesTagsValue:
+		typename = "TagsValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesTagsValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesTeamValue:
+		typename = "TeamValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesTeamValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesTextValue:
+		typename = "TextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesTimeTrackingValue:
+		typename = "TimeTrackingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesTimeTrackingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesTimelineValue:
+		typename = "TimelineValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesTimelineValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesUnsupportedValue:
+		typename = "UnsupportedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesUnsupportedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesVoteValue:
+		typename = "VoteValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesVoteValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesWeekValue:
+		typename = "WeekValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesWeekValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemGetItemsItemColumn_valuesWorldClockValue:
+		typename = "WorldClockValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemGetItemsItemColumn_valuesWorldClockValue
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for ItemGetItemsItemColumn_valuesColumnValue: "%T"`, v)
+	}
+}
+
+// ItemGetItemsItemColumn_valuesColumnValueColumn includes the requested fields of the GraphQL type Column.
+type ItemGetItemsItemColumn_valuesColumnValueColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+}
+
+// GetId returns ItemGetItemsItemColumn_valuesColumnValueColumn.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColumnValueColumn) GetId() string { return v.Id }
+
+// GetTitle returns ItemGetItemsItemColumn_valuesColumnValueColumn.Title, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColumnValueColumn) GetTitle() string { return v.Title }
+
+// GetSettings_str returns ItemGetItemsItemColumn_valuesColumnValueColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesColumnValueColumn) GetSettings_str() string {
+	return v.Settings_str
+}
+
+// ItemGetItemsItemColumn_valuesCountryValue includes the requested fields of the GraphQL type CountryValue.
+type ItemGetItemsItemColumn_valuesCountryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesCountryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesCountryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesCountryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesCountryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesCountryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesCountryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCountryValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesCreationLogValue includes the requested fields of the GraphQL type CreationLogValue.
+type ItemGetItemsItemColumn_valuesCreationLogValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesCreationLogValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesCreationLogValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesCreationLogValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesCreationLogValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesCreationLogValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesCreationLogValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesCreationLogValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesDateValue includes the requested fields of the GraphQL type DateValue.
+type ItemGetItemsItemColumn_valuesDateValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesDateValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesDateValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesDateValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesDateValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesDateValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesDateValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDateValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesDependencyValue includes the requested fields of the GraphQL type DependencyValue.
+type ItemGetItemsItemColumn_valuesDependencyValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesDependencyValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesDependencyValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesDependencyValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesDependencyValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesDependencyValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesDependencyValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDependencyValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesDirectDocValue includes the requested fields of the GraphQL type DirectDocValue.
+type ItemGetItemsItemColumn_valuesDirectDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesDirectDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesDirectDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesDirectDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesDirectDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesDirectDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesDirectDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDirectDocValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesDocValue includes the requested fields of the GraphQL type DocValue.
+type ItemGetItemsItemColumn_valuesDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDocValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesDropdownValue includes the requested fields of the GraphQL type DropdownValue.
+type ItemGetItemsItemColumn_valuesDropdownValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesDropdownValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesDropdownValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesDropdownValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesDropdownValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesDropdownValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesDropdownValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesDropdownValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesEmailValue includes the requested fields of the GraphQL type EmailValue.
+type ItemGetItemsItemColumn_valuesEmailValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesEmailValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesEmailValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesEmailValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesEmailValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesEmailValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesEmailValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesEmailValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesFileValue includes the requested fields of the GraphQL type FileValue.
+type ItemGetItemsItemColumn_valuesFileValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesFileValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesFileValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesFileValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesFileValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesFileValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesFileValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFileValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesFormulaValue includes the requested fields of the GraphQL type FormulaValue.
+type ItemGetItemsItemColumn_valuesFormulaValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesFormulaValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesFormulaValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesFormulaValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesFormulaValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesFormulaValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesFormulaValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesFormulaValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesGroupValue includes the requested fields of the GraphQL type GroupValue.
+type ItemGetItemsItemColumn_valuesGroupValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesGroupValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesGroupValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesGroupValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesGroupValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesGroupValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesGroupValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesGroupValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesHourValue includes the requested fields of the GraphQL type HourValue.
+type ItemGetItemsItemColumn_valuesHourValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesHourValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesHourValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesHourValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesHourValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesHourValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesHourValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesHourValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesIntegrationValue includes the requested fields of the GraphQL type IntegrationValue.
+type ItemGetItemsItemColumn_valuesIntegrationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesIntegrationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesIntegrationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesIntegrationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesIntegrationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesIntegrationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesIntegrationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesIntegrationValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesItemIdValue includes the requested fields of the GraphQL type ItemIdValue.
+type ItemGetItemsItemColumn_valuesItemIdValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesItemIdValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesItemIdValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesItemIdValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesItemIdValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesItemIdValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesItemIdValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesItemIdValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesLastUpdatedValue includes the requested fields of the GraphQL type LastUpdatedValue.
+type ItemGetItemsItemColumn_valuesLastUpdatedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesLastUpdatedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLastUpdatedValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesLinkValue includes the requested fields of the GraphQL type LinkValue.
+type ItemGetItemsItemColumn_valuesLinkValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesLinkValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesLinkValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesLinkValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesLinkValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesLinkValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesLinkValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLinkValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesLocationValue includes the requested fields of the GraphQL type LocationValue.
+type ItemGetItemsItemColumn_valuesLocationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesLocationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesLocationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesLocationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesLocationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesLocationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesLocationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLocationValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesLongTextValue includes the requested fields of the GraphQL type LongTextValue.
+type ItemGetItemsItemColumn_valuesLongTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesLongTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesLongTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesLongTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesLongTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesLongTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesLongTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesLongTextValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesMirrorValue includes the requested fields of the GraphQL type MirrorValue.
+type ItemGetItemsItemColumn_valuesMirrorValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesMirrorValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesMirrorValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesMirrorValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesMirrorValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesMirrorValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesMirrorValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesMirrorValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesNumbersValue includes the requested fields of the GraphQL type NumbersValue.
+type ItemGetItemsItemColumn_valuesNumbersValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesNumbersValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesNumbersValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesNumbersValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesNumbersValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesNumbersValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesNumbersValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesNumbersValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesPeopleValue includes the requested fields of the GraphQL type PeopleValue.
+type ItemGetItemsItemColumn_valuesPeopleValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesPeopleValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesPeopleValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesPeopleValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesPeopleValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesPeopleValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesPeopleValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPeopleValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesPersonValue includes the requested fields of the GraphQL type PersonValue.
+type ItemGetItemsItemColumn_valuesPersonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesPersonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesPersonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesPersonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesPersonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesPersonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesPersonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPersonValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesPhoneValue includes the requested fields of the GraphQL type PhoneValue.
+type ItemGetItemsItemColumn_valuesPhoneValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesPhoneValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesPhoneValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesPhoneValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesPhoneValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesPhoneValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesPhoneValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesPhoneValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesProgressValue includes the requested fields of the GraphQL type ProgressValue.
+type ItemGetItemsItemColumn_valuesProgressValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesProgressValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesProgressValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesProgressValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesProgressValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesProgressValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesProgressValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesProgressValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesRatingValue includes the requested fields of the GraphQL type RatingValue.
+type ItemGetItemsItemColumn_valuesRatingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesRatingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesRatingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesRatingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesRatingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesRatingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesRatingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesRatingValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesStatusValue includes the requested fields of the GraphQL type StatusValue.
+type ItemGetItemsItemColumn_valuesStatusValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesStatusValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesStatusValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesStatusValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesStatusValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesStatusValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesStatusValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesStatusValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesSubtasksValue includes the requested fields of the GraphQL type SubtasksValue.
+type ItemGetItemsItemColumn_valuesSubtasksValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesSubtasksValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesSubtasksValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesSubtasksValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesSubtasksValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesSubtasksValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesSubtasksValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesSubtasksValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesTagsValue includes the requested fields of the GraphQL type TagsValue.
+type ItemGetItemsItemColumn_valuesTagsValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesTagsValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesTagsValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesTagsValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesTagsValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesTagsValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesTagsValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTagsValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesTeamValue includes the requested fields of the GraphQL type TeamValue.
+type ItemGetItemsItemColumn_valuesTeamValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesTeamValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesTeamValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesTeamValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesTeamValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesTeamValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesTeamValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTeamValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesTextValue includes the requested fields of the GraphQL type TextValue.
+type ItemGetItemsItemColumn_valuesTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTextValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesTimeTrackingValue includes the requested fields of the GraphQL type TimeTrackingValue.
+type ItemGetItemsItemColumn_valuesTimeTrackingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesTimeTrackingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimeTrackingValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesTimelineValue includes the requested fields of the GraphQL type TimelineValue.
+type ItemGetItemsItemColumn_valuesTimelineValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesTimelineValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesTimelineValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesTimelineValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesTimelineValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesTimelineValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesTimelineValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesTimelineValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesUnsupportedValue includes the requested fields of the GraphQL type UnsupportedValue.
+type ItemGetItemsItemColumn_valuesUnsupportedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesUnsupportedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesUnsupportedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesUnsupportedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesUnsupportedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesUnsupportedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesUnsupportedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesUnsupportedValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesVoteValue includes the requested fields of the GraphQL type VoteValue.
+type ItemGetItemsItemColumn_valuesVoteValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesVoteValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesVoteValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesVoteValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesVoteValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesVoteValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesVoteValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesVoteValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesWeekValue includes the requested fields of the GraphQL type WeekValue.
+type ItemGetItemsItemColumn_valuesWeekValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesWeekValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesWeekValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesWeekValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesWeekValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesWeekValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesWeekValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWeekValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemColumn_valuesWorldClockValue includes the requested fields of the GraphQL type WorldClockValue.
+type ItemGetItemsItemColumn_valuesWorldClockValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemGetItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemGetItemsItemColumn_valuesWorldClockValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetTypename() string { return v.Typename }
+
+// GetId returns ItemGetItemsItemColumn_valuesWorldClockValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetId() string { return v.Id }
+
+// GetType returns ItemGetItemsItemColumn_valuesWorldClockValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetType() ColumnType { return v.Type }
+
+// GetValue returns ItemGetItemsItemColumn_valuesWorldClockValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetValue() string { return v.Value }
+
+// GetText returns ItemGetItemsItemColumn_valuesWorldClockValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetText() string { return v.Text }
+
+// GetColumn returns ItemGetItemsItemColumn_valuesWorldClockValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetColumn() ItemGetItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemGetItemsItemCreatorUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type ItemGetItemsItemCreatorUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemGetItemsItemCreatorUser.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemCreatorUser) GetId() string { return v.Id }
+
+// GetName returns ItemGetItemsItemCreatorUser.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemCreatorUser) GetName() string { return v.Name }
+
+// ItemGetItemsItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemGetItemsItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemGetItemsItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemGroup) GetId() string { return v.Id }
+
+// GetTitle returns ItemGetItemsItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemGroup) GetTitle() string { return v.Title }
+
+// ItemGetItemsItemParent_itemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemGetItemsItemParent_itemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemGetItemsItemParent_itemItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemParent_itemItem) GetId() string { return v.Id }
+
+// GetName returns ItemGetItemsItemParent_itemItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemParent_itemItem) GetName() string { return v.Name }
+
+// ItemGetItemsItemSubitemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemGetItemsItemSubitemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns ItemGetItemsItemSubitemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemSubitemsItem) GetId() string { return v.Id }
+
+// GetName returns ItemGetItemsItemSubitemsItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemSubitemsItem) GetName() string { return v.Name }
+
+// GetState returns ItemGetItemsItemSubitemsItem.State, and is useful for accessing the field via an interface.
+func (v *ItemGetItemsItemSubitemsItem) GetState() State { return v.State }
+
+// ItemGetResponse is returned by ItemGet on success.
+type ItemGetResponse struct {
+	// Get a collection of items.
+	Items []ItemGetItemsItem `json:"items"`
+}
+
+// GetItems returns ItemGetResponse.Items, and is useful for accessing the field via an interface.
+func (v *ItemGetResponse) GetItems() []ItemGetItemsItem { return v.Items }
+
+// ItemsListByBoardBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemsListByBoardBoardsBoard struct {
+	// The board's items (rows).
+	Items_page ItemsListByBoardBoardsBoardItems_pageItemsResponse `json:"items_page"`
+}
+
+// GetItems_page returns ItemsListByBoardBoardsBoard.Items_page, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoard) GetItems_page() ItemsListByBoardBoardsBoardItems_pageItemsResponse {
+	return v.Items_page
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponse includes the requested fields of the GraphQL type ItemsResponse.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponse struct {
+	// An opaque cursor that represents the position in the list after the last
+	// returned item. Use this cursor for pagination to fetch the next set of items.
+	// If the cursor is null, there are no more items to fetch.
+	Cursor string `json:"cursor"`
+	// The items associated with the cursor.
+	Items []ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem `json:"items"`
+}
+
+// GetCursor returns ItemsListByBoardBoardsBoardItems_pageItemsResponse.Cursor, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponse) GetCursor() string { return v.Cursor }
+
+// GetItems returns ItemsListByBoardBoardsBoardItems_pageItemsResponse.Items, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponse) GetItems() []ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem {
+	return v.Items
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The group that contains this item.
+	Group ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup `json:"group"`
+	// The item's column values.
+	Column_values []ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue `json:"-"`
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) GetId() string { return v.Id }
+
+// GetName returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) GetName() string { return v.Name }
+
+// GetState returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.State, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) GetState() State {
+	return v.State
+}
+
+// GetGroup returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) GetGroup() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup {
+	return v.Group
+}
+
+// GetColumn_values returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Column_values, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) GetColumn_values() []ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue {
+	return v.Column_values
+}
+
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem
+		Column_values []json.RawMessage `json:"column_values"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Column_values
+		src := firstPass.Column_values
+		*dst = make(
+			[]ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			if len(src) != 0 && string(src) != "null" {
+				err = __unmarshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue(
+					src, dst)
+				if err != nil {
+					return fmt.Errorf(
+						"unable to unmarshal ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Column_values: %w", err)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem struct {
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	State State `json:"state"`
+
+	Group ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup `json:"group"`
+
+	Column_values []json.RawMessage `json:"column_values"`
+}
+
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem) __premarshalJSON() (*__premarshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem, error) {
+	var retval __premarshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem
+
+	retval.Id = v.Id
+	retval.Name = v.Name
+	retval.State = v.State
+	retval.Group = v.Group
+	{
+
+		dst := &retval.Column_values
+		src := v.Column_values
+		*dst = make(
+			[]json.RawMessage,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			var err error
+			*dst, err = __marshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue(
+				&src)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"unable to marshal ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem.Column_values: %w", err)
+			}
+		}
+	}
+	return &retval, nil
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue includes the requested fields of the GraphQL type BatteryValue.
+// The GraphQL type's documentation follows.
+//
+// A value showing status distribution counts
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue includes the requested fields of the GraphQL type BoardRelationValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue includes the requested fields of the GraphQL type ButtonValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue includes the requested fields of the GraphQL type CheckboxValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue includes the requested fields of the GraphQL type ColorPickerValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue includes the requested fields of the GraphQL interface ColumnValue.
+//
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue is implemented by the following types:
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue interface {
+	implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() string
+	// GetId returns the interface-field "id" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's unique identifier.
+	GetId() string
+	// GetType returns the interface-field "type" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's type.
+	GetType() ColumnType
+	// GetValue returns the interface-field "value" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's raw value in JSON format.
+	GetValue() string
+	// GetText returns the interface-field "text" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// Text representation of the column value. Note: Not all columns support textual value
+	GetText() string
+	// GetColumn returns the interface-field "column" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column that this value belongs to.
+	GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn
+}
+
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) implementsGraphQLInterfaceItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+
+func __unmarshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue(b []byte, v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "BatteryValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue)
+		return json.Unmarshal(b, *v)
+	case "BoardRelationValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue)
+		return json.Unmarshal(b, *v)
+	case "ButtonValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue)
+		return json.Unmarshal(b, *v)
+	case "CheckboxValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue)
+		return json.Unmarshal(b, *v)
+	case "ColorPickerValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue)
+		return json.Unmarshal(b, *v)
+	case "CountryValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue)
+		return json.Unmarshal(b, *v)
+	case "CreationLogValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue)
+		return json.Unmarshal(b, *v)
+	case "DateValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue)
+		return json.Unmarshal(b, *v)
+	case "DependencyValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue)
+		return json.Unmarshal(b, *v)
+	case "DirectDocValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue)
+		return json.Unmarshal(b, *v)
+	case "DocValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue)
+		return json.Unmarshal(b, *v)
+	case "DropdownValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue)
+		return json.Unmarshal(b, *v)
+	case "EmailValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue)
+		return json.Unmarshal(b, *v)
+	case "FileValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue)
+		return json.Unmarshal(b, *v)
+	case "FormulaValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue)
+		return json.Unmarshal(b, *v)
+	case "GroupValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue)
+		return json.Unmarshal(b, *v)
+	case "HourValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue)
+		return json.Unmarshal(b, *v)
+	case "IntegrationValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue)
+		return json.Unmarshal(b, *v)
+	case "ItemIdValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue)
+		return json.Unmarshal(b, *v)
+	case "LastUpdatedValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue)
+		return json.Unmarshal(b, *v)
+	case "LinkValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue)
+		return json.Unmarshal(b, *v)
+	case "LocationValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue)
+		return json.Unmarshal(b, *v)
+	case "LongTextValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue)
+		return json.Unmarshal(b, *v)
+	case "MirrorValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue)
+		return json.Unmarshal(b, *v)
+	case "NumbersValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue)
+		return json.Unmarshal(b, *v)
+	case "PeopleValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue)
+		return json.Unmarshal(b, *v)
+	case "PersonValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue)
+		return json.Unmarshal(b, *v)
+	case "PhoneValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue)
+		return json.Unmarshal(b, *v)
+	case "ProgressValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue)
+		return json.Unmarshal(b, *v)
+	case "RatingValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue)
+		return json.Unmarshal(b, *v)
+	case "StatusValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue)
+		return json.Unmarshal(b, *v)
+	case "SubtasksValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue)
+		return json.Unmarshal(b, *v)
+	case "TagsValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue)
+		return json.Unmarshal(b, *v)
+	case "TeamValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue)
+		return json.Unmarshal(b, *v)
+	case "TextValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue)
+		return json.Unmarshal(b, *v)
+	case "TimeTrackingValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue)
+		return json.Unmarshal(b, *v)
+	case "TimelineValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue)
+		return json.Unmarshal(b, *v)
+	case "UnsupportedValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue)
+		return json.Unmarshal(b, *v)
+	case "VoteValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue)
+		return json.Unmarshal(b, *v)
+	case "WeekValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue)
+		return json.Unmarshal(b, *v)
+	case "WorldClockValue":
+		*v = new(ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing ColumnValue.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue(v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue:
+		typename = "BatteryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBatteryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue:
+		typename = "BoardRelationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue:
+		typename = "ButtonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesButtonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue:
+		typename = "CheckboxValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue:
+		typename = "ColorPickerValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue:
+		typename = "CountryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue:
+		typename = "CreationLogValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue:
+		typename = "DateValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue:
+		typename = "DependencyValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue:
+		typename = "DirectDocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue:
+		typename = "DocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue:
+		typename = "DropdownValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue:
+		typename = "EmailValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue:
+		typename = "FileValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue:
+		typename = "FormulaValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue:
+		typename = "GroupValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue:
+		typename = "HourValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue:
+		typename = "IntegrationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue:
+		typename = "ItemIdValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue:
+		typename = "LastUpdatedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue:
+		typename = "LinkValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue:
+		typename = "LocationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue:
+		typename = "LongTextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue:
+		typename = "MirrorValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue:
+		typename = "NumbersValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue:
+		typename = "PeopleValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue:
+		typename = "PersonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue:
+		typename = "PhoneValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue:
+		typename = "ProgressValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue:
+		typename = "RatingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue:
+		typename = "StatusValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue:
+		typename = "SubtasksValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue:
+		typename = "TagsValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue:
+		typename = "TeamValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue:
+		typename = "TextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue:
+		typename = "TimeTrackingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue:
+		typename = "TimelineValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue:
+		typename = "UnsupportedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue:
+		typename = "VoteValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue:
+		typename = "WeekValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue:
+		typename = "WorldClockValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue: "%T"`, v)
+	}
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn includes the requested fields of the GraphQL type Column.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetId() string {
+	return v.Id
+}
+
+// GetTitle returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Title, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetTitle() string {
+	return v.Title
+}
+
+// GetSettings_str returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetSettings_str() string {
+	return v.Settings_str
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue includes the requested fields of the GraphQL type CountryValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue includes the requested fields of the GraphQL type CreationLogValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue includes the requested fields of the GraphQL type DateValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue includes the requested fields of the GraphQL type DependencyValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue includes the requested fields of the GraphQL type DirectDocValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue includes the requested fields of the GraphQL type DocValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue includes the requested fields of the GraphQL type DropdownValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue includes the requested fields of the GraphQL type EmailValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue includes the requested fields of the GraphQL type FileValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue includes the requested fields of the GraphQL type FormulaValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue includes the requested fields of the GraphQL type GroupValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue includes the requested fields of the GraphQL type HourValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue includes the requested fields of the GraphQL type IntegrationValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue includes the requested fields of the GraphQL type ItemIdValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue includes the requested fields of the GraphQL type LastUpdatedValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue includes the requested fields of the GraphQL type LinkValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue includes the requested fields of the GraphQL type LocationValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue includes the requested fields of the GraphQL type LongTextValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue includes the requested fields of the GraphQL type MirrorValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue includes the requested fields of the GraphQL type NumbersValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue includes the requested fields of the GraphQL type PeopleValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue includes the requested fields of the GraphQL type PersonValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue includes the requested fields of the GraphQL type PhoneValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue includes the requested fields of the GraphQL type ProgressValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue includes the requested fields of the GraphQL type RatingValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue includes the requested fields of the GraphQL type StatusValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue includes the requested fields of the GraphQL type SubtasksValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue includes the requested fields of the GraphQL type TagsValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue includes the requested fields of the GraphQL type TeamValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue includes the requested fields of the GraphQL type TextValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue includes the requested fields of the GraphQL type TimeTrackingValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue includes the requested fields of the GraphQL type TimelineValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue includes the requested fields of the GraphQL type UnsupportedValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue includes the requested fields of the GraphQL type VoteValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue includes the requested fields of the GraphQL type WeekValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue includes the requested fields of the GraphQL type WorldClockValue.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetColumn() ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup) GetId() string {
+	return v.Id
+}
+
+// GetTitle returns ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemGroup) GetTitle() string {
+	return v.Title
+}
+
+// ItemsListByBoardResponse is returned by ItemsListByBoard on success.
+type ItemsListByBoardResponse struct {
+	// Get a collection of boards.
+	Boards []ItemsListByBoardBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns ItemsListByBoardResponse.Boards, and is useful for accessing the field via an interface.
+func (v *ItemsListByBoardResponse) GetBoards() []ItemsListByBoardBoardsBoard { return v.Boards }
+
+// ItemsListByGroupBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemsListByGroupBoardsBoard struct {
+	// The board's visible groups.
+	Groups []ItemsListByGroupBoardsBoardGroupsGroup `json:"groups"`
+}
+
+// GetGroups returns ItemsListByGroupBoardsBoard.Groups, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoard) GetGroups() []ItemsListByGroupBoardsBoardGroupsGroup {
+	return v.Groups
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemsListByGroupBoardsBoardGroupsGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The items in the group.
+	Items_page ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse `json:"items_page"`
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroup) GetId() string { return v.Id }
+
+// GetItems_page returns ItemsListByGroupBoardsBoardGroupsGroup.Items_page, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroup) GetItems_page() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse {
+	return v.Items_page
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse includes the requested fields of the GraphQL type ItemsResponse.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse struct {
+	// An opaque cursor that represents the position in the list after the last
+	// returned item. Use this cursor for pagination to fetch the next set of items.
+	// If the cursor is null, there are no more items to fetch.
+	Cursor string `json:"cursor"`
+	// The items associated with the cursor.
+	Items []ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem `json:"items"`
+}
+
+// GetCursor returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse.Cursor, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse) GetCursor() string {
+	return v.Cursor
+}
+
+// GetItems returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse.Items, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponse) GetItems() []ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem {
+	return v.Items
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The group that contains this item.
+	Group ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup `json:"group"`
+	// The item's column values.
+	Column_values []ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue `json:"-"`
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) GetId() string {
+	return v.Id
+}
+
+// GetName returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) GetName() string {
+	return v.Name
+}
+
+// GetState returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.State, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) GetState() State {
+	return v.State
+}
+
+// GetGroup returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) GetGroup() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup {
+	return v.Group
+}
+
+// GetColumn_values returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Column_values, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) GetColumn_values() []ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue {
+	return v.Column_values
+}
+
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem
+		Column_values []json.RawMessage `json:"column_values"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Column_values
+		src := firstPass.Column_values
+		*dst = make(
+			[]ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			if len(src) != 0 && string(src) != "null" {
+				err = __unmarshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue(
+					src, dst)
+				if err != nil {
+					return fmt.Errorf(
+						"unable to unmarshal ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Column_values: %w", err)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem struct {
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	State State `json:"state"`
+
+	Group ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup `json:"group"`
+
+	Column_values []json.RawMessage `json:"column_values"`
+}
+
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem) __premarshalJSON() (*__premarshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem, error) {
+	var retval __premarshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem
+
+	retval.Id = v.Id
+	retval.Name = v.Name
+	retval.State = v.State
+	retval.Group = v.Group
+	{
+
+		dst := &retval.Column_values
+		src := v.Column_values
+		*dst = make(
+			[]json.RawMessage,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			var err error
+			*dst, err = __marshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue(
+				&src)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"unable to marshal ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem.Column_values: %w", err)
+			}
+		}
+	}
+	return &retval, nil
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue includes the requested fields of the GraphQL type BatteryValue.
+// The GraphQL type's documentation follows.
+//
+// A value showing status distribution counts
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue includes the requested fields of the GraphQL type BoardRelationValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue includes the requested fields of the GraphQL type ButtonValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue includes the requested fields of the GraphQL type CheckboxValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue includes the requested fields of the GraphQL type ColorPickerValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue includes the requested fields of the GraphQL interface ColumnValue.
+//
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue is implemented by the following types:
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue interface {
+	implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() string
+	// GetId returns the interface-field "id" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's unique identifier.
+	GetId() string
+	// GetType returns the interface-field "type" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's type.
+	GetType() ColumnType
+	// GetValue returns the interface-field "value" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column's raw value in JSON format.
+	GetValue() string
+	// GetText returns the interface-field "text" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// Text representation of the column value. Note: Not all columns support textual value
+	GetText() string
+	// GetColumn returns the interface-field "column" from its implementation.
+	// The GraphQL interface field's documentation follows.
+	//
+	// The column that this value belongs to.
+	GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn
+}
+
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) implementsGraphQLInterfaceItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue() {
+}
+
+func __unmarshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue(b []byte, v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "BatteryValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue)
+		return json.Unmarshal(b, *v)
+	case "BoardRelationValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue)
+		return json.Unmarshal(b, *v)
+	case "ButtonValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue)
+		return json.Unmarshal(b, *v)
+	case "CheckboxValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue)
+		return json.Unmarshal(b, *v)
+	case "ColorPickerValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue)
+		return json.Unmarshal(b, *v)
+	case "CountryValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue)
+		return json.Unmarshal(b, *v)
+	case "CreationLogValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue)
+		return json.Unmarshal(b, *v)
+	case "DateValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue)
+		return json.Unmarshal(b, *v)
+	case "DependencyValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue)
+		return json.Unmarshal(b, *v)
+	case "DirectDocValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue)
+		return json.Unmarshal(b, *v)
+	case "DocValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue)
+		return json.Unmarshal(b, *v)
+	case "DropdownValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue)
+		return json.Unmarshal(b, *v)
+	case "EmailValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue)
+		return json.Unmarshal(b, *v)
+	case "FileValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue)
+		return json.Unmarshal(b, *v)
+	case "FormulaValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue)
+		return json.Unmarshal(b, *v)
+	case "GroupValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue)
+		return json.Unmarshal(b, *v)
+	case "HourValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue)
+		return json.Unmarshal(b, *v)
+	case "IntegrationValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue)
+		return json.Unmarshal(b, *v)
+	case "ItemIdValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue)
+		return json.Unmarshal(b, *v)
+	case "LastUpdatedValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue)
+		return json.Unmarshal(b, *v)
+	case "LinkValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue)
+		return json.Unmarshal(b, *v)
+	case "LocationValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue)
+		return json.Unmarshal(b, *v)
+	case "LongTextValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue)
+		return json.Unmarshal(b, *v)
+	case "MirrorValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue)
+		return json.Unmarshal(b, *v)
+	case "NumbersValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue)
+		return json.Unmarshal(b, *v)
+	case "PeopleValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue)
+		return json.Unmarshal(b, *v)
+	case "PersonValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue)
+		return json.Unmarshal(b, *v)
+	case "PhoneValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue)
+		return json.Unmarshal(b, *v)
+	case "ProgressValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue)
+		return json.Unmarshal(b, *v)
+	case "RatingValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue)
+		return json.Unmarshal(b, *v)
+	case "StatusValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue)
+		return json.Unmarshal(b, *v)
+	case "SubtasksValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue)
+		return json.Unmarshal(b, *v)
+	case "TagsValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue)
+		return json.Unmarshal(b, *v)
+	case "TeamValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue)
+		return json.Unmarshal(b, *v)
+	case "TextValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue)
+		return json.Unmarshal(b, *v)
+	case "TimeTrackingValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue)
+		return json.Unmarshal(b, *v)
+	case "TimelineValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue)
+		return json.Unmarshal(b, *v)
+	case "UnsupportedValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue)
+		return json.Unmarshal(b, *v)
+	case "VoteValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue)
+		return json.Unmarshal(b, *v)
+	case "WeekValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue)
+		return json.Unmarshal(b, *v)
+	case "WorldClockValue":
+		*v = new(ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing ColumnValue.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue(v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue:
+		typename = "BatteryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBatteryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue:
+		typename = "BoardRelationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesBoardRelationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue:
+		typename = "ButtonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesButtonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue:
+		typename = "CheckboxValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCheckboxValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue:
+		typename = "ColorPickerValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColorPickerValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue:
+		typename = "CountryValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue:
+		typename = "CreationLogValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue:
+		typename = "DateValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue:
+		typename = "DependencyValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue:
+		typename = "DirectDocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue:
+		typename = "DocValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue:
+		typename = "DropdownValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue:
+		typename = "EmailValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue:
+		typename = "FileValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue:
+		typename = "FormulaValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue:
+		typename = "GroupValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue:
+		typename = "HourValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue:
+		typename = "IntegrationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue:
+		typename = "ItemIdValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue:
+		typename = "LastUpdatedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue:
+		typename = "LinkValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue:
+		typename = "LocationValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue:
+		typename = "LongTextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue:
+		typename = "MirrorValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue:
+		typename = "NumbersValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue:
+		typename = "PeopleValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue:
+		typename = "PersonValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue:
+		typename = "PhoneValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue:
+		typename = "ProgressValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue:
+		typename = "RatingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue:
+		typename = "StatusValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue:
+		typename = "SubtasksValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue:
+		typename = "TagsValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue:
+		typename = "TeamValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue:
+		typename = "TextValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue:
+		typename = "TimeTrackingValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue:
+		typename = "TimelineValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue:
+		typename = "UnsupportedValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue:
+		typename = "VoteValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue:
+		typename = "WeekValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue
+		}{typename, v}
+		return json.Marshal(result)
+	case *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue:
+		typename = "WorldClockValue"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValue: "%T"`, v)
+	}
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn includes the requested fields of the GraphQL type Column.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetId() string {
+	return v.Id
+}
+
+// GetTitle returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Title, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetTitle() string {
+	return v.Title
+}
+
+// GetSettings_str returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn) GetSettings_str() string {
+	return v.Settings_str
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue includes the requested fields of the GraphQL type CountryValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCountryValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue includes the requested fields of the GraphQL type CreationLogValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesCreationLogValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue includes the requested fields of the GraphQL type DateValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDateValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue includes the requested fields of the GraphQL type DependencyValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDependencyValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue includes the requested fields of the GraphQL type DirectDocValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDirectDocValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue includes the requested fields of the GraphQL type DocValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDocValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue includes the requested fields of the GraphQL type DropdownValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesDropdownValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue includes the requested fields of the GraphQL type EmailValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesEmailValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue includes the requested fields of the GraphQL type FileValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFileValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue includes the requested fields of the GraphQL type FormulaValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesFormulaValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue includes the requested fields of the GraphQL type GroupValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesGroupValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue includes the requested fields of the GraphQL type HourValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesHourValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue includes the requested fields of the GraphQL type IntegrationValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesIntegrationValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue includes the requested fields of the GraphQL type ItemIdValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesItemIdValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue includes the requested fields of the GraphQL type LastUpdatedValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLastUpdatedValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue includes the requested fields of the GraphQL type LinkValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLinkValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue includes the requested fields of the GraphQL type LocationValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLocationValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue includes the requested fields of the GraphQL type LongTextValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesLongTextValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue includes the requested fields of the GraphQL type MirrorValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesMirrorValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue includes the requested fields of the GraphQL type NumbersValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesNumbersValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue includes the requested fields of the GraphQL type PeopleValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPeopleValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue includes the requested fields of the GraphQL type PersonValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPersonValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue includes the requested fields of the GraphQL type PhoneValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesPhoneValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue includes the requested fields of the GraphQL type ProgressValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesProgressValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue includes the requested fields of the GraphQL type RatingValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesRatingValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue includes the requested fields of the GraphQL type StatusValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesStatusValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue includes the requested fields of the GraphQL type SubtasksValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesSubtasksValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue includes the requested fields of the GraphQL type TagsValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTagsValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue includes the requested fields of the GraphQL type TeamValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTeamValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue includes the requested fields of the GraphQL type TextValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTextValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue includes the requested fields of the GraphQL type TimeTrackingValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimeTrackingValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue includes the requested fields of the GraphQL type TimelineValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesTimelineValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue includes the requested fields of the GraphQL type UnsupportedValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesUnsupportedValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue includes the requested fields of the GraphQL type VoteValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesVoteValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue includes the requested fields of the GraphQL type WeekValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWeekValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue includes the requested fields of the GraphQL type WorldClockValue.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue struct {
+	Typename string `json:"__typename"`
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's raw value in JSON format.
+	Value string `json:"value"`
+	// Text representation of the column value. Note: Not all columns support textual value
+	Text string `json:"text"`
+	// The column that this value belongs to.
+	Column ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn `json:"column"`
+}
+
+// GetTypename returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Typename, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetTypename() string {
+	return v.Typename
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetId() string {
+	return v.Id
+}
+
+// GetType returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Type, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetType() ColumnType {
+	return v.Type
+}
+
+// GetValue returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Value, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetValue() string {
+	return v.Value
+}
+
+// GetText returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Text, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetText() string {
+	return v.Text
+}
+
+// GetColumn returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue.Column, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesWorldClockValue) GetColumn() ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemColumn_valuesColumnValueColumn {
+	return v.Column
+}
+
+// ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup) GetId() string {
+	return v.Id
+}
+
+// GetTitle returns ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemGroup) GetTitle() string {
+	return v.Title
+}
+
+// ItemsListByGroupResponse is returned by ItemsListByGroup on success.
+type ItemsListByGroupResponse struct {
+	// Get a collection of boards.
+	Boards []ItemsListByGroupBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns ItemsListByGroupResponse.Boards, and is useful for accessing the field via an interface.
+func (v *ItemsListByGroupResponse) GetBoards() []ItemsListByGroupBoardsBoard { return v.Boards }
+
 // MeMeUser includes the requested fields of the GraphQL type User.
 // The GraphQL type's documentation follows.
 //
@@ -562,6 +8368,50 @@ func (v *__BoardsListInput) GetPage() int { return v.Page }
 
 // GetWorkspaceIds returns __BoardsListInput.WorkspaceIds, and is useful for accessing the field via an interface.
 func (v *__BoardsListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
+
+// __ItemGetInput is used internally by genqlient
+type __ItemGetInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __ItemGetInput.Id, and is useful for accessing the field via an interface.
+func (v *__ItemGetInput) GetId() string { return v.Id }
+
+// __ItemsListByBoardInput is used internally by genqlient
+type __ItemsListByBoardInput struct {
+	BoardId string `json:"boardId"`
+	Limit   int    `json:"limit"`
+	Cursor  string `json:"cursor,omitempty"`
+}
+
+// GetBoardId returns __ItemsListByBoardInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemsListByBoardInput) GetBoardId() string { return v.BoardId }
+
+// GetLimit returns __ItemsListByBoardInput.Limit, and is useful for accessing the field via an interface.
+func (v *__ItemsListByBoardInput) GetLimit() int { return v.Limit }
+
+// GetCursor returns __ItemsListByBoardInput.Cursor, and is useful for accessing the field via an interface.
+func (v *__ItemsListByBoardInput) GetCursor() string { return v.Cursor }
+
+// __ItemsListByGroupInput is used internally by genqlient
+type __ItemsListByGroupInput struct {
+	BoardId string `json:"boardId"`
+	GroupId string `json:"groupId"`
+	Limit   int    `json:"limit"`
+	Cursor  string `json:"cursor,omitempty"`
+}
+
+// GetBoardId returns __ItemsListByGroupInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemsListByGroupInput) GetBoardId() string { return v.BoardId }
+
+// GetGroupId returns __ItemsListByGroupInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__ItemsListByGroupInput) GetGroupId() string { return v.GroupId }
+
+// GetLimit returns __ItemsListByGroupInput.Limit, and is useful for accessing the field via an interface.
+func (v *__ItemsListByGroupInput) GetLimit() int { return v.Limit }
+
+// GetCursor returns __ItemsListByGroupInput.Cursor, and is useful for accessing the field via an interface.
+func (v *__ItemsListByGroupInput) GetCursor() string { return v.Cursor }
 
 // The query executed by BoardByID.
 const BoardByID_Operation = `
@@ -748,6 +8598,209 @@ func BoardsList(
 	}
 
 	data_ = &BoardsListResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ItemGet.
+const ItemGet_Operation = `
+query ItemGet ($id: ID!) {
+	items(ids: [$id]) {
+		id
+		name
+		state
+		created_at
+		updated_at
+		creator {
+			id
+			name
+		}
+		group {
+			id
+			title
+		}
+		board {
+			id
+			name
+		}
+		parent_item {
+			id
+			name
+		}
+		subitems {
+			id
+			name
+			state
+		}
+		column_values {
+			__typename
+			id
+			type
+			value
+			text
+			column {
+				id
+				title
+				settings_str
+			}
+		}
+	}
+}
+`
+
+// ItemGet fetches a single item by ID with full detail.
+func ItemGet(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *ItemGetResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemGet",
+		Query:  ItemGet_Operation,
+		Variables: &__ItemGetInput{
+			Id: id,
+		},
+	}
+
+	data_ = &ItemGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ItemsListByBoard.
+const ItemsListByBoard_Operation = `
+query ItemsListByBoard ($boardId: ID!, $limit: Int! = 25, $cursor: String) {
+	boards(ids: [$boardId]) {
+		items_page(limit: $limit, cursor: $cursor) {
+			cursor
+			items {
+				id
+				name
+				state
+				group {
+					id
+					title
+				}
+				column_values {
+					__typename
+					id
+					type
+					value
+					text
+					column {
+						id
+						title
+						settings_str
+					}
+				}
+			}
+		}
+	}
+}
+`
+
+// ItemsListByBoard fetches a page of items from a board (no group filter).
+// monday's items_page uses opaque cursor pagination. Pass empty/omitted cursor for
+// the first page; the response cursor is null/empty when no more pages.
+func ItemsListByBoard(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	limit int,
+	cursor string,
+) (data_ *ItemsListByBoardResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemsListByBoard",
+		Query:  ItemsListByBoard_Operation,
+		Variables: &__ItemsListByBoardInput{
+			BoardId: boardId,
+			Limit:   limit,
+			Cursor:  cursor,
+		},
+	}
+
+	data_ = &ItemsListByBoardResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ItemsListByGroup.
+const ItemsListByGroup_Operation = `
+query ItemsListByGroup ($boardId: ID!, $groupId: String!, $limit: Int! = 25, $cursor: String) {
+	boards(ids: [$boardId]) {
+		groups(ids: [$groupId]) {
+			id
+			items_page(limit: $limit, cursor: $cursor) {
+				cursor
+				items {
+					id
+					name
+					state
+					group {
+						id
+						title
+					}
+					column_values {
+						__typename
+						id
+						type
+						value
+						text
+						column {
+							id
+							title
+							settings_str
+						}
+					}
+				}
+			}
+		}
+	}
+}
+`
+
+// ItemsListByGroup fetches a page of items from a specific group within a board.
+func ItemsListByGroup(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	groupId string,
+	limit int,
+	cursor string,
+) (data_ *ItemsListByGroupResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemsListByGroup",
+		Query:  ItemsListByGroup_Operation,
+		Variables: &__ItemsListByGroupInput{
+			BoardId: boardId,
+			GroupId: groupId,
+			Limit:   limit,
+			Cursor:  cursor,
+		},
+	}
+
+	data_ = &ItemsListByGroupResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

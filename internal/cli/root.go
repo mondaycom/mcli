@@ -41,6 +41,7 @@ func init() {
 	rootCmd.AddCommand(newAuthCmd())
 	rootCmd.AddCommand(newMeCmd())
 	rootCmd.AddCommand(newBoardCmd())
+	rootCmd.AddCommand(newItemCmd())
 }
 
 // Execute runs the root command.

@@ -1,0 +1,82 @@
+# ItemsListByBoard fetches a page of items from a board (no group filter).
+# monday's items_page uses opaque cursor pagination. Pass empty/omitted cursor for
+# the first page; the response cursor is null/empty when no more pages.
+query ItemsListByBoard(
+  $boardId: ID!,
+  $limit: Int! = 25,
+  # @genqlient(omitempty: true)
+  $cursor: String,
+) {
+  boards(ids: [$boardId]) {
+    items_page(limit: $limit, cursor: $cursor) {
+      cursor
+      items {
+        id
+        name
+        state
+        group { id title }
+        column_values {
+          id
+          type
+          value
+          text
+          column { id title settings_str }
+        }
+      }
+    }
+  }
+}
+
+# ItemsListByGroup fetches a page of items from a specific group within a board.
+query ItemsListByGroup(
+  $boardId: ID!,
+  $groupId: String!,
+  $limit: Int! = 25,
+  # @genqlient(omitempty: true)
+  $cursor: String,
+) {
+  boards(ids: [$boardId]) {
+    groups(ids: [$groupId]) {
+      id
+      items_page(limit: $limit, cursor: $cursor) {
+        cursor
+        items {
+          id
+          name
+          state
+          group { id title }
+          column_values {
+            id
+            type
+            value
+            text
+            column { id title settings_str }
+          }
+        }
+      }
+    }
+  }
+}
+
+# ItemGet fetches a single item by ID with full detail.
+query ItemGet($id: ID!) {
+  items(ids: [$id]) {
+    id
+    name
+    state
+    created_at
+    updated_at
+    creator { id name }
+    group { id title }
+    board { id name }
+    parent_item { id name }
+    subitems { id name state }
+    column_values {
+      id
+      type
+      value
+      text
+      column { id title settings_str }
+    }
+  }
+}

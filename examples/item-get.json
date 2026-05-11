@@ -1,0 +1,64 @@
+{
+  "id": "1234567890",
+  "name": "Build authentication service",
+  "state": "active",
+  "created_at": "2026-05-01",
+  "updated_at": "2026-05-09",
+  "creator": {
+    "id": "50353184",
+    "name": "Alice"
+  },
+  "group": {
+    "id": "topics",
+    "title": "Sprint 1"
+  },
+  "board": {
+    "id": "9832181507",
+    "name": "Dev Board"
+  },
+  "parent_item": null,
+  "subitems": [
+    {
+      "id": "5555555551",
+      "name": "Design API contract",
+      "state": "done"
+    },
+    {
+      "id": "5555555552",
+      "name": "Implement JWT handler",
+      "state": "active"
+    }
+  ],
+  "columns": [
+    {
+      "id": "status",
+      "type": "status",
+      "value": "In Progress"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "value": "2026-05-15"
+    },
+    {
+      "id": "owner",
+      "type": "people",
+      "value": [
+        {"id": "50353184", "kind": "person"}
+      ]
+    },
+    {
+      "id": "story_points",
+      "type": "numeric",
+      "value": 8
+    },
+    {
+      "id": "pr_link",
+      "type": "link",
+      "value": {
+        "url": "https://github.com/org/repo/pull/42",
+        "text": "PR #42"
+      }
+    }
+  ]
+}
