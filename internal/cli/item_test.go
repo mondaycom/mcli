@@ -919,3 +919,167 @@ func TestItemUpdate_APIError(t *testing.T) {
 		t.Fatal("expected error from API error response")
 	}
 }
+
+// ---- item move tests ----
+
+func execItemMove(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"move"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+func sampleMoveToGroupResponse(id, name, groupID, groupTitle string) map[string]any {
+	return map[string]any{
+		"move_item_to_group": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "active",
+			"board": map[string]any{"id": "9832181507", "name": "Dev Board"},
+			"group": map[string]any{"id": groupID, "title": groupTitle},
+		},
+	}
+}
+
+func sampleMoveToBoardResponse(id, name, boardID, boardName, groupID, groupTitle string) map[string]any {
+	return map[string]any{
+		"move_item_to_board": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "active",
+			"board": map[string]any{"id": boardID, "name": boardName},
+			"group": map[string]any{"id": groupID, "title": groupTitle},
+		},
+	}
+}
+
+func TestItemMove_ToGroup(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemMoveToGroup" {
+			t.Errorf("expected ItemMoveToGroup op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleMoveToGroupResponse("111", "My Item", "new_group", "Sprint 2"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemMove(t, "111", "--to-group", "new_group")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["itemId"] != "111" {
+		t.Errorf("expected itemId='111', got %v", capturedVars["itemId"])
+	}
+	if capturedVars["groupId"] != "new_group" {
+		t.Errorf("expected groupId='new_group', got %v", capturedVars["groupId"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "111" {
+		t.Errorf("expected id='111', got %v", result["id"])
+	}
+	group, _ := result["group"].(map[string]any)
+	if group == nil || group["id"] != "new_group" {
+		t.Errorf("expected group.id='new_group', got %v", group)
+	}
+}
+
+func TestItemMove_ToBoard(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemMoveToBoard" {
+			t.Errorf("expected ItemMoveToBoard op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleMoveToBoardResponse("222", "Task", "8888", "Other Board", "grp1", "Target Group"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemMove(t, "222", "--to-board", "8888", "--group", "grp1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["itemId"] != "222" {
+		t.Errorf("expected itemId='222', got %v", capturedVars["itemId"])
+	}
+	if capturedVars["boardId"] != "8888" {
+		t.Errorf("expected boardId='8888', got %v", capturedVars["boardId"])
+	}
+	if capturedVars["groupId"] != "grp1" {
+		t.Errorf("expected groupId='grp1', got %v", capturedVars["groupId"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	board, _ := result["board"].(map[string]any)
+	if board == nil || board["id"] != "8888" {
+		t.Errorf("expected board.id='8888', got %v", board)
+	}
+}
+
+func TestItemMove_ToBoardMissingGroup(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleMoveToBoardResponse("222", "x", "8888", "x", "g", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemMove(t, "222", "--to-board", "8888")
+	if err == nil {
+		t.Fatal("expected error when --group is missing with --to-board")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemMove_NeitherFlag(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleMoveToGroupResponse("1", "x", "g", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemMove(t, "111")
+	if err == nil {
+		t.Fatal("expected error when neither --to-group nor --to-board given")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemMove_BothFlags(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleMoveToGroupResponse("1", "x", "g", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemMove(t, "111", "--to-group", "g", "--to-board", "b")
+	if err == nil {
+		t.Fatal("expected error when both --to-group and --to-board given")
+	}
+}

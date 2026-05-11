@@ -73,6 +73,7 @@ func newItemCmd() *cobra.Command {
 	cmd.AddCommand(newItemGetCmd())
 	cmd.AddCommand(newItemCreateCmd())
 	cmd.AddCommand(newItemUpdateCmd())
+	cmd.AddCommand(newItemMoveCmd())
 	return cmd
 }
 
@@ -375,6 +376,100 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 	for _, f := range colFlags {
 		_, _ = fmt.Fprintf(o, "  col  → %s\n", f)
 	}
+	return err
+}
+
+// --- item move ---
+
+func newItemMoveCmd() *cobra.Command {
+	var toGroup string
+	var toBoard string
+	var groupID string
+
+	cmd := &cobra.Command{
+		Use:   "move <item-id>",
+		Short: "Move an item to a different group or board",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemMove(cmd, args[0], toGroup, toBoard, groupID)
+		},
+	}
+	cmd.Flags().StringVar(&toGroup, "to-group", "", "Target group ID (within same board)")
+	cmd.Flags().StringVar(&toBoard, "to-board", "", "Target board ID")
+	cmd.Flags().StringVar(&groupID, "group", "", "Target group ID on target board (required with --to-board)")
+	cmd.MarkFlagsMutuallyExclusive("to-group", "to-board")
+	return cmd
+}
+
+func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) error {
+	if _, err := strconv.ParseUint(itemID, 10, 64); err != nil {
+		return errs.Usage("item id must be a numeric string, got %q", itemID)
+	}
+	if toGroup == "" && toBoard == "" {
+		return errs.Usage("must specify --to-group or --to-board")
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	var out itemWriteOutput
+
+	if toGroup != "" {
+		resp, apiErr := gen.ItemMoveToGroup(context.Background(), gql, itemID, toGroup)
+		if apiErr != nil {
+			return apiErr
+		}
+		it := resp.Move_item_to_group
+		out = itemWriteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+		if it.Board.Id != "" {
+			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+		}
+		if it.Group.Id != "" {
+			out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+		}
+	} else {
+		if groupID == "" {
+			return errs.Usage("--group is required when using --to-board")
+		}
+		resp, apiErr := gen.ItemMoveToBoard(context.Background(), gql, itemID, toBoard, groupID)
+		if apiErr != nil {
+			return apiErr
+		}
+		it := resp.Move_item_to_board
+		out = itemWriteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+		if it.Board.Id != "" {
+			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+		}
+		if it.Group.Id != "" {
+			out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+		}
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	o := cmd.OutOrStdout()
+	_, err = fmt.Fprintf(o, "Moved item %s", out.ID)
+	if out.Group != nil {
+		_, _ = fmt.Fprintf(o, " → group %q", out.Group.Title)
+	}
+	if out.Board != nil {
+		_, _ = fmt.Fprintf(o, " on board %q", out.Board.Name)
+	}
+	_, _ = fmt.Fprintln(o)
 	return err
 }
 

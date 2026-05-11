@@ -2890,6 +2890,168 @@ type ItemGetResponse struct {
 // GetItems returns ItemGetResponse.Items, and is useful for accessing the field via an interface.
 func (v *ItemGetResponse) GetItems() []ItemGetItemsItem { return v.Items }
 
+// ItemMoveToBoardMove_item_to_boardItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemMoveToBoardMove_item_to_boardItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board that contains this item.
+	Board ItemMoveToBoardMove_item_to_boardItemBoard `json:"board"`
+	// The group that contains this item.
+	Group ItemMoveToBoardMove_item_to_boardItemGroup `json:"group"`
+}
+
+// GetId returns ItemMoveToBoardMove_item_to_boardItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItem) GetId() string { return v.Id }
+
+// GetName returns ItemMoveToBoardMove_item_to_boardItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItem) GetName() string { return v.Name }
+
+// GetState returns ItemMoveToBoardMove_item_to_boardItem.State, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItem) GetState() State { return v.State }
+
+// GetBoard returns ItemMoveToBoardMove_item_to_boardItem.Board, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItem) GetBoard() ItemMoveToBoardMove_item_to_boardItemBoard {
+	return v.Board
+}
+
+// GetGroup returns ItemMoveToBoardMove_item_to_boardItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItem) GetGroup() ItemMoveToBoardMove_item_to_boardItemGroup {
+	return v.Group
+}
+
+// ItemMoveToBoardMove_item_to_boardItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemMoveToBoardMove_item_to_boardItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemMoveToBoardMove_item_to_boardItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItemBoard) GetId() string { return v.Id }
+
+// GetName returns ItemMoveToBoardMove_item_to_boardItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItemBoard) GetName() string { return v.Name }
+
+// ItemMoveToBoardMove_item_to_boardItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemMoveToBoardMove_item_to_boardItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemMoveToBoardMove_item_to_boardItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItemGroup) GetId() string { return v.Id }
+
+// GetTitle returns ItemMoveToBoardMove_item_to_boardItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardMove_item_to_boardItemGroup) GetTitle() string { return v.Title }
+
+// ItemMoveToBoardResponse is returned by ItemMoveToBoard on success.
+type ItemMoveToBoardResponse struct {
+	// Move an item to a different board.
+	Move_item_to_board ItemMoveToBoardMove_item_to_boardItem `json:"move_item_to_board"`
+}
+
+// GetMove_item_to_board returns ItemMoveToBoardResponse.Move_item_to_board, and is useful for accessing the field via an interface.
+func (v *ItemMoveToBoardResponse) GetMove_item_to_board() ItemMoveToBoardMove_item_to_boardItem {
+	return v.Move_item_to_board
+}
+
+// ItemMoveToGroupMove_item_to_groupItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemMoveToGroupMove_item_to_groupItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+	// The board that contains this item.
+	Board ItemMoveToGroupMove_item_to_groupItemBoard `json:"board"`
+	// The group that contains this item.
+	Group ItemMoveToGroupMove_item_to_groupItemGroup `json:"group"`
+}
+
+// GetId returns ItemMoveToGroupMove_item_to_groupItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItem) GetId() string { return v.Id }
+
+// GetName returns ItemMoveToGroupMove_item_to_groupItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItem) GetName() string { return v.Name }
+
+// GetState returns ItemMoveToGroupMove_item_to_groupItem.State, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItem) GetState() State { return v.State }
+
+// GetBoard returns ItemMoveToGroupMove_item_to_groupItem.Board, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItem) GetBoard() ItemMoveToGroupMove_item_to_groupItemBoard {
+	return v.Board
+}
+
+// GetGroup returns ItemMoveToGroupMove_item_to_groupItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItem) GetGroup() ItemMoveToGroupMove_item_to_groupItemGroup {
+	return v.Group
+}
+
+// ItemMoveToGroupMove_item_to_groupItemBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type ItemMoveToGroupMove_item_to_groupItemBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns ItemMoveToGroupMove_item_to_groupItemBoard.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItemBoard) GetId() string { return v.Id }
+
+// GetName returns ItemMoveToGroupMove_item_to_groupItemBoard.Name, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItemBoard) GetName() string { return v.Name }
+
+// ItemMoveToGroupMove_item_to_groupItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemMoveToGroupMove_item_to_groupItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemMoveToGroupMove_item_to_groupItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItemGroup) GetId() string { return v.Id }
+
+// GetTitle returns ItemMoveToGroupMove_item_to_groupItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupMove_item_to_groupItemGroup) GetTitle() string { return v.Title }
+
+// ItemMoveToGroupResponse is returned by ItemMoveToGroup on success.
+type ItemMoveToGroupResponse struct {
+	// Move an item to a different group.
+	Move_item_to_group ItemMoveToGroupMove_item_to_groupItem `json:"move_item_to_group"`
+}
+
+// GetMove_item_to_group returns ItemMoveToGroupResponse.Move_item_to_group, and is useful for accessing the field via an interface.
+func (v *ItemMoveToGroupResponse) GetMove_item_to_group() ItemMoveToGroupMove_item_to_groupItem {
+	return v.Move_item_to_group
+}
+
 // ItemUpdateChange_multiple_column_valuesItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
 //
@@ -8634,6 +8796,34 @@ type __ItemGetInput struct {
 // GetId returns __ItemGetInput.Id, and is useful for accessing the field via an interface.
 func (v *__ItemGetInput) GetId() string { return v.Id }
 
+// __ItemMoveToBoardInput is used internally by genqlient
+type __ItemMoveToBoardInput struct {
+	ItemId  string `json:"itemId"`
+	BoardId string `json:"boardId"`
+	GroupId string `json:"groupId"`
+}
+
+// GetItemId returns __ItemMoveToBoardInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemMoveToBoardInput) GetItemId() string { return v.ItemId }
+
+// GetBoardId returns __ItemMoveToBoardInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemMoveToBoardInput) GetBoardId() string { return v.BoardId }
+
+// GetGroupId returns __ItemMoveToBoardInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__ItemMoveToBoardInput) GetGroupId() string { return v.GroupId }
+
+// __ItemMoveToGroupInput is used internally by genqlient
+type __ItemMoveToGroupInput struct {
+	ItemId  string `json:"itemId"`
+	GroupId string `json:"groupId"`
+}
+
+// GetItemId returns __ItemMoveToGroupInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemMoveToGroupInput) GetItemId() string { return v.ItemId }
+
+// GetGroupId returns __ItemMoveToGroupInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__ItemMoveToGroupInput) GetGroupId() string { return v.GroupId }
+
 // __ItemUpdateInput is used internally by genqlient
 type __ItemUpdateInput struct {
 	BoardId      string `json:"boardId"`
@@ -9021,6 +9211,102 @@ func ItemGet(
 	return data_, err_
 }
 
+// The mutation executed by ItemMoveToBoard.
+const ItemMoveToBoard_Operation = `
+mutation ItemMoveToBoard ($itemId: ID!, $boardId: ID!, $groupId: ID!) {
+	move_item_to_board(item_id: $itemId, board_id: $boardId, group_id: $groupId) {
+		id
+		name
+		state
+		board {
+			id
+			name
+		}
+		group {
+			id
+			title
+		}
+	}
+}
+`
+
+// ItemMoveToBoard moves an item to a different board.
+func ItemMoveToBoard(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+	boardId string,
+	groupId string,
+) (data_ *ItemMoveToBoardResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemMoveToBoard",
+		Query:  ItemMoveToBoard_Operation,
+		Variables: &__ItemMoveToBoardInput{
+			ItemId:  itemId,
+			BoardId: boardId,
+			GroupId: groupId,
+		},
+	}
+
+	data_ = &ItemMoveToBoardResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ItemMoveToGroup.
+const ItemMoveToGroup_Operation = `
+mutation ItemMoveToGroup ($itemId: ID, $groupId: String!) {
+	move_item_to_group(item_id: $itemId, group_id: $groupId) {
+		id
+		name
+		state
+		board {
+			id
+			name
+		}
+		group {
+			id
+			title
+		}
+	}
+}
+`
+
+// ItemMoveToGroup moves an item to a different group within the same board.
+func ItemMoveToGroup(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+	groupId string,
+) (data_ *ItemMoveToGroupResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemMoveToGroup",
+		Query:  ItemMoveToGroup_Operation,
+		Variables: &__ItemMoveToGroupInput{
+			ItemId:  itemId,
+			GroupId: groupId,
+		},
+	}
+
+	data_ = &ItemMoveToGroupResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ItemUpdate.
 const ItemUpdate_Operation = `
 mutation ItemUpdate ($boardId: ID!, $itemId: ID!, $columnValues: JSON!) {
@@ -9041,7 +9327,7 @@ mutation ItemUpdate ($boardId: ID!, $itemId: ID!, $columnValues: JSON!) {
 `
 
 // ItemUpdate changes one or more column values on an item.
-// Use the column id "name" with value {"name":"..."} to rename.
+// Use the column id "name" with value "new name" (bare string) to rename.
 func ItemUpdate(
 	ctx_ context.Context,
 	client_ graphql.Client,

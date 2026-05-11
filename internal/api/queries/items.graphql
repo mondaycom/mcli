@@ -125,7 +125,7 @@ mutation SubitemCreate(
 }
 
 # ItemUpdate changes one or more column values on an item.
-# Use the column id "name" with value {"name":"..."} to rename.
+# Use the column id "name" with value "new name" (bare string) to rename.
 mutation ItemUpdate(
   $boardId: ID!,
   $itemId: ID!,
@@ -135,6 +135,42 @@ mutation ItemUpdate(
     board_id: $boardId,
     item_id: $itemId,
     column_values: $columnValues,
+  ) {
+    id
+    name
+    state
+    board { id name }
+    group { id title }
+  }
+}
+
+# ItemMoveToGroup moves an item to a different group within the same board.
+mutation ItemMoveToGroup(
+  $itemId: ID,
+  $groupId: String!,
+) {
+  move_item_to_group(
+    item_id: $itemId,
+    group_id: $groupId,
+  ) {
+    id
+    name
+    state
+    board { id name }
+    group { id title }
+  }
+}
+
+# ItemMoveToBoard moves an item to a different board.
+mutation ItemMoveToBoard(
+  $itemId: ID!,
+  $boardId: ID!,
+  $groupId: ID!,
+) {
+  move_item_to_board(
+    item_id: $itemId,
+    board_id: $boardId,
+    group_id: $groupId,
   ) {
     id
     name
