@@ -30,6 +30,7 @@ type Daemon struct {
 	httpServer *http.Server
 	ipcServer  *IPCServer
 	tunnel     *Tunnel
+	store      *Store
 	stopCh     chan struct{}
 	stopped    atomic.Bool
 }
@@ -44,13 +45,8 @@ func New(cfg Config) *Daemon {
 		stopCh: make(chan struct{}),
 	}
 
-	whMux := http.NewServeMux()
-	whMux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
 	d.httpServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: whMux,
+		Addr: fmt.Sprintf(":%d", cfg.Port),
 	}
 
 	d.ipcServer = NewIPCServer(d.sockPath(), d)
@@ -82,6 +78,21 @@ func (d *Daemon) Start(ctx context.Context) error {
 	if err := WritePID(d.pidPath()); err != nil {
 		return fmt.Errorf("Start: %w", err)
 	}
+
+	// Open the event store and wire the webhook handler.
+	store, err := OpenStore(filepath.Join(d.cfg.ConfigDir, "events.db"))
+	if err != nil {
+		return fmt.Errorf("Start: open event store: %w", err)
+	}
+	d.store = store
+
+	whMux := http.NewServeMux()
+	whMux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"status":"ok"}`)
+	})
+	whMux.Handle("/webhook", NewWebhookHandler(d.store))
+	d.httpServer.Handler = whMux
 
 	// Remove stale socket if present.
 	_ = os.Remove(d.sockPath())
@@ -152,6 +163,10 @@ func (d *Daemon) shutdown() error {
 		_ = d.tunnel.Stop()
 	}
 
+	if d.store != nil {
+		_ = d.store.Close()
+	}
+
 	_ = RemovePID(d.pidPath())
 	_ = os.Remove(d.sockPath())
 
@@ -162,6 +177,11 @@ func (d *Daemon) shutdown() error {
 		return fmt.Errorf("shutdown IPC: %w", ipcErr)
 	}
 	return nil
+}
+
+// Store returns the daemon's event store. It is nil before Start is called.
+func (d *Daemon) Store() *Store {
+	return d.store
 }
 
 // URL returns the external URL for this daemon instance. If an ExternalURL was
