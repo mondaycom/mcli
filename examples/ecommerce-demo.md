@@ -106,7 +106,10 @@ mcli mutation run create_product \
 
 ## Phase 5: Place an Order
 
-This is where the semantic layer shines — the agent only needs domain vocabulary:
+This is where the semantic layer shines — the agent writes natural JSON in `--var`
+and mcli handles the encoding automatically. monday.com's `JSON` scalar expects a
+stringified JSON value on the wire, but mcli detects variables declared as `JSON`
+in the query and re-encodes them transparently. No double-escaping needed.
 
 ```sh
 # 1. Create order in Draft status
@@ -144,5 +147,6 @@ mcli query run get_order --var itemId="[$ORDER_ID]" --pretty
 
 - **Generic commands** (`board create`, `item create`) handle setup
 - **Saved queries/mutations** create a domain-specific API layer
-- **LLM agents** can operate entirely through `mcli mutation run <name>` / `mcli query run <name>` without understanding monday.com internals
+- **JSON coercion** — variables declared as `JSON` in the query are auto-stringified, so `--var cols='{"key":"val"}'` just works without double-encoding
+- **LLM agents** can operate entirely through `mcli mutation run <name>` / `mcli query run <name>` without understanding monday.com internals or wire-format quirks
 - The semantic layer is project-local (`.mcli/` directory) and version-controllable
