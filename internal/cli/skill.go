@@ -111,6 +111,15 @@ Inline mutations also work: ` + "`mcli mutation '<graphql>' [--var key=value]...
 
 Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}` + "`" + `. Exit 0 if no errors, exit 2 if errors present.
 
+### Daemon + Notifications (webhook inbox)
+
+1. Start daemon: ` + "`mcli daemon start`" + ` (requires ` + "`cloudflared`" + ` in PATH, or pass ` + "`--url`" + `)
+2. Register webhook: ` + "`mcli webhook create --board <id> --event create_item`" + `
+3. Poll for events: ` + "`mcli notification count`" + ` (quick) or ` + "`mcli notification list --unread`" + `
+4. Acknowledge: ` + "`mcli notification ack <id>`" + ` or ` + "`mcli notification ack --all`" + `
+
+Available events: ` + "`mcli webhook events`" + `
+
 ## Output Shapes
 
 | Pattern | Shape |

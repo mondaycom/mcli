@@ -78,11 +78,70 @@ mcli query save/list/run/delete      Saved query management
 mcli mutation '<graphql>'            Raw GraphQL mutations (inline, -f file, -f -)
 mcli mutation save/list/run/delete   Saved mutation management
 
+mcli daemon start/stop/status        Background daemon (webhook receiver)
+mcli webhook create/list/delete/events  Webhook registration management
+mcli notification list/count/ack     Event inbox (poll for webhook events)
+
 mcli skill                           Print LLM skill document
 mcli version                         Print version
 ```
 
 Run `mcli <command> --help` for flags and usage on any command.
+
+## Daemon & Webhooks
+
+mcli includes a background daemon that receives monday.com webhooks and stores them as an inbox for LLM agents to poll.
+
+### Setup
+
+```sh
+# Start the daemon (foreground — it opens a Cloudflare Quick Tunnel automatically)
+mcli daemon start
+
+# Or supply your own public URL (skips tunnel)
+mcli daemon start --url https://your-server.example.com
+```
+
+The daemon:
+- Listens for webhook payloads on an HTTP port (default 6780)
+- Exposes a Unix socket IPC for CLI commands
+- Opens a Cloudflare Quick Tunnel for a public URL (requires `cloudflared` in PATH)
+- Re-registers webhooks automatically when the tunnel URL changes
+
+### Register Webhooks
+
+```sh
+# Register a webhook for item creation events on a board
+mcli webhook create --board 9832181507 --event create_item
+
+# List registered webhooks
+mcli webhook list
+
+# List supported event types
+mcli webhook events
+
+# Remove a webhook
+mcli webhook delete <webhook-id>
+```
+
+### Poll Notifications
+
+```sh
+# Check if there are unread events
+mcli notification count
+
+# List unread events
+mcli notification list --unread
+
+# Filter by board or event type
+mcli notification list --board 9832181507 --event change_column_value
+
+# Acknowledge (mark read)
+mcli notification ack <event-id>
+mcli notification ack --all
+```
+
+All notification/webhook commands require the daemon to be running. If it isn't, they return a `DAEMON_REQUIRED` error with exit code 6.
 
 ## LLM Integration
 
