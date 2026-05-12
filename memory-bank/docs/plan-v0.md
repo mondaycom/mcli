@@ -126,19 +126,20 @@ Monday's `column_values` are JSON-string blobs whose shape varies per column typ
 - AC-4.3: Unsupported column types Decode to their raw JSON string (passthrough, no error). Encode side is JSON-passthrough end-to-end so unsupported types are not a special case there.
 - AC-4.4: Subitems created via `--parent` appear under the parent on a subsequent `mcli item get`.
 
-## Phase 5 — Raw query escape hatch
+## Phase 5 — Raw query escape hatch ✅
 
 **Deliverables:**
-- `mcli query [-f <file>|-f -] [--var key=value]... [--vars-file <json>]`
-- Accepts query on stdin when `-f -`.
-- Variables from `--var` flags (string by default; `--var-type key=int` for typed) OR from a JSON file via `--vars-file`.
-- Output: `{"data": ..., "errors": [...], "extensions": {...}}` passthrough — no normalization for raw queries.
+- `mcli query '<graphql>'` inline, `-f <file>`, `-f -` from stdin.
+- `--var key=value` with auto-typing (int/float/bool/null/JSON obj/string).
+- `--vars-file <json>` for complex variables; combinable with `--var` (flag wins).
+- Saved queries: `mcli query save/list/run/delete` with local + global storage.
+- Output: raw passthrough `{"data":...,"errors":...,"extensions":...}`.
 - Exit code 2 if `errors` is non-empty, 0 otherwise.
 
 **Acceptance:**
-- AC-5.1: `echo 'query { me { id } }' | mcli query -f -` works.
-- AC-5.2: Variables from flags and from file produce identical requests (verified by captured request body).
-- AC-5.3: A query with GraphQL errors exits 2.
+- AC-5.1: `echo 'query { me { id } }' | mcli query -f -` works. ✅
+- AC-5.2: Variables from flags and from file produce identical requests. ✅
+- AC-5.3: A query with GraphQL errors exits 2. ✅
 
 ## Phase 6 — LLM skill API
 
@@ -196,3 +197,4 @@ Explicitly deferred, each a candidate for its own later plan:
 - 2026-05-10: Phase 3 complete — mcli board {list,get,create}. Notable: monday's `boards` query without workspace_ids returns empty when the var is sent as null; required `# @genqlient(omitempty: true)` to drop it. Page+limit pagination encoded as decimal-string cursor for surface uniformity. Live smoke: 25-board listing, get of board 9832181507, create of board 18412490770. Examples committed under examples/.
 - 2026-05-11: Phase 4 complete — items CRUD + column-value normalization. 4a: Decode registry (14 types + passthrough). 4b: item list (cursor-based items_page) + item get (full detail w/ subitems, creator, columns). 4c: item create (--board/--parent mutually exclusive, --col passthrough), item update (--name as bare JSON string, --col). 4d: item move (--to-group XOR --to-board+--group). Name column fix: monday expects bare string, not {"name":...}. Live verified all commands against board 9832181507.
 - 2026-05-12: Phase 4.5 complete — board structure + workspace + skill. 4.5a: workspace list/get/create/update/delete + folder list/create/rename/delete. 4.5b: board rename/delete/archive, group CRUD (list/create/delete/archive/rename), column CRUD (list/create/delete/rename/describe). 4.5c: item delete/archive + `mcli skill`/`mcli describe` (1028-line LLM skill doc generated from command tree). All live-verified. 50 command sections in skill doc.
+- 2026-05-12: Phase 5 complete — `mcli query` raw GraphQL escape hatch. Inline query as first arg, -f file/stdin, --var with auto-typing, --vars-file. Saved queries (save/list/run/delete) with local (.mcli/queries/) + global (~/.config/mcli/queries/) storage. Skill doc rewritten to 107-line goal-oriented format with raw query section.
