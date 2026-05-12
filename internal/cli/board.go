@@ -70,6 +70,11 @@ func newBoardCmd() *cobra.Command {
 	cmd.AddCommand(newBoardListCmd())
 	cmd.AddCommand(newBoardGetCmd())
 	cmd.AddCommand(newBoardCreateCmd())
+	cmd.AddCommand(newBoardRenameCmd())
+	cmd.AddCommand(newBoardDeleteCmd())
+	cmd.AddCommand(newBoardArchiveCmd())
+	cmd.AddCommand(newBoardGroupCmd())
+	cmd.AddCommand(newBoardColumnCmd())
 	return cmd
 }
 
@@ -471,4 +476,161 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 	}
 
 	return nil
+}
+
+// boardRenameOutput is the JSON shape for 'mcli board rename'.
+type boardRenameOutput struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func newBoardRenameCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "rename <id> <name>",
+		Short: "Rename a board",
+		Long:  "Rename a monday.com board by setting a new name.",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runBoardRename(cmd, args[0], args[1])
+		},
+	}
+}
+
+func runBoardRename(cmd *cobra.Command, id, name string) error {
+	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
+		return errs.Usage("board id must be a numeric string, got %q", id)
+	}
+	if name == "" {
+		return errs.Usage("name must not be empty")
+	}
+
+	gql, err := newBoardClient()
+	if err != nil {
+		return err
+	}
+
+	if _, err = gen.BoardRename(context.Background(), gql, id, name); err != nil {
+		return err
+	}
+
+	out := boardRenameOutput{ID: id, Name: name}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Renamed board %s: %s\n", out.ID, out.Name)
+	return err
+}
+
+// boardDeleteOutput is the JSON shape for 'mcli board delete' and 'mcli board archive'.
+type boardDeleteOutput struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func newBoardDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <id>",
+		Short: "Delete a board",
+		Long:  "Permanently delete a monday.com board by ID.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runBoardDelete(cmd, args[0])
+		},
+	}
+}
+
+func runBoardDelete(cmd *cobra.Command, id string) error {
+	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
+		return errs.Usage("board id must be a numeric string, got %q", id)
+	}
+
+	gql, err := newBoardClient()
+	if err != nil {
+		return err
+	}
+
+	resp, err := gen.BoardDelete(context.Background(), gql, id)
+	if err != nil {
+		return err
+	}
+
+	b := resp.Delete_board
+	out := boardDeleteOutput{ID: b.Id, Name: b.Name}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Deleted board %s: %s\n", out.ID, out.Name)
+	return err
+}
+
+func newBoardArchiveCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "archive <id>",
+		Short: "Archive a board",
+		Long:  "Archive a monday.com board by ID.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runBoardArchive(cmd, args[0])
+		},
+	}
+}
+
+func runBoardArchive(cmd *cobra.Command, id string) error {
+	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
+		return errs.Usage("board id must be a numeric string, got %q", id)
+	}
+
+	gql, err := newBoardClient()
+	if err != nil {
+		return err
+	}
+
+	resp, err := gen.BoardArchive(context.Background(), gql, id)
+	if err != nil {
+		return err
+	}
+
+	b := resp.Archive_board
+	out := boardDeleteOutput{ID: b.Id, Name: b.Name}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Archived board %s: %s\n", out.ID, out.Name)
+	return err
 }

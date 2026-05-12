@@ -10,6 +10,34 @@ import (
 	"github.com/Khan/genqlient/graphql"
 )
 
+// BoardArchiveArchive_boardBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardArchiveArchive_boardBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns BoardArchiveArchive_boardBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardArchiveArchive_boardBoard) GetId() string { return v.Id }
+
+// GetName returns BoardArchiveArchive_boardBoard.Name, and is useful for accessing the field via an interface.
+func (v *BoardArchiveArchive_boardBoard) GetName() string { return v.Name }
+
+// BoardArchiveResponse is returned by BoardArchive on success.
+type BoardArchiveResponse struct {
+	// Archive a board.
+	Archive_board BoardArchiveArchive_boardBoard `json:"archive_board"`
+}
+
+// GetArchive_board returns BoardArchiveResponse.Archive_board, and is useful for accessing the field via an interface.
+func (v *BoardArchiveResponse) GetArchive_board() BoardArchiveArchive_boardBoard {
+	return v.Archive_board
+}
+
 // BoardByIDBoardsBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
 //
@@ -35,6 +63,230 @@ type BoardByIDResponse struct {
 
 // GetBoards returns BoardByIDResponse.Boards, and is useful for accessing the field via an interface.
 func (v *BoardByIDResponse) GetBoards() []BoardByIDBoardsBoard { return v.Boards }
+
+// BoardColumnCreateCreate_columnColumn includes the requested fields of the GraphQL type Column.
+type BoardColumnCreateCreate_columnColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+	// The column's width.
+	Width int `json:"width"`
+	// Is the column archived or not.
+	Archived bool `json:"archived"`
+}
+
+// GetId returns BoardColumnCreateCreate_columnColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardColumnCreateCreate_columnColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetTitle() string { return v.Title }
+
+// GetType returns BoardColumnCreateCreate_columnColumn.Type, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetType() ColumnType { return v.Type }
+
+// GetSettings_str returns BoardColumnCreateCreate_columnColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetSettings_str() string { return v.Settings_str }
+
+// GetWidth returns BoardColumnCreateCreate_columnColumn.Width, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetWidth() int { return v.Width }
+
+// GetArchived returns BoardColumnCreateCreate_columnColumn.Archived, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetArchived() bool { return v.Archived }
+
+// BoardColumnCreateResponse is returned by BoardColumnCreate on success.
+type BoardColumnCreateResponse struct {
+	// Generic mutation for creating any column type with validation. Supports creating column with properties like title, description, and type-specific defaults/settings. The mutation validates input against the column type's schema before applying changes. Use get_column_type_schema query to understand available properties for each column type.
+	Create_column BoardColumnCreateCreate_columnColumn `json:"create_column"`
+}
+
+// GetCreate_column returns BoardColumnCreateResponse.Create_column, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateResponse) GetCreate_column() BoardColumnCreateCreate_columnColumn {
+	return v.Create_column
+}
+
+// BoardColumnDeleteDelete_columnColumn includes the requested fields of the GraphQL type Column.
+type BoardColumnDeleteDelete_columnColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+}
+
+// GetId returns BoardColumnDeleteDelete_columnColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnDeleteDelete_columnColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardColumnDeleteDelete_columnColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardColumnDeleteDelete_columnColumn) GetTitle() string { return v.Title }
+
+// BoardColumnDeleteResponse is returned by BoardColumnDelete on success.
+type BoardColumnDeleteResponse struct {
+	// Deletes a column from a board. Cannot delete mandatory columns (e.g., name column).
+	Delete_column BoardColumnDeleteDelete_columnColumn `json:"delete_column"`
+}
+
+// GetDelete_column returns BoardColumnDeleteResponse.Delete_column, and is useful for accessing the field via an interface.
+func (v *BoardColumnDeleteResponse) GetDelete_column() BoardColumnDeleteDelete_columnColumn {
+	return v.Delete_column
+}
+
+// BoardColumnDescribeChange_column_metadataColumn includes the requested fields of the GraphQL type Column.
+type BoardColumnDescribeChange_column_metadataColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+	// The column's width.
+	Width int `json:"width"`
+	// Is the column archived or not.
+	Archived bool `json:"archived"`
+}
+
+// GetId returns BoardColumnDescribeChange_column_metadataColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardColumnDescribeChange_column_metadataColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetTitle() string { return v.Title }
+
+// GetType returns BoardColumnDescribeChange_column_metadataColumn.Type, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetType() ColumnType { return v.Type }
+
+// GetSettings_str returns BoardColumnDescribeChange_column_metadataColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetSettings_str() string {
+	return v.Settings_str
+}
+
+// GetWidth returns BoardColumnDescribeChange_column_metadataColumn.Width, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetWidth() int { return v.Width }
+
+// GetArchived returns BoardColumnDescribeChange_column_metadataColumn.Archived, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetArchived() bool { return v.Archived }
+
+// BoardColumnDescribeResponse is returned by BoardColumnDescribe on success.
+type BoardColumnDescribeResponse struct {
+	// Change a column's properties
+	Change_column_metadata BoardColumnDescribeChange_column_metadataColumn `json:"change_column_metadata"`
+}
+
+// GetChange_column_metadata returns BoardColumnDescribeResponse.Change_column_metadata, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeResponse) GetChange_column_metadata() BoardColumnDescribeChange_column_metadataColumn {
+	return v.Change_column_metadata
+}
+
+// BoardColumnListBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardColumnListBoardsBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's visible columns.
+	Columns []BoardColumnListBoardsBoardColumnsColumn `json:"columns"`
+}
+
+// GetId returns BoardColumnListBoardsBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoard) GetId() string { return v.Id }
+
+// GetColumns returns BoardColumnListBoardsBoard.Columns, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoard) GetColumns() []BoardColumnListBoardsBoardColumnsColumn {
+	return v.Columns
+}
+
+// BoardColumnListBoardsBoardColumnsColumn includes the requested fields of the GraphQL type Column.
+type BoardColumnListBoardsBoardColumnsColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+	// The column's width.
+	Width int `json:"width"`
+	// Is the column archived or not.
+	Archived bool `json:"archived"`
+}
+
+// GetId returns BoardColumnListBoardsBoardColumnsColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardColumnListBoardsBoardColumnsColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetTitle() string { return v.Title }
+
+// GetType returns BoardColumnListBoardsBoardColumnsColumn.Type, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetType() ColumnType { return v.Type }
+
+// GetSettings_str returns BoardColumnListBoardsBoardColumnsColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetSettings_str() string { return v.Settings_str }
+
+// GetWidth returns BoardColumnListBoardsBoardColumnsColumn.Width, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetWidth() int { return v.Width }
+
+// GetArchived returns BoardColumnListBoardsBoardColumnsColumn.Archived, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetArchived() bool { return v.Archived }
+
+// BoardColumnListResponse is returned by BoardColumnList on success.
+type BoardColumnListResponse struct {
+	// Get a collection of boards.
+	Boards []BoardColumnListBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns BoardColumnListResponse.Boards, and is useful for accessing the field via an interface.
+func (v *BoardColumnListResponse) GetBoards() []BoardColumnListBoardsBoard { return v.Boards }
+
+// BoardColumnRenameChange_column_titleColumn includes the requested fields of the GraphQL type Column.
+type BoardColumnRenameChange_column_titleColumn struct {
+	// The column's unique identifier.
+	Id string `json:"id"`
+	// The column's title.
+	Title string `json:"title"`
+	// The column's type.
+	Type ColumnType `json:"type"`
+	// The column's settings in a string form.
+	Settings_str string `json:"settings_str"`
+	// The column's width.
+	Width int `json:"width"`
+	// Is the column archived or not.
+	Archived bool `json:"archived"`
+}
+
+// GetId returns BoardColumnRenameChange_column_titleColumn.Id, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetId() string { return v.Id }
+
+// GetTitle returns BoardColumnRenameChange_column_titleColumn.Title, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetTitle() string { return v.Title }
+
+// GetType returns BoardColumnRenameChange_column_titleColumn.Type, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetType() ColumnType { return v.Type }
+
+// GetSettings_str returns BoardColumnRenameChange_column_titleColumn.Settings_str, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetSettings_str() string { return v.Settings_str }
+
+// GetWidth returns BoardColumnRenameChange_column_titleColumn.Width, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetWidth() int { return v.Width }
+
+// GetArchived returns BoardColumnRenameChange_column_titleColumn.Archived, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetArchived() bool { return v.Archived }
+
+// BoardColumnRenameResponse is returned by BoardColumnRename on success.
+type BoardColumnRenameResponse struct {
+	// Change a column's title
+	Change_column_title BoardColumnRenameChange_column_titleColumn `json:"change_column_title"`
+}
+
+// GetChange_column_title returns BoardColumnRenameResponse.Change_column_title, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameResponse) GetChange_column_title() BoardColumnRenameChange_column_titleColumn {
+	return v.Change_column_title
+}
 
 // BoardCreateCreate_boardBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
@@ -81,6 +333,32 @@ type BoardCreateResponse struct {
 
 // GetCreate_board returns BoardCreateResponse.Create_board, and is useful for accessing the field via an interface.
 func (v *BoardCreateResponse) GetCreate_board() BoardCreateCreate_boardBoard { return v.Create_board }
+
+// BoardDeleteDelete_boardBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardDeleteDelete_boardBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's name.
+	Name string `json:"name"`
+}
+
+// GetId returns BoardDeleteDelete_boardBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardDeleteDelete_boardBoard) GetId() string { return v.Id }
+
+// GetName returns BoardDeleteDelete_boardBoard.Name, and is useful for accessing the field via an interface.
+func (v *BoardDeleteDelete_boardBoard) GetName() string { return v.Name }
+
+// BoardDeleteResponse is returned by BoardDelete on success.
+type BoardDeleteResponse struct {
+	// Delete a board.
+	Delete_board BoardDeleteDelete_boardBoard `json:"delete_board"`
+}
+
+// GetDelete_board returns BoardDeleteResponse.Delete_board, and is useful for accessing the field via an interface.
+func (v *BoardDeleteResponse) GetDelete_board() BoardDeleteDelete_boardBoard { return v.Delete_board }
 
 // BoardGetBoardsBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
@@ -248,6 +526,193 @@ type BoardGetResponse struct {
 // GetBoards returns BoardGetResponse.Boards, and is useful for accessing the field via an interface.
 func (v *BoardGetResponse) GetBoards() []BoardGetBoardsBoard { return v.Boards }
 
+// BoardGroupArchiveArchive_groupGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGroupArchiveArchive_groupGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns BoardGroupArchiveArchive_groupGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupArchiveArchive_groupGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGroupArchiveArchive_groupGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGroupArchiveArchive_groupGroup) GetTitle() string { return v.Title }
+
+// BoardGroupArchiveResponse is returned by BoardGroupArchive on success.
+type BoardGroupArchiveResponse struct {
+	// Archives a group in a specific board.
+	Archive_group BoardGroupArchiveArchive_groupGroup `json:"archive_group"`
+}
+
+// GetArchive_group returns BoardGroupArchiveResponse.Archive_group, and is useful for accessing the field via an interface.
+func (v *BoardGroupArchiveResponse) GetArchive_group() BoardGroupArchiveArchive_groupGroup {
+	return v.Archive_group
+}
+
+// BoardGroupCreateCreate_groupGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGroupCreateCreate_groupGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+	// The group's color.
+	Color string `json:"color"`
+	// The group's position in the board.
+	Position string `json:"position"`
+}
+
+// GetId returns BoardGroupCreateCreate_groupGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupCreateCreate_groupGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGroupCreateCreate_groupGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGroupCreateCreate_groupGroup) GetTitle() string { return v.Title }
+
+// GetColor returns BoardGroupCreateCreate_groupGroup.Color, and is useful for accessing the field via an interface.
+func (v *BoardGroupCreateCreate_groupGroup) GetColor() string { return v.Color }
+
+// GetPosition returns BoardGroupCreateCreate_groupGroup.Position, and is useful for accessing the field via an interface.
+func (v *BoardGroupCreateCreate_groupGroup) GetPosition() string { return v.Position }
+
+// BoardGroupCreateResponse is returned by BoardGroupCreate on success.
+type BoardGroupCreateResponse struct {
+	// Creates a new group in a specific board.
+	Create_group BoardGroupCreateCreate_groupGroup `json:"create_group"`
+}
+
+// GetCreate_group returns BoardGroupCreateResponse.Create_group, and is useful for accessing the field via an interface.
+func (v *BoardGroupCreateResponse) GetCreate_group() BoardGroupCreateCreate_groupGroup {
+	return v.Create_group
+}
+
+// BoardGroupDeleteDelete_groupGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGroupDeleteDelete_groupGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns BoardGroupDeleteDelete_groupGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupDeleteDelete_groupGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGroupDeleteDelete_groupGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGroupDeleteDelete_groupGroup) GetTitle() string { return v.Title }
+
+// BoardGroupDeleteResponse is returned by BoardGroupDelete on success.
+type BoardGroupDeleteResponse struct {
+	// Deletes a group in a specific board.
+	Delete_group BoardGroupDeleteDelete_groupGroup `json:"delete_group"`
+}
+
+// GetDelete_group returns BoardGroupDeleteResponse.Delete_group, and is useful for accessing the field via an interface.
+func (v *BoardGroupDeleteResponse) GetDelete_group() BoardGroupDeleteDelete_groupGroup {
+	return v.Delete_group
+}
+
+// BoardGroupListBoardsBoard includes the requested fields of the GraphQL type Board.
+// The GraphQL type's documentation follows.
+//
+// A monday.com board.
+type BoardGroupListBoardsBoard struct {
+	// The unique identifier of the board.
+	Id string `json:"id"`
+	// The board's visible groups.
+	Groups []BoardGroupListBoardsBoardGroupsGroup `json:"groups"`
+}
+
+// GetId returns BoardGroupListBoardsBoard.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoard) GetId() string { return v.Id }
+
+// GetGroups returns BoardGroupListBoardsBoard.Groups, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoard) GetGroups() []BoardGroupListBoardsBoardGroupsGroup {
+	return v.Groups
+}
+
+// BoardGroupListBoardsBoardGroupsGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGroupListBoardsBoardGroupsGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+	// The group's color.
+	Color string `json:"color"`
+	// The group's position in the board.
+	Position string `json:"position"`
+}
+
+// GetId returns BoardGroupListBoardsBoardGroupsGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoardGroupsGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGroupListBoardsBoardGroupsGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoardGroupsGroup) GetTitle() string { return v.Title }
+
+// GetColor returns BoardGroupListBoardsBoardGroupsGroup.Color, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoardGroupsGroup) GetColor() string { return v.Color }
+
+// GetPosition returns BoardGroupListBoardsBoardGroupsGroup.Position, and is useful for accessing the field via an interface.
+func (v *BoardGroupListBoardsBoardGroupsGroup) GetPosition() string { return v.Position }
+
+// BoardGroupListResponse is returned by BoardGroupList on success.
+type BoardGroupListResponse struct {
+	// Get a collection of boards.
+	Boards []BoardGroupListBoardsBoard `json:"boards"`
+}
+
+// GetBoards returns BoardGroupListResponse.Boards, and is useful for accessing the field via an interface.
+func (v *BoardGroupListResponse) GetBoards() []BoardGroupListBoardsBoard { return v.Boards }
+
+// BoardGroupRenameResponse is returned by BoardGroupRename on success.
+type BoardGroupRenameResponse struct {
+	// Update an existing group.
+	Update_group BoardGroupRenameUpdate_groupGroup `json:"update_group"`
+}
+
+// GetUpdate_group returns BoardGroupRenameResponse.Update_group, and is useful for accessing the field via an interface.
+func (v *BoardGroupRenameResponse) GetUpdate_group() BoardGroupRenameUpdate_groupGroup {
+	return v.Update_group
+}
+
+// BoardGroupRenameUpdate_groupGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type BoardGroupRenameUpdate_groupGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+	// The group's color.
+	Color string `json:"color"`
+	// The group's position in the board.
+	Position string `json:"position"`
+}
+
+// GetId returns BoardGroupRenameUpdate_groupGroup.Id, and is useful for accessing the field via an interface.
+func (v *BoardGroupRenameUpdate_groupGroup) GetId() string { return v.Id }
+
+// GetTitle returns BoardGroupRenameUpdate_groupGroup.Title, and is useful for accessing the field via an interface.
+func (v *BoardGroupRenameUpdate_groupGroup) GetTitle() string { return v.Title }
+
+// GetColor returns BoardGroupRenameUpdate_groupGroup.Color, and is useful for accessing the field via an interface.
+func (v *BoardGroupRenameUpdate_groupGroup) GetColor() string { return v.Color }
+
+// GetPosition returns BoardGroupRenameUpdate_groupGroup.Position, and is useful for accessing the field via an interface.
+func (v *BoardGroupRenameUpdate_groupGroup) GetPosition() string { return v.Position }
+
 // The board kinds available.
 type BoardKind string
 
@@ -265,6 +730,15 @@ var AllBoardKind = []BoardKind{
 	BoardKindPublic,
 	BoardKindShare,
 }
+
+// BoardRenameResponse is returned by BoardRename on success.
+type BoardRenameResponse struct {
+	// Update Board attribute.
+	Update_board string `json:"update_board"`
+}
+
+// GetUpdate_board returns BoardRenameResponse.Update_board, and is useful for accessing the field via an interface.
+func (v *BoardRenameResponse) GetUpdate_board() string { return v.Update_board }
 
 // BoardsListBoardsBoard includes the requested fields of the GraphQL type Board.
 // The GraphQL type's documentation follows.
@@ -9161,6 +9635,14 @@ func (v *WorkspacesListWorkspacesWorkspace) GetCreated_at() string { return v.Cr
 // GetState returns WorkspacesListWorkspacesWorkspace.State, and is useful for accessing the field via an interface.
 func (v *WorkspacesListWorkspacesWorkspace) GetState() State { return v.State }
 
+// __BoardArchiveInput is used internally by genqlient
+type __BoardArchiveInput struct {
+	BoardId string `json:"boardId"`
+}
+
+// GetBoardId returns __BoardArchiveInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardArchiveInput) GetBoardId() string { return v.BoardId }
+
 // __BoardByIDInput is used internally by genqlient
 type __BoardByIDInput struct {
 	Ids []string `json:"ids"`
@@ -9168,6 +9650,82 @@ type __BoardByIDInput struct {
 
 // GetIds returns __BoardByIDInput.Ids, and is useful for accessing the field via an interface.
 func (v *__BoardByIDInput) GetIds() []string { return v.Ids }
+
+// __BoardColumnCreateInput is used internally by genqlient
+type __BoardColumnCreateInput struct {
+	BoardId     string     `json:"boardId"`
+	Title       string     `json:"title"`
+	ColumnType  ColumnType `json:"columnType"`
+	Description string     `json:"description,omitempty"`
+	Defaults    string     `json:"defaults,omitempty"`
+}
+
+// GetBoardId returns __BoardColumnCreateInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnCreateInput) GetBoardId() string { return v.BoardId }
+
+// GetTitle returns __BoardColumnCreateInput.Title, and is useful for accessing the field via an interface.
+func (v *__BoardColumnCreateInput) GetTitle() string { return v.Title }
+
+// GetColumnType returns __BoardColumnCreateInput.ColumnType, and is useful for accessing the field via an interface.
+func (v *__BoardColumnCreateInput) GetColumnType() ColumnType { return v.ColumnType }
+
+// GetDescription returns __BoardColumnCreateInput.Description, and is useful for accessing the field via an interface.
+func (v *__BoardColumnCreateInput) GetDescription() string { return v.Description }
+
+// GetDefaults returns __BoardColumnCreateInput.Defaults, and is useful for accessing the field via an interface.
+func (v *__BoardColumnCreateInput) GetDefaults() string { return v.Defaults }
+
+// __BoardColumnDeleteInput is used internally by genqlient
+type __BoardColumnDeleteInput struct {
+	BoardId  string `json:"boardId"`
+	ColumnId string `json:"columnId"`
+}
+
+// GetBoardId returns __BoardColumnDeleteInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnDeleteInput) GetBoardId() string { return v.BoardId }
+
+// GetColumnId returns __BoardColumnDeleteInput.ColumnId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnDeleteInput) GetColumnId() string { return v.ColumnId }
+
+// __BoardColumnDescribeInput is used internally by genqlient
+type __BoardColumnDescribeInput struct {
+	BoardId     string `json:"boardId"`
+	ColumnId    string `json:"columnId"`
+	Description string `json:"description"`
+}
+
+// GetBoardId returns __BoardColumnDescribeInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnDescribeInput) GetBoardId() string { return v.BoardId }
+
+// GetColumnId returns __BoardColumnDescribeInput.ColumnId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnDescribeInput) GetColumnId() string { return v.ColumnId }
+
+// GetDescription returns __BoardColumnDescribeInput.Description, and is useful for accessing the field via an interface.
+func (v *__BoardColumnDescribeInput) GetDescription() string { return v.Description }
+
+// __BoardColumnListInput is used internally by genqlient
+type __BoardColumnListInput struct {
+	BoardId string `json:"boardId"`
+}
+
+// GetBoardId returns __BoardColumnListInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnListInput) GetBoardId() string { return v.BoardId }
+
+// __BoardColumnRenameInput is used internally by genqlient
+type __BoardColumnRenameInput struct {
+	BoardId  string `json:"boardId"`
+	ColumnId string `json:"columnId"`
+	Title    string `json:"title"`
+}
+
+// GetBoardId returns __BoardColumnRenameInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnRenameInput) GetBoardId() string { return v.BoardId }
+
+// GetColumnId returns __BoardColumnRenameInput.ColumnId, and is useful for accessing the field via an interface.
+func (v *__BoardColumnRenameInput) GetColumnId() string { return v.ColumnId }
+
+// GetTitle returns __BoardColumnRenameInput.Title, and is useful for accessing the field via an interface.
+func (v *__BoardColumnRenameInput) GetTitle() string { return v.Title }
 
 // __BoardCreateInput is used internally by genqlient
 type __BoardCreateInput struct {
@@ -9193,6 +9751,14 @@ func (v *__BoardCreateInput) GetDescription() string { return v.Description }
 // GetEmpty returns __BoardCreateInput.Empty, and is useful for accessing the field via an interface.
 func (v *__BoardCreateInput) GetEmpty() bool { return v.Empty }
 
+// __BoardDeleteInput is used internally by genqlient
+type __BoardDeleteInput struct {
+	BoardId string `json:"boardId"`
+}
+
+// GetBoardId returns __BoardDeleteInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardDeleteInput) GetBoardId() string { return v.BoardId }
+
 // __BoardGetInput is used internally by genqlient
 type __BoardGetInput struct {
 	Id string `json:"id"`
@@ -9200,6 +9766,82 @@ type __BoardGetInput struct {
 
 // GetId returns __BoardGetInput.Id, and is useful for accessing the field via an interface.
 func (v *__BoardGetInput) GetId() string { return v.Id }
+
+// __BoardGroupArchiveInput is used internally by genqlient
+type __BoardGroupArchiveInput struct {
+	BoardId string `json:"boardId"`
+	GroupId string `json:"groupId"`
+}
+
+// GetBoardId returns __BoardGroupArchiveInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupArchiveInput) GetBoardId() string { return v.BoardId }
+
+// GetGroupId returns __BoardGroupArchiveInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupArchiveInput) GetGroupId() string { return v.GroupId }
+
+// __BoardGroupCreateInput is used internally by genqlient
+type __BoardGroupCreateInput struct {
+	BoardId string `json:"boardId"`
+	Name    string `json:"name"`
+	Color   string `json:"color,omitempty"`
+}
+
+// GetBoardId returns __BoardGroupCreateInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupCreateInput) GetBoardId() string { return v.BoardId }
+
+// GetName returns __BoardGroupCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__BoardGroupCreateInput) GetName() string { return v.Name }
+
+// GetColor returns __BoardGroupCreateInput.Color, and is useful for accessing the field via an interface.
+func (v *__BoardGroupCreateInput) GetColor() string { return v.Color }
+
+// __BoardGroupDeleteInput is used internally by genqlient
+type __BoardGroupDeleteInput struct {
+	BoardId string `json:"boardId"`
+	GroupId string `json:"groupId"`
+}
+
+// GetBoardId returns __BoardGroupDeleteInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupDeleteInput) GetBoardId() string { return v.BoardId }
+
+// GetGroupId returns __BoardGroupDeleteInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupDeleteInput) GetGroupId() string { return v.GroupId }
+
+// __BoardGroupListInput is used internally by genqlient
+type __BoardGroupListInput struct {
+	BoardId string `json:"boardId"`
+}
+
+// GetBoardId returns __BoardGroupListInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupListInput) GetBoardId() string { return v.BoardId }
+
+// __BoardGroupRenameInput is used internally by genqlient
+type __BoardGroupRenameInput struct {
+	BoardId string `json:"boardId"`
+	GroupId string `json:"groupId"`
+	Name    string `json:"name"`
+}
+
+// GetBoardId returns __BoardGroupRenameInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupRenameInput) GetBoardId() string { return v.BoardId }
+
+// GetGroupId returns __BoardGroupRenameInput.GroupId, and is useful for accessing the field via an interface.
+func (v *__BoardGroupRenameInput) GetGroupId() string { return v.GroupId }
+
+// GetName returns __BoardGroupRenameInput.Name, and is useful for accessing the field via an interface.
+func (v *__BoardGroupRenameInput) GetName() string { return v.Name }
+
+// __BoardRenameInput is used internally by genqlient
+type __BoardRenameInput struct {
+	BoardId string `json:"boardId"`
+	Name    string `json:"name"`
+}
+
+// GetBoardId returns __BoardRenameInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__BoardRenameInput) GetBoardId() string { return v.BoardId }
+
+// GetName returns __BoardRenameInput.Name, and is useful for accessing the field via an interface.
+func (v *__BoardRenameInput) GetName() string { return v.Name }
 
 // __BoardsListInput is used internally by genqlient
 type __BoardsListInput struct {
@@ -9453,6 +10095,42 @@ func (v *__WorkspacesListInput) GetLimit() int { return v.Limit }
 // GetPage returns __WorkspacesListInput.Page, and is useful for accessing the field via an interface.
 func (v *__WorkspacesListInput) GetPage() int { return v.Page }
 
+// The mutation executed by BoardArchive.
+const BoardArchive_Operation = `
+mutation BoardArchive ($boardId: ID!) {
+	archive_board(board_id: $boardId) {
+		id
+		name
+	}
+}
+`
+
+// BoardArchive archives a board by ID.
+func BoardArchive(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+) (data_ *BoardArchiveResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardArchive",
+		Query:  BoardArchive_Operation,
+		Variables: &__BoardArchiveInput{
+			BoardId: boardId,
+		},
+	}
+
+	data_ = &BoardArchiveResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by BoardByID.
 const BoardByID_Operation = `
 query BoardByID ($ids: [ID!]) {
@@ -9477,6 +10155,223 @@ func BoardByID(
 	}
 
 	data_ = &BoardByIDResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardColumnCreate.
+const BoardColumnCreate_Operation = `
+mutation BoardColumnCreate ($boardId: ID!, $title: String!, $columnType: ColumnType!, $description: String, $defaults: JSON) {
+	create_column(board_id: $boardId, title: $title, column_type: $columnType, description: $description, defaults: $defaults) {
+		id
+		title
+		type
+		settings_str
+		width
+		archived
+	}
+}
+`
+
+// BoardColumnCreate creates a new column in a board.
+func BoardColumnCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	title string,
+	columnType ColumnType,
+	description string,
+	defaults string,
+) (data_ *BoardColumnCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardColumnCreate",
+		Query:  BoardColumnCreate_Operation,
+		Variables: &__BoardColumnCreateInput{
+			BoardId:     boardId,
+			Title:       title,
+			ColumnType:  columnType,
+			Description: description,
+			Defaults:    defaults,
+		},
+	}
+
+	data_ = &BoardColumnCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardColumnDelete.
+const BoardColumnDelete_Operation = `
+mutation BoardColumnDelete ($boardId: ID!, $columnId: String!) {
+	delete_column(board_id: $boardId, column_id: $columnId) {
+		id
+		title
+	}
+}
+`
+
+// BoardColumnDelete deletes a column from a board.
+func BoardColumnDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	columnId string,
+) (data_ *BoardColumnDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardColumnDelete",
+		Query:  BoardColumnDelete_Operation,
+		Variables: &__BoardColumnDeleteInput{
+			BoardId:  boardId,
+			ColumnId: columnId,
+		},
+	}
+
+	data_ = &BoardColumnDeleteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardColumnDescribe.
+const BoardColumnDescribe_Operation = `
+mutation BoardColumnDescribe ($boardId: ID!, $columnId: String!, $description: String!) {
+	change_column_metadata(board_id: $boardId, column_id: $columnId, column_property: description, value: $description) {
+		id
+		title
+		type
+		settings_str
+		width
+		archived
+	}
+}
+`
+
+// BoardColumnDescribe updates the description of a column.
+func BoardColumnDescribe(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	columnId string,
+	description string,
+) (data_ *BoardColumnDescribeResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardColumnDescribe",
+		Query:  BoardColumnDescribe_Operation,
+		Variables: &__BoardColumnDescribeInput{
+			BoardId:     boardId,
+			ColumnId:    columnId,
+			Description: description,
+		},
+	}
+
+	data_ = &BoardColumnDescribeResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by BoardColumnList.
+const BoardColumnList_Operation = `
+query BoardColumnList ($boardId: ID!) {
+	boards(ids: [$boardId]) {
+		id
+		columns {
+			id
+			title
+			type
+			settings_str
+			width
+			archived
+		}
+	}
+}
+`
+
+// BoardColumnList fetches the columns of a board.
+func BoardColumnList(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+) (data_ *BoardColumnListResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardColumnList",
+		Query:  BoardColumnList_Operation,
+		Variables: &__BoardColumnListInput{
+			BoardId: boardId,
+		},
+	}
+
+	data_ = &BoardColumnListResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardColumnRename.
+const BoardColumnRename_Operation = `
+mutation BoardColumnRename ($boardId: ID!, $columnId: String!, $title: String!) {
+	change_column_title(board_id: $boardId, column_id: $columnId, title: $title) {
+		id
+		title
+		type
+		settings_str
+		width
+		archived
+	}
+}
+`
+
+// BoardColumnRename renames a column in a board.
+func BoardColumnRename(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	columnId string,
+	title string,
+) (data_ *BoardColumnRenameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardColumnRename",
+		Query:  BoardColumnRename_Operation,
+		Variables: &__BoardColumnRenameInput{
+			BoardId:  boardId,
+			ColumnId: columnId,
+			Title:    title,
+		},
+	}
+
+	data_ = &BoardColumnRenameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9525,6 +10420,42 @@ func BoardCreate(
 	}
 
 	data_ = &BoardCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardDelete.
+const BoardDelete_Operation = `
+mutation BoardDelete ($boardId: ID!) {
+	delete_board(board_id: $boardId) {
+		id
+		name
+	}
+}
+`
+
+// BoardDelete deletes a board by ID.
+func BoardDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+) (data_ *BoardDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardDelete",
+		Query:  BoardDelete_Operation,
+		Variables: &__BoardDeleteInput{
+			BoardId: boardId,
+		},
+	}
+
+	data_ = &BoardDeleteResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9588,6 +10519,242 @@ func BoardGet(
 	}
 
 	data_ = &BoardGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardGroupArchive.
+const BoardGroupArchive_Operation = `
+mutation BoardGroupArchive ($boardId: ID!, $groupId: String!) {
+	archive_group(board_id: $boardId, group_id: $groupId) {
+		id
+		title
+	}
+}
+`
+
+// BoardGroupArchive archives a group in a board.
+func BoardGroupArchive(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	groupId string,
+) (data_ *BoardGroupArchiveResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGroupArchive",
+		Query:  BoardGroupArchive_Operation,
+		Variables: &__BoardGroupArchiveInput{
+			BoardId: boardId,
+			GroupId: groupId,
+		},
+	}
+
+	data_ = &BoardGroupArchiveResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardGroupCreate.
+const BoardGroupCreate_Operation = `
+mutation BoardGroupCreate ($boardId: ID!, $name: String!, $color: String) {
+	create_group(board_id: $boardId, group_name: $name, group_color: $color) {
+		id
+		title
+		color
+		position
+	}
+}
+`
+
+// BoardGroupCreate creates a new group in a board.
+func BoardGroupCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	name string,
+	color string,
+) (data_ *BoardGroupCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGroupCreate",
+		Query:  BoardGroupCreate_Operation,
+		Variables: &__BoardGroupCreateInput{
+			BoardId: boardId,
+			Name:    name,
+			Color:   color,
+		},
+	}
+
+	data_ = &BoardGroupCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardGroupDelete.
+const BoardGroupDelete_Operation = `
+mutation BoardGroupDelete ($boardId: ID!, $groupId: String!) {
+	delete_group(board_id: $boardId, group_id: $groupId) {
+		id
+		title
+	}
+}
+`
+
+// BoardGroupDelete deletes a group from a board.
+func BoardGroupDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	groupId string,
+) (data_ *BoardGroupDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGroupDelete",
+		Query:  BoardGroupDelete_Operation,
+		Variables: &__BoardGroupDeleteInput{
+			BoardId: boardId,
+			GroupId: groupId,
+		},
+	}
+
+	data_ = &BoardGroupDeleteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by BoardGroupList.
+const BoardGroupList_Operation = `
+query BoardGroupList ($boardId: ID!) {
+	boards(ids: [$boardId]) {
+		id
+		groups {
+			id
+			title
+			color
+			position
+		}
+	}
+}
+`
+
+// BoardGroupList fetches the groups of a board.
+func BoardGroupList(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+) (data_ *BoardGroupListResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGroupList",
+		Query:  BoardGroupList_Operation,
+		Variables: &__BoardGroupListInput{
+			BoardId: boardId,
+		},
+	}
+
+	data_ = &BoardGroupListResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardGroupRename.
+const BoardGroupRename_Operation = `
+mutation BoardGroupRename ($boardId: ID!, $groupId: String!, $name: String!) {
+	update_group(board_id: $boardId, group_id: $groupId, group_attribute: title, new_value: $name) {
+		id
+		title
+		color
+		position
+	}
+}
+`
+
+// BoardGroupRename renames a group in a board.
+func BoardGroupRename(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	groupId string,
+	name string,
+) (data_ *BoardGroupRenameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardGroupRename",
+		Query:  BoardGroupRename_Operation,
+		Variables: &__BoardGroupRenameInput{
+			BoardId: boardId,
+			GroupId: groupId,
+			Name:    name,
+		},
+	}
+
+	data_ = &BoardGroupRenameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by BoardRename.
+const BoardRename_Operation = `
+mutation BoardRename ($boardId: ID!, $name: String!) {
+	update_board(board_id: $boardId, board_attribute: name, new_value: $name)
+}
+`
+
+// BoardRename updates the board name attribute.
+func BoardRename(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	name string,
+) (data_ *BoardRenameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "BoardRename",
+		Query:  BoardRename_Operation,
+		Variables: &__BoardRenameInput{
+			BoardId: boardId,
+			Name:    name,
+		},
+	}
+
+	data_ = &BoardRenameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

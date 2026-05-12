@@ -72,3 +72,145 @@ query BoardGet($id: ID!) {
     }
   }
 }
+
+# BoardRename updates the board name attribute.
+mutation BoardRename($boardId: ID!, $name: String!) {
+  update_board(board_id: $boardId, board_attribute: name, new_value: $name)
+}
+
+# BoardDelete deletes a board by ID.
+mutation BoardDelete($boardId: ID!) {
+  delete_board(board_id: $boardId) {
+    id
+    name
+  }
+}
+
+# BoardArchive archives a board by ID.
+mutation BoardArchive($boardId: ID!) {
+  archive_board(board_id: $boardId) {
+    id
+    name
+  }
+}
+
+# BoardGroupList fetches the groups of a board.
+query BoardGroupList($boardId: ID!) {
+  boards(ids: [$boardId]) {
+    id
+    groups {
+      id
+      title
+      color
+      position
+    }
+  }
+}
+
+# BoardGroupCreate creates a new group in a board.
+mutation BoardGroupCreate(
+  $boardId: ID!,
+  $name: String!,
+  # @genqlient(omitempty: true)
+  $color: String,
+) {
+  create_group(board_id: $boardId, group_name: $name, group_color: $color) {
+    id
+    title
+    color
+    position
+  }
+}
+
+# BoardGroupDelete deletes a group from a board.
+mutation BoardGroupDelete($boardId: ID!, $groupId: String!) {
+  delete_group(board_id: $boardId, group_id: $groupId) {
+    id
+    title
+  }
+}
+
+# BoardGroupArchive archives a group in a board.
+mutation BoardGroupArchive($boardId: ID!, $groupId: String!) {
+  archive_group(board_id: $boardId, group_id: $groupId) {
+    id
+    title
+  }
+}
+
+# BoardGroupRename renames a group in a board.
+mutation BoardGroupRename($boardId: ID!, $groupId: String!, $name: String!) {
+  update_group(board_id: $boardId, group_id: $groupId, group_attribute: title, new_value: $name) {
+    id
+    title
+    color
+    position
+  }
+}
+
+# BoardColumnList fetches the columns of a board.
+query BoardColumnList($boardId: ID!) {
+  boards(ids: [$boardId]) {
+    id
+    columns {
+      id
+      title
+      type
+      settings_str
+      width
+      archived
+    }
+  }
+}
+
+# BoardColumnCreate creates a new column in a board.
+mutation BoardColumnCreate(
+  $boardId: ID!,
+  $title: String!,
+  $columnType: ColumnType!,
+  # @genqlient(omitempty: true)
+  $description: String,
+  # @genqlient(omitempty: true)
+  $defaults: JSON,
+) {
+  create_column(board_id: $boardId, title: $title, column_type: $columnType, description: $description, defaults: $defaults) {
+    id
+    title
+    type
+    settings_str
+    width
+    archived
+  }
+}
+
+# BoardColumnDelete deletes a column from a board.
+mutation BoardColumnDelete($boardId: ID!, $columnId: String!) {
+  delete_column(board_id: $boardId, column_id: $columnId) {
+    id
+    title
+  }
+}
+
+# BoardColumnRename renames a column in a board.
+mutation BoardColumnRename($boardId: ID!, $columnId: String!, $title: String!) {
+  change_column_title(board_id: $boardId, column_id: $columnId, title: $title) {
+    id
+    title
+    type
+    settings_str
+    width
+    archived
+  }
+}
+
+# BoardColumnDescribe updates the description of a column.
+mutation BoardColumnDescribe($boardId: ID!, $columnId: String!, $description: String!) {
+  change_column_metadata(board_id: $boardId, column_id: $columnId, column_property: description, value: $description) {
+    id
+    title
+    type
+    settings_str
+    width
+    archived
+  }
+}

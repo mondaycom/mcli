@@ -565,3 +565,193 @@ func errsCode(err error) string {
 	}
 	return msg
 }
+
+// execBoardRename runs 'board rename <id> <name>' and returns stdout, exit err.
+func execBoardRename(t *testing.T, id, name string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs([]string{"rename", id, name})
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// execBoardDelete runs 'board delete <id>' and returns stdout, exit err.
+func execBoardDelete(t *testing.T, id string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs([]string{"delete", id})
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// execBoardArchive runs 'board archive <id>' and returns stdout, exit err.
+func execBoardArchive(t *testing.T, id string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newBoardCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs([]string{"archive", id})
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+// ---- BoardRename tests ----
+
+func TestBoardRename_Success(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardRename" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return `{"update_board":"true"}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardRename(t, "9832181507", "New Name")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9832181507" {
+		t.Errorf("expected id 9832181507, got %v", result["id"])
+	}
+	if result["name"] != "New Name" {
+		t.Errorf("expected name 'New Name', got %v", result["name"])
+	}
+	if capturedVars["boardId"] != "9832181507" {
+		t.Errorf("expected variables.boardId='9832181507', got %v", capturedVars["boardId"])
+	}
+	if capturedVars["name"] != "New Name" {
+		t.Errorf("expected variables.name='New Name', got %v", capturedVars["name"])
+	}
+}
+
+func TestBoardRename_NonNumericID_UsageError(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return `{"update_board":"true"}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardRename(t, "not-a-number", "New Name")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	if code := errsCode(err); code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+// ---- BoardDelete tests ----
+
+func TestBoardDelete_Success(t *testing.T) {
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardDelete" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		board := map[string]any{"id": "9832181507", "name": "Deleted Board"}
+		return mustMarshal(map[string]any{"delete_board": board})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardDelete(t, "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9832181507" {
+		t.Errorf("expected id 9832181507, got %v", result["id"])
+	}
+	if result["name"] != "Deleted Board" {
+		t.Errorf("expected name 'Deleted Board', got %v", result["name"])
+	}
+}
+
+func TestBoardDelete_NonNumericID_UsageError(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return `{"delete_board":null}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardDelete(t, "abc")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	if code := errsCode(err); code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+// ---- BoardArchive tests ----
+
+func TestBoardArchive_Success(t *testing.T) {
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "BoardArchive" {
+			t.Errorf("unexpected operationName: %q", opName)
+		}
+		board := map[string]any{"id": "9832181507", "name": "Archived Board"}
+		return mustMarshal(map[string]any{"archive_board": board})
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardArchive(t, "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9832181507" {
+		t.Errorf("expected id 9832181507, got %v", result["id"])
+	}
+	if result["name"] != "Archived Board" {
+		t.Errorf("expected name 'Archived Board', got %v", result["name"])
+	}
+}
+
+func TestBoardArchive_NonNumericID_UsageError(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return `{"archive_board":null}`
+	})
+	installBoardFactory(t, srv.URL)
+
+	_, err := execBoardArchive(t, "xyz")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	if code := errsCode(err); code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
