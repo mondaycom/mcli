@@ -1083,3 +1083,193 @@ func TestItemMove_BothFlags(t *testing.T) {
 		t.Fatal("expected error when both --to-group and --to-board given")
 	}
 }
+
+// ---- item delete tests ----
+
+func execItemDelete(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"delete"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+func sampleItemDeleteResponse(id, name string) map[string]any {
+	return map[string]any{
+		"delete_item": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "deleted",
+		},
+	}
+}
+
+func TestItemDelete_HappyPath(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemDelete" {
+			t.Errorf("expected ItemDelete op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemDeleteResponse("1234567890", "My Task"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemDelete(t, "1234567890")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["itemId"] != "1234567890" {
+		t.Errorf("expected itemId='1234567890', got %v", capturedVars["itemId"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "1234567890" {
+		t.Errorf("expected id='1234567890', got %v", result["id"])
+	}
+	if result["name"] != "My Task" {
+		t.Errorf("expected name='My Task', got %v", result["name"])
+	}
+	if result["state"] != "deleted" {
+		t.Errorf("expected state='deleted', got %v", result["state"])
+	}
+}
+
+func TestItemDelete_InvalidID(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemDeleteResponse("1", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemDelete(t, "not-a-number")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemDelete_APIError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"errors":[{"message":"forbidden","extensions":{"code":"Forbidden"}}]}`)
+	}))
+	t.Cleanup(srv.Close)
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemDelete(t, "1234567890")
+	if err == nil {
+		t.Fatal("expected error from API error response")
+	}
+}
+
+// ---- item archive tests ----
+
+func execItemArchive(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"archive"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+func sampleItemArchiveResponse(id, name string) map[string]any {
+	return map[string]any{
+		"archive_item": map[string]any{
+			"id":    id,
+			"name":  name,
+			"state": "archived",
+		},
+	}
+}
+
+func TestItemArchive_HappyPath(t *testing.T) {
+	var capturedVars map[string]any
+
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemArchive" {
+			t.Errorf("expected ItemArchive op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemArchiveResponse("1234567890", "My Task"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemArchive(t, "1234567890")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["itemId"] != "1234567890" {
+		t.Errorf("expected itemId='1234567890', got %v", capturedVars["itemId"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "1234567890" {
+		t.Errorf("expected id='1234567890', got %v", result["id"])
+	}
+	if result["name"] != "My Task" {
+		t.Errorf("expected name='My Task', got %v", result["name"])
+	}
+	if result["state"] != "archived" {
+		t.Errorf("expected state='archived', got %v", result["state"])
+	}
+}
+
+func TestItemArchive_InvalidID(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(sampleItemArchiveResponse("1", "x"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemArchive(t, "not-a-number")
+	if err == nil {
+		t.Fatal("expected error for non-numeric id")
+	}
+	code := errsCode(err)
+	if code != "USAGE" {
+		t.Errorf("expected USAGE, got %q", code)
+	}
+}
+
+func TestItemArchive_APIError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"errors":[{"message":"access denied","extensions":{"code":"Unauthorized"}}]}`)
+	}))
+	t.Cleanup(srv.Close)
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemArchive(t, "1234567890")
+	if err == nil {
+		t.Fatal("expected error from API error response")
+	}
+}

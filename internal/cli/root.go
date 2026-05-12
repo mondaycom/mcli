@@ -44,6 +44,7 @@ func init() {
 	rootCmd.AddCommand(newItemCmd())
 	rootCmd.AddCommand(newWorkspaceCmd())
 	rootCmd.AddCommand(newFolderCmd())
+	rootCmd.AddCommand(newSkillCmd())
 }
 
 // Execute runs the root command.

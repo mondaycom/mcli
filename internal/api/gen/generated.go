@@ -1130,6 +1130,37 @@ type FoldersListResponse struct {
 // GetFolders returns FoldersListResponse.Folders, and is useful for accessing the field via an interface.
 func (v *FoldersListResponse) GetFolders() []FoldersListFoldersFolder { return v.Folders }
 
+// ItemArchiveArchive_itemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemArchiveArchive_itemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns ItemArchiveArchive_itemItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemArchiveArchive_itemItem) GetId() string { return v.Id }
+
+// GetName returns ItemArchiveArchive_itemItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemArchiveArchive_itemItem) GetName() string { return v.Name }
+
+// GetState returns ItemArchiveArchive_itemItem.State, and is useful for accessing the field via an interface.
+func (v *ItemArchiveArchive_itemItem) GetState() State { return v.State }
+
+// ItemArchiveResponse is returned by ItemArchive on success.
+type ItemArchiveResponse struct {
+	// Archive an item.
+	Archive_item ItemArchiveArchive_itemItem `json:"archive_item"`
+}
+
+// GetArchive_item returns ItemArchiveResponse.Archive_item, and is useful for accessing the field via an interface.
+func (v *ItemArchiveResponse) GetArchive_item() ItemArchiveArchive_itemItem { return v.Archive_item }
+
 // ItemCreateCreate_itemItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
 //
@@ -1204,6 +1235,37 @@ type ItemCreateResponse struct {
 
 // GetCreate_item returns ItemCreateResponse.Create_item, and is useful for accessing the field via an interface.
 func (v *ItemCreateResponse) GetCreate_item() ItemCreateCreate_itemItem { return v.Create_item }
+
+// ItemDeleteDelete_itemItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemDeleteDelete_itemItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The item's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns ItemDeleteDelete_itemItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemDeleteDelete_itemItem) GetId() string { return v.Id }
+
+// GetName returns ItemDeleteDelete_itemItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemDeleteDelete_itemItem) GetName() string { return v.Name }
+
+// GetState returns ItemDeleteDelete_itemItem.State, and is useful for accessing the field via an interface.
+func (v *ItemDeleteDelete_itemItem) GetState() State { return v.State }
+
+// ItemDeleteResponse is returned by ItemDelete on success.
+type ItemDeleteResponse struct {
+	// Delete an item.
+	Delete_item ItemDeleteDelete_itemItem `json:"delete_item"`
+}
+
+// GetDelete_item returns ItemDeleteResponse.Delete_item, and is useful for accessing the field via an interface.
+func (v *ItemDeleteResponse) GetDelete_item() ItemDeleteDelete_itemItem { return v.Delete_item }
 
 // ItemGetItemsItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
@@ -9911,6 +9973,14 @@ func (v *__FoldersListInput) GetPage() int { return v.Page }
 // GetWorkspaceIds returns __FoldersListInput.WorkspaceIds, and is useful for accessing the field via an interface.
 func (v *__FoldersListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
 
+// __ItemArchiveInput is used internally by genqlient
+type __ItemArchiveInput struct {
+	ItemId string `json:"itemId"`
+}
+
+// GetItemId returns __ItemArchiveInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemArchiveInput) GetItemId() string { return v.ItemId }
+
 // __ItemCreateInput is used internally by genqlient
 type __ItemCreateInput struct {
 	BoardId      string `json:"boardId"`
@@ -9930,6 +10000,14 @@ func (v *__ItemCreateInput) GetGroupId() string { return v.GroupId }
 
 // GetColumnValues returns __ItemCreateInput.ColumnValues, and is useful for accessing the field via an interface.
 func (v *__ItemCreateInput) GetColumnValues() string { return v.ColumnValues }
+
+// __ItemDeleteInput is used internally by genqlient
+type __ItemDeleteInput struct {
+	ItemId string `json:"itemId"`
+}
+
+// GetItemId returns __ItemDeleteInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemDeleteInput) GetItemId() string { return v.ItemId }
 
 // __ItemGetInput is used internally by genqlient
 type __ItemGetInput struct {
@@ -10983,6 +11061,43 @@ func FoldersList(
 	return data_, err_
 }
 
+// The mutation executed by ItemArchive.
+const ItemArchive_Operation = `
+mutation ItemArchive ($itemId: ID!) {
+	archive_item(item_id: $itemId) {
+		id
+		name
+		state
+	}
+}
+`
+
+// ItemArchive archives an item by ID.
+func ItemArchive(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+) (data_ *ItemArchiveResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemArchive",
+		Query:  ItemArchive_Operation,
+		Variables: &__ItemArchiveInput{
+			ItemId: itemId,
+		},
+	}
+
+	data_ = &ItemArchiveResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ItemCreate.
 const ItemCreate_Operation = `
 mutation ItemCreate ($boardId: ID!, $name: String!, $groupId: String, $columnValues: JSON) {
@@ -11023,6 +11138,43 @@ func ItemCreate(
 	}
 
 	data_ = &ItemCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ItemDelete.
+const ItemDelete_Operation = `
+mutation ItemDelete ($itemId: ID!) {
+	delete_item(item_id: $itemId) {
+		id
+		name
+		state
+	}
+}
+`
+
+// ItemDelete permanently deletes an item by ID.
+func ItemDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+) (data_ *ItemDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemDelete",
+		Query:  ItemDelete_Operation,
+		Variables: &__ItemDeleteInput{
+			ItemId: itemId,
+		},
+	}
+
+	data_ = &ItemDeleteResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

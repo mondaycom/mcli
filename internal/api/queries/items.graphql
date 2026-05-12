@@ -179,3 +179,21 @@ mutation ItemMoveToBoard(
     group { id title }
   }
 }
+
+# ItemDelete permanently deletes an item by ID.
+mutation ItemDelete($itemId: ID!) {
+  delete_item(item_id: $itemId) {
+    id
+    name
+    state
+  }
+}
+
+# ItemArchive archives an item by ID.
+mutation ItemArchive($itemId: ID!) {
+  archive_item(item_id: $itemId) {
+    id
+    name
+    state
+  }
+}

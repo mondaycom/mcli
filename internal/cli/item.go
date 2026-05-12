@@ -74,6 +74,8 @@ func newItemCmd() *cobra.Command {
 	cmd.AddCommand(newItemCreateCmd())
 	cmd.AddCommand(newItemUpdateCmd())
 	cmd.AddCommand(newItemMoveCmd())
+	cmd.AddCommand(newItemDeleteCmd())
+	cmd.AddCommand(newItemArchiveCmd())
 	return cmd
 }
 
@@ -470,6 +472,113 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 		_, _ = fmt.Fprintf(o, " on board %q", out.Board.Name)
 	}
 	_, _ = fmt.Fprintln(o)
+	return err
+}
+
+// --- item delete ---
+
+// itemDeleteOutput is the JSON shape for delete and archive responses.
+type itemDeleteOutput struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	State string `json:"state"`
+}
+
+func newItemDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <id>",
+		Short: "Permanently delete an item",
+		Long:  "Permanently delete a monday.com item by its numeric ID.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemDelete(cmd, args[0])
+		},
+	}
+}
+
+func runItemDelete(cmd *cobra.Command, id string) error {
+	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
+		return errs.Usage("item id must be a numeric string, got %q", id)
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	resp, err := gen.ItemDelete(context.Background(), gql, id)
+	if err != nil {
+		return err
+	}
+
+	it := resp.Delete_item
+	out := itemDeleteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Deleted item %s: %s\n", out.ID, out.Name)
+	return err
+}
+
+// --- item archive ---
+
+func newItemArchiveCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "archive <id>",
+		Short: "Archive an item",
+		Long:  "Archive a monday.com item by its numeric ID.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemArchive(cmd, args[0])
+		},
+	}
+}
+
+func runItemArchive(cmd *cobra.Command, id string) error {
+	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
+		return errs.Usage("item id must be a numeric string, got %q", id)
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	resp, err := gen.ItemArchive(context.Background(), gql, id)
+	if err != nil {
+		return err
+	}
+
+	it := resp.Archive_item
+	out := itemDeleteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Archived item %s: %s\n", out.ID, out.Name)
 	return err
 }
 
