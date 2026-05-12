@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// execSkill runs 'mcli skill' and returns stdout.
 func execSkill(t *testing.T, args ...string) (string, error) {
 	t.Helper()
 
@@ -22,8 +21,6 @@ func execSkill(t *testing.T, args ...string) (string, error) {
 	return buf.String(), err
 }
 
-// buildTestRoot constructs a root command with all subcommands wired,
-// mirroring what init() does, but isolated for testing.
 func buildTestRoot() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "mcli",
@@ -58,37 +55,29 @@ func TestSkill_StartsWithH1(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if !strings.HasPrefix(out, "# mcli") {
-		t.Errorf("expected output to start with '# mcli', got: %q", out[:minInt(50, len(out))])
+		t.Errorf("expected output to start with '# mcli', got: %q", out[:min(50, len(out))])
 	}
 }
 
-func TestSkill_ContainsKeyCommands(t *testing.T) {
+func TestSkill_ContainsGoals(t *testing.T) {
 	out, err := execSkill(t)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	required := []string{
-		"mcli workspace list",
-		"mcli board list",
-		"mcli board get",
 		"mcli board create",
-		"mcli board delete",
-		"mcli board archive",
-		"mcli board group",
-		"mcli board column",
+		"mcli board group create",
+		"mcli board column create",
+		"mcli item create",
 		"mcli item list",
 		"mcli item get",
-		"mcli item create",
 		"mcli item update",
 		"mcli item move",
 		"mcli item delete",
 		"mcli item archive",
-		"mcli folder list",
-		"mcli auth",
-		"mcli me",
-		"mcli version",
-		"mcli skill",
+		"mcli workspace",
+		"mcli folder",
 	}
 
 	for _, keyword := range required {
@@ -105,13 +94,11 @@ func TestSkill_ContainsSections(t *testing.T) {
 	}
 
 	sections := []string{
-		"## Authentication",
-		"## Global Flags",
-		"## Commands",
-		"## Output Format",
-		"## Error Handling",
-		"## Exit Codes",
-		"## Workflows",
+		"## Monday Hierarchy",
+		"## Goals & Commands",
+		"## Output Shapes",
+		"## Column Values",
+		"## Error Codes",
 	}
 
 	for _, section := range sections {
@@ -147,38 +134,17 @@ func TestSkill_AliasDescribe(t *testing.T) {
 	}
 	out := buf.String()
 	if !strings.HasPrefix(out, "# mcli") {
-		t.Errorf("alias 'describe' should produce same output, got: %q", out[:minInt(50, len(out))])
+		t.Errorf("alias 'describe' should produce same output, got: %q", out[:min(50, len(out))])
 	}
 }
 
-func TestSkill_ContainsGlobalFlags(t *testing.T) {
+func TestSkill_Concise(t *testing.T) {
 	out, err := execSkill(t)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	globalFlags := []string{"--json", "--token", "--config", "--verbose", "--no-input", "--pretty"}
-	for _, flag := range globalFlags {
-		if !strings.Contains(out, flag) {
-			t.Errorf("expected skill output to contain global flag %q", flag)
-		}
+	lines := strings.Count(out, "\n")
+	if lines > 200 {
+		t.Errorf("skill doc should be concise; got %d lines (max 200)", lines)
 	}
-}
-
-func TestSkill_ContainsErrorFormat(t *testing.T) {
-	out, err := execSkill(t)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if !strings.Contains(out, `"error"`) {
-		t.Error("expected skill output to document error JSON format")
-	}
-}
-
-// minInt returns the smaller of a and b.
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
