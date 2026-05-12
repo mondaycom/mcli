@@ -7,7 +7,7 @@ Add the fundamental structural commands an LLM agent needs to fully manage a mon
 Monday's hierarchy: Account → Workspace → Folder → Board → Group/Column → Item → Subitem.
 
 ## Phase 4.5a: Workspace + Folder commands
-**Status**: not_started
+**Status**: completed
 
 ### Tasks:
 - [ ] **GraphQL queries/mutations**: `workspaces` (list), `create_workspace`, `update_workspace`, `delete_workspace`, `folders` (list), `create_folder`, `update_folder`, `delete_folder`
@@ -30,7 +30,7 @@ Monday's hierarchy: Account → Workspace → Folder → Board → Group/Column 
 - [ ] `AC-4.5a-4`: All commands have unit tests; `go test -race` green
 
 ## Phase 4.5b: Board delete/rename/archive + group CRUD + column CRUD
-**Status**: not_started
+**Status**: completed
 
 ### Tasks:
 - [ ] **GraphQL mutations**: `delete_board`, `archive_board`, `update_board(name)`, `create_group`, `delete_group`, `archive_group`, `update_group(title)`, `create_column`, `delete_column`, `change_column_title`, `change_column_metadata(description)`
@@ -58,7 +58,7 @@ Monday's hierarchy: Account → Workspace → Folder → Board → Group/Column 
 - [ ] `AC-4.5b-5`: All commands unit-tested; `go test -race` green
 
 ## Phase 4.5c: Item delete/archive + `mcli skill`
-**Status**: not_started
+**Status**: completed
 
 ### Tasks:
 - [ ] **GraphQL mutations**: `delete_item`, `archive_item`
