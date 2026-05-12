@@ -65,7 +65,11 @@ func OpenStore(dbPath string) (*Store, error) {
 
 	if _, err := db.Exec(schema); err != nil {
 		_ = db.Close()
-		return nil, fmt.Errorf("OpenStore: migrate: %w", err)
+		return nil, fmt.Errorf("OpenStore: migrate events: %w", err)
+	}
+	if _, err := db.Exec(webhookSchema); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("OpenStore: migrate webhooks: %w", err)
 	}
 	return &Store{db: db}, nil
 }

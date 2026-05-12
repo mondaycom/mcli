@@ -10,8 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/daemon"
 	"github.com/mondaycom/mcli/internal/errs"
+	"github.com/mondaycom/mcli/internal/secrets"
 )
 
 // newDaemonCmd returns the 'mcli daemon' parent command.
@@ -44,10 +46,19 @@ func newDaemonStartCmd() *cobra.Command {
 				return errs.Usage("detach mode not yet supported")
 			}
 
+			// Resolve API token so the daemon can make monday.com API calls.
+			token, err := resolveToken()
+			if err != nil {
+				// Token resolution failure is non-fatal for daemon start; the
+				// daemon will return errors when webhook operations are attempted.
+				token = ""
+			}
+
 			cfg := daemon.Config{
 				Port:        port,
 				ConfigDir:   resolveConfigDir(),
 				ExternalURL: url,
+				Token:       token,
 			}
 			d := daemon.New(cfg)
 
@@ -73,6 +84,31 @@ func newDaemonStartCmd() *cobra.Command {
 	cmd.Flags().StringVar(&url, "url", "", "external URL to register webhooks (skips tunnel setup)")
 
 	return cmd
+}
+
+// resolveToken loads the monday.com API token from config/secrets using the
+// same mechanism as newQueryHTTPClient.
+func resolveToken() (string, error) {
+	cfgPath := resolveConfigPath()
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		return "", fmt.Errorf("load config: %w", err)
+	}
+
+	var store config.Store
+	if cfg.SecretStore != "" {
+		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
+		if openErr != nil {
+			return "", openErr
+		}
+		store = st
+	}
+
+	token, err := config.ResolveToken(cfg, globals.Token, store)
+	if err != nil {
+		return "", err
+	}
+	return string(token), nil
 }
 
 // newDaemonStopCmd returns the 'mcli daemon stop' command.
@@ -144,23 +180,3 @@ func newNotificationCmd() *cobra.Command {
 	}
 }
 
-// newWebhookCmd is a stub that requires the daemon to be running.
-func newWebhookCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "webhook",
-		Short: "Manage webhooks (requires daemon)",
-		Args:  cobra.NoArgs,
-		RunE: func(_ *cobra.Command, _ []string) error {
-			if _, err := requireDaemon(); err != nil {
-				return err
-			}
-			return errs.Usage("webhook subcommands not yet implemented")
-		},
-	}
-}
-
-// printDaemonError writes a structured error to stderr in a format consistent
-// with ADR-002. Kept here to avoid scattering os.Stderr calls.
-func printDaemonError(err error) {
-	_, _ = fmt.Fprintf(os.Stderr, "error: %v\n", err)
-}
