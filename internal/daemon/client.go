@@ -130,3 +130,92 @@ func (c *Client) DeleteWebhook(id string) error {
 	}
 	return nil
 }
+
+// ListNotifications returns events matching filter along with the current
+// unread count.
+func (c *Client) ListNotifications(filter EventFilter) (*NotificationListResponse, error) {
+	q := url.Values{}
+	if filter.Unread {
+		q.Set("unread", "true")
+	}
+	if filter.BoardID != "" {
+		q.Set("board_id", filter.BoardID)
+	}
+	if filter.EventType != "" {
+		q.Set("event_type", filter.EventType)
+	}
+	if filter.Since != "" {
+		q.Set("since", filter.Since)
+	}
+	if filter.Limit > 0 {
+		q.Set("limit", fmt.Sprintf("%d", filter.Limit))
+	}
+	endpoint := "http://daemon/notifications"
+	if len(q) > 0 {
+		endpoint += "?" + q.Encode()
+	}
+	resp, err := c.http.Get(endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("ListNotifications: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("ListNotifications: unexpected status %d", resp.StatusCode)
+	}
+	var result NotificationListResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("ListNotifications: decode: %w", err)
+	}
+	return &result, nil
+}
+
+// AckNotification marks the event with the given id as read.
+func (c *Client) AckNotification(id EventID) error {
+	body, err := json.Marshal(notificationAckRequest{ID: id})
+	if err != nil {
+		return fmt.Errorf("AckNotification: marshal: %w", err)
+	}
+	resp, err := c.http.Post("http://daemon/notifications/ack", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("AckNotification: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("AckNotification: unexpected status %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// AckAllNotifications marks all events as read.
+func (c *Client) AckAllNotifications() error {
+	body, err := json.Marshal(notificationAckRequest{All: true})
+	if err != nil {
+		return fmt.Errorf("AckAllNotifications: marshal: %w", err)
+	}
+	resp, err := c.http.Post("http://daemon/notifications/ack", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("AckAllNotifications: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("AckAllNotifications: unexpected status %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// NotificationCount returns the current number of unread notifications.
+func (c *Client) NotificationCount() (int, error) {
+	resp, err := c.http.Get("http://daemon/notifications/count")
+	if err != nil {
+		return 0, fmt.Errorf("NotificationCount: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return 0, fmt.Errorf("NotificationCount: unexpected status %d", resp.StatusCode)
+	}
+	var result NotificationCountResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return 0, fmt.Errorf("NotificationCount: decode: %w", err)
+	}
+	return result.Unread, nil
+}

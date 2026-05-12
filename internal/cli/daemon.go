@@ -165,18 +165,4 @@ func newDaemonStatusCmd() *cobra.Command {
 	}
 }
 
-// newNotificationCmd is a stub that requires the daemon to be running.
-func newNotificationCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "notification",
-		Short: "Manage notifications (requires daemon)",
-		Args:  cobra.NoArgs,
-		RunE: func(_ *cobra.Command, _ []string) error {
-			if _, err := requireDaemon(); err != nil {
-				return err
-			}
-			return errs.Usage("notification subcommands not yet implemented")
-		},
-	}
-}
 

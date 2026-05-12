@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 )
 
 // StatusResponse is the JSON shape returned by GET /status.
@@ -20,6 +21,22 @@ type StatusResponse struct {
 // StopResponse is the JSON shape returned by POST /stop.
 type StopResponse struct {
 	Stopping bool `json:"stopping"`
+}
+
+// NotificationListResponse is the JSON shape returned by GET /notifications.
+type NotificationListResponse struct {
+	Items       []Event `json:"items"`
+	UnreadCount int     `json:"unread_count"`
+}
+
+// NotificationCountResponse is the JSON shape returned by GET /notifications/count.
+type NotificationCountResponse struct {
+	Unread int `json:"unread"`
+}
+
+// NotificationAckResponse is the JSON shape returned by POST /notifications/ack.
+type NotificationAckResponse struct {
+	Acknowledged bool `json:"acknowledged"`
 }
 
 // registerWebhookRequest is the body for POST /webhooks/register.
@@ -45,6 +62,9 @@ func NewIPCServer(sockPath string, d *Daemon) *IPCServer {
 	mux.HandleFunc("GET /webhooks", s.handleListWebhooks)
 	mux.HandleFunc("POST /webhooks/register", s.handleRegisterWebhook)
 	mux.HandleFunc("DELETE /webhooks/{id}", s.handleDeleteWebhook)
+	mux.HandleFunc("GET /notifications", s.handleListNotifications)
+	mux.HandleFunc("POST /notifications/ack", s.handleAckNotification)
+	mux.HandleFunc("GET /notifications/count", s.handleNotificationCount)
 	// Legacy method-agnostic routes for backward compatibility with older clients.
 	mux.HandleFunc("/status", s.handleStatus)
 	mux.HandleFunc("/stop", s.handleStop)
@@ -186,4 +206,103 @@ func (s *IPCServer) handleDeleteWebhook(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *IPCServer) handleListNotifications(w http.ResponseWriter, r *http.Request) {
+	store := s.daemon.store
+	if store == nil {
+		http.Error(w, "store not ready", http.StatusServiceUnavailable)
+		return
+	}
+
+	q := r.URL.Query()
+	filter := EventFilter{
+		BoardID:   q.Get("board_id"),
+		EventType: q.Get("event_type"),
+		Since:     q.Get("since"),
+	}
+	if q.Get("unread") == "true" {
+		filter.Unread = true
+	}
+	if s := q.Get("limit"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			filter.Limit = n
+		}
+	}
+
+	events, err := store.ListEvents(filter)
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	if events == nil {
+		events = []Event{}
+	}
+
+	unread, err := store.CountUnread()
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(NotificationListResponse{
+		Items:       events,
+		UnreadCount: unread,
+	})
+}
+
+// notificationAckRequest is the body for POST /notifications/ack.
+type notificationAckRequest struct {
+	ID  EventID `json:"id"`
+	All bool    `json:"all"`
+}
+
+func (s *IPCServer) handleAckNotification(w http.ResponseWriter, r *http.Request) {
+	store := s.daemon.store
+	if store == nil {
+		http.Error(w, "store not ready", http.StatusServiceUnavailable)
+		return
+	}
+
+	var req notificationAckRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, fmt.Sprintf("invalid request body: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	if req.All {
+		if err := store.AckAll(); err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+	} else if req.ID != "" {
+		if err := store.AckEvent(req.ID); err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(w, "id or all is required", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(NotificationAckResponse{Acknowledged: true})
+}
+
+func (s *IPCServer) handleNotificationCount(w http.ResponseWriter, r *http.Request) {
+	store := s.daemon.store
+	if store == nil {
+		http.Error(w, "store not ready", http.StatusServiceUnavailable)
+		return
+	}
+
+	unread, err := store.CountUnread()
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(NotificationCountResponse{Unread: unread})
 }
