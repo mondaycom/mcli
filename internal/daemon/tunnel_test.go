@@ -87,4 +87,3 @@ func TestTunnel_StartErrorWhenCloudflaredMissing(t *testing.T) {
 		t.Errorf("unexpected error message: %v", err)
 	}
 }
-

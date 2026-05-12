@@ -164,5 +164,3 @@ func newDaemonStatusCmd() *cobra.Command {
 		},
 	}
 }
-
-
