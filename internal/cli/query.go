@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -53,6 +54,34 @@ func newQueryHTTPClient() (*http.Client, string, error) {
 
 	client := httpx.NewClient(token, version)
 	return client, mondayAPIEndpoint, nil
+}
+
+// jsonVarTypeRE matches variable declarations like "$cols: JSON!" or "$x: JSON"
+// in a GraphQL operation signature. It captures the variable name and the base
+// type (before any '!' or wrapping brackets).
+var jsonVarTypeRE = regexp.MustCompile(`\$(\w+)\s*:\s*\[?\s*JSON\s*!?\s*\]?\s*!?`)
+
+// coerceJSONVars inspects the query's variable declarations and, for any
+// variable declared as a JSON scalar, re-encodes map/slice values as a JSON
+// string. monday.com's JSON scalar expects a stringified JSON value on the wire.
+func coerceJSONVars(queryStr string, vars map[string]any) {
+	if len(vars) == 0 {
+		return
+	}
+	matches := jsonVarTypeRE.FindAllStringSubmatch(queryStr, -1)
+	for _, m := range matches {
+		name := m[1]
+		v, ok := vars[name]
+		if !ok || v == nil {
+			continue
+		}
+		switch v.(type) {
+		case map[string]any, []any:
+			if b, err := json.Marshal(v); err == nil {
+				vars[name] = string(b)
+			}
+		}
+	}
 }
 
 // parseVarValue auto-types a value string per the spec:
@@ -151,6 +180,8 @@ func executeRawQuery(cmd *cobra.Command, queryStr string, vars map[string]any) e
 	if queryStr == "" {
 		return errs.Usage("query string must not be empty")
 	}
+
+	coerceJSONVars(queryStr, vars)
 
 	httpClient, endpoint, err := newQueryHTTPClient()
 	if err != nil {
