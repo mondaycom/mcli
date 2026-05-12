@@ -1,0 +1,75 @@
+# WorkspacesList fetches a page of workspaces.
+#
+# Pagination note: monday.com workspaces use page/limit (integer page numbers),
+# not cursor-based pagination. The CLI surface exposes --cursor as a string
+# for API uniformity; the cursor is encoded as the decimal page number. Page 1
+# is the first page. When results fill the limit there may be more pages; the
+# caller receives the next page number encoded as a string cursor. When fewer
+# results than limit are returned, the cursor is empty (no more pages).
+query WorkspacesList(
+  # @genqlient(omitempty: true)
+  $kind: WorkspaceKind,
+  $limit: Int,
+  $page: Int,
+) {
+  workspaces(kind: $kind, limit: $limit, page: $page) {
+    id
+    name
+    kind
+    description
+    created_at
+    state
+  }
+}
+
+# WorkspaceGet fetches a single workspace by ID.
+query WorkspaceGet($id: ID!) {
+  workspaces(ids: [$id]) {
+    id
+    name
+    kind
+    description
+    created_at
+    state
+  }
+}
+
+# WorkspaceCreate creates a new workspace.
+mutation WorkspaceCreate(
+  $name: String!,
+  $kind: WorkspaceKind!,
+  # @genqlient(omitempty: true)
+  $description: String,
+) {
+  create_workspace(name: $name, kind: $kind, description: $description) {
+    id
+    name
+    kind
+    description
+    created_at
+    state
+  }
+}
+
+# WorkspaceUpdate updates attributes on an existing workspace.
+mutation WorkspaceUpdate(
+  $id: ID!,
+  $attributes: UpdateWorkspaceAttributesInput!,
+) {
+  update_workspace(id: $id, attributes: $attributes) {
+    id
+    name
+    kind
+    description
+    created_at
+    state
+  }
+}
+
+# WorkspaceDelete deletes a workspace.
+mutation WorkspaceDelete($workspaceId: ID!) {
+  delete_workspace(workspace_id: $workspaceId) {
+    id
+    name
+  }
+}

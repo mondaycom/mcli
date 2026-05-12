@@ -444,6 +444,218 @@ var AllColumnType = []ColumnType{
 	ColumnTypeSubtasks,
 }
 
+// One value out of a list of valid folder colors
+type FolderColor string
+
+const (
+	// aquamarine
+	FolderColorAquamarine FolderColor = "AQUAMARINE"
+	// bright-blue
+	FolderColorBrightBlue FolderColor = "BRIGHT_BLUE"
+	// bright-green
+	FolderColorBrightGreen FolderColor = "BRIGHT_GREEN"
+	// chili-blue
+	FolderColorChiliBlue FolderColor = "CHILI_BLUE"
+	// dark-orange
+	FolderColorDarkOrange FolderColor = "DARK_ORANGE"
+	// dark_purple
+	FolderColorDarkPurple FolderColor = "DARK_PURPLE"
+	// dark-red
+	FolderColorDarkRed FolderColor = "DARK_RED"
+	// done-green
+	FolderColorDoneGreen FolderColor = "DONE_GREEN"
+	// indigo
+	FolderColorIndigo FolderColor = "INDIGO"
+	// lipstick
+	FolderColorLipstick FolderColor = "LIPSTICK"
+	// No color
+	FolderColorNull FolderColor = "NULL"
+	// purple
+	FolderColorPurple FolderColor = "PURPLE"
+	// sofia_pink
+	FolderColorSofiaPink FolderColor = "SOFIA_PINK"
+	// stuck-red
+	FolderColorStuckRed FolderColor = "STUCK_RED"
+	// sunset
+	FolderColorSunset FolderColor = "SUNSET"
+	// working_orange
+	FolderColorWorkingOrange FolderColor = "WORKING_ORANGE"
+)
+
+var AllFolderColor = []FolderColor{
+	FolderColorAquamarine,
+	FolderColorBrightBlue,
+	FolderColorBrightGreen,
+	FolderColorChiliBlue,
+	FolderColorDarkOrange,
+	FolderColorDarkPurple,
+	FolderColorDarkRed,
+	FolderColorDoneGreen,
+	FolderColorIndigo,
+	FolderColorLipstick,
+	FolderColorNull,
+	FolderColorPurple,
+	FolderColorSofiaPink,
+	FolderColorStuckRed,
+	FolderColorSunset,
+	FolderColorWorkingOrange,
+}
+
+// FolderCreateCreate_folderFolder includes the requested fields of the GraphQL type Folder.
+// The GraphQL type's documentation follows.
+//
+// A workspace folder containing boards, docs, sub folders, etc.
+type FolderCreateCreate_folderFolder struct {
+	// The folder's unique identifier.
+	Id string `json:"id"`
+	// The folder's name.
+	Name string `json:"name"`
+	// The folder's color.
+	Color FolderColor `json:"color"`
+	// The folder's creation date.
+	Created_at string `json:"created_at"`
+	// The folder's user owner unique identifier.
+	Owner_id string `json:"owner_id"`
+}
+
+// GetId returns FolderCreateCreate_folderFolder.Id, and is useful for accessing the field via an interface.
+func (v *FolderCreateCreate_folderFolder) GetId() string { return v.Id }
+
+// GetName returns FolderCreateCreate_folderFolder.Name, and is useful for accessing the field via an interface.
+func (v *FolderCreateCreate_folderFolder) GetName() string { return v.Name }
+
+// GetColor returns FolderCreateCreate_folderFolder.Color, and is useful for accessing the field via an interface.
+func (v *FolderCreateCreate_folderFolder) GetColor() FolderColor { return v.Color }
+
+// GetCreated_at returns FolderCreateCreate_folderFolder.Created_at, and is useful for accessing the field via an interface.
+func (v *FolderCreateCreate_folderFolder) GetCreated_at() string { return v.Created_at }
+
+// GetOwner_id returns FolderCreateCreate_folderFolder.Owner_id, and is useful for accessing the field via an interface.
+func (v *FolderCreateCreate_folderFolder) GetOwner_id() string { return v.Owner_id }
+
+// FolderCreateResponse is returned by FolderCreate on success.
+type FolderCreateResponse struct {
+	// Creates a folder in a specific workspace.
+	Create_folder FolderCreateCreate_folderFolder `json:"create_folder"`
+}
+
+// GetCreate_folder returns FolderCreateResponse.Create_folder, and is useful for accessing the field via an interface.
+func (v *FolderCreateResponse) GetCreate_folder() FolderCreateCreate_folderFolder {
+	return v.Create_folder
+}
+
+// FolderDeleteDelete_folderFolder includes the requested fields of the GraphQL type Folder.
+// The GraphQL type's documentation follows.
+//
+// A workspace folder containing boards, docs, sub folders, etc.
+type FolderDeleteDelete_folderFolder struct {
+	// The folder's unique identifier.
+	Id string `json:"id"`
+	// The folder's name.
+	Name string `json:"name"`
+}
+
+// GetId returns FolderDeleteDelete_folderFolder.Id, and is useful for accessing the field via an interface.
+func (v *FolderDeleteDelete_folderFolder) GetId() string { return v.Id }
+
+// GetName returns FolderDeleteDelete_folderFolder.Name, and is useful for accessing the field via an interface.
+func (v *FolderDeleteDelete_folderFolder) GetName() string { return v.Name }
+
+// FolderDeleteResponse is returned by FolderDelete on success.
+type FolderDeleteResponse struct {
+	// Deletes a folder in a specific workspace.
+	Delete_folder FolderDeleteDelete_folderFolder `json:"delete_folder"`
+}
+
+// GetDelete_folder returns FolderDeleteResponse.Delete_folder, and is useful for accessing the field via an interface.
+func (v *FolderDeleteResponse) GetDelete_folder() FolderDeleteDelete_folderFolder {
+	return v.Delete_folder
+}
+
+// FolderRenameResponse is returned by FolderRename on success.
+type FolderRenameResponse struct {
+	// Updates a folder.
+	Update_folder FolderRenameUpdate_folderFolder `json:"update_folder"`
+}
+
+// GetUpdate_folder returns FolderRenameResponse.Update_folder, and is useful for accessing the field via an interface.
+func (v *FolderRenameResponse) GetUpdate_folder() FolderRenameUpdate_folderFolder {
+	return v.Update_folder
+}
+
+// FolderRenameUpdate_folderFolder includes the requested fields of the GraphQL type Folder.
+// The GraphQL type's documentation follows.
+//
+// A workspace folder containing boards, docs, sub folders, etc.
+type FolderRenameUpdate_folderFolder struct {
+	// The folder's unique identifier.
+	Id string `json:"id"`
+	// The folder's name.
+	Name string `json:"name"`
+	// The folder's color.
+	Color FolderColor `json:"color"`
+	// The folder's creation date.
+	Created_at string `json:"created_at"`
+	// The folder's user owner unique identifier.
+	Owner_id string `json:"owner_id"`
+}
+
+// GetId returns FolderRenameUpdate_folderFolder.Id, and is useful for accessing the field via an interface.
+func (v *FolderRenameUpdate_folderFolder) GetId() string { return v.Id }
+
+// GetName returns FolderRenameUpdate_folderFolder.Name, and is useful for accessing the field via an interface.
+func (v *FolderRenameUpdate_folderFolder) GetName() string { return v.Name }
+
+// GetColor returns FolderRenameUpdate_folderFolder.Color, and is useful for accessing the field via an interface.
+func (v *FolderRenameUpdate_folderFolder) GetColor() FolderColor { return v.Color }
+
+// GetCreated_at returns FolderRenameUpdate_folderFolder.Created_at, and is useful for accessing the field via an interface.
+func (v *FolderRenameUpdate_folderFolder) GetCreated_at() string { return v.Created_at }
+
+// GetOwner_id returns FolderRenameUpdate_folderFolder.Owner_id, and is useful for accessing the field via an interface.
+func (v *FolderRenameUpdate_folderFolder) GetOwner_id() string { return v.Owner_id }
+
+// FoldersListFoldersFolder includes the requested fields of the GraphQL type Folder.
+// The GraphQL type's documentation follows.
+//
+// A workspace folder containing boards, docs, sub folders, etc.
+type FoldersListFoldersFolder struct {
+	// The folder's unique identifier.
+	Id string `json:"id"`
+	// The folder's name.
+	Name string `json:"name"`
+	// The folder's color.
+	Color FolderColor `json:"color"`
+	// The folder's creation date.
+	Created_at string `json:"created_at"`
+	// The folder's user owner unique identifier.
+	Owner_id string `json:"owner_id"`
+}
+
+// GetId returns FoldersListFoldersFolder.Id, and is useful for accessing the field via an interface.
+func (v *FoldersListFoldersFolder) GetId() string { return v.Id }
+
+// GetName returns FoldersListFoldersFolder.Name, and is useful for accessing the field via an interface.
+func (v *FoldersListFoldersFolder) GetName() string { return v.Name }
+
+// GetColor returns FoldersListFoldersFolder.Color, and is useful for accessing the field via an interface.
+func (v *FoldersListFoldersFolder) GetColor() FolderColor { return v.Color }
+
+// GetCreated_at returns FoldersListFoldersFolder.Created_at, and is useful for accessing the field via an interface.
+func (v *FoldersListFoldersFolder) GetCreated_at() string { return v.Created_at }
+
+// GetOwner_id returns FoldersListFoldersFolder.Owner_id, and is useful for accessing the field via an interface.
+func (v *FoldersListFoldersFolder) GetOwner_id() string { return v.Owner_id }
+
+// FoldersListResponse is returned by FoldersList on success.
+type FoldersListResponse struct {
+	// Get a collection of folders. Note: This query won't return folders from closed workspaces to which you are not subscribed
+	Folders []FoldersListFoldersFolder `json:"folders"`
+}
+
+// GetFolders returns FoldersListResponse.Folders, and is useful for accessing the field via an interface.
+func (v *FoldersListResponse) GetFolders() []FoldersListFoldersFolder { return v.Folders }
+
 // ItemCreateCreate_itemItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
 //
@@ -8694,6 +8906,147 @@ func (v *SubitemCreateResponse) GetCreate_subitem() SubitemCreateCreate_subitemI
 	return v.Create_subitem
 }
 
+// Attributes of a workspace to update
+type UpdateWorkspaceAttributesInput struct {
+	// The description of the workspace to update
+	Description string `json:"description"`
+	// The kind of the workspace to update (open / closed / template)
+	Kind WorkspaceKind `json:"kind"`
+	// The name of the workspace to update
+	Name string `json:"name"`
+}
+
+// GetDescription returns UpdateWorkspaceAttributesInput.Description, and is useful for accessing the field via an interface.
+func (v *UpdateWorkspaceAttributesInput) GetDescription() string { return v.Description }
+
+// GetKind returns UpdateWorkspaceAttributesInput.Kind, and is useful for accessing the field via an interface.
+func (v *UpdateWorkspaceAttributesInput) GetKind() WorkspaceKind { return v.Kind }
+
+// GetName returns UpdateWorkspaceAttributesInput.Name, and is useful for accessing the field via an interface.
+func (v *UpdateWorkspaceAttributesInput) GetName() string { return v.Name }
+
+// WorkspaceCreateCreate_workspaceWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type WorkspaceCreateCreate_workspaceWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+	// The workspace's kind (open / closed / template).
+	Kind WorkspaceKind `json:"kind"`
+	// The workspace's description.
+	Description string `json:"description"`
+	// The workspace's creation date.
+	Created_at string `json:"created_at"`
+	// The workspace's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns WorkspaceCreateCreate_workspaceWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetId() string { return v.Id }
+
+// GetName returns WorkspaceCreateCreate_workspaceWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetName() string { return v.Name }
+
+// GetKind returns WorkspaceCreateCreate_workspaceWorkspace.Kind, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetKind() WorkspaceKind { return v.Kind }
+
+// GetDescription returns WorkspaceCreateCreate_workspaceWorkspace.Description, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetDescription() string { return v.Description }
+
+// GetCreated_at returns WorkspaceCreateCreate_workspaceWorkspace.Created_at, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetCreated_at() string { return v.Created_at }
+
+// GetState returns WorkspaceCreateCreate_workspaceWorkspace.State, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateCreate_workspaceWorkspace) GetState() State { return v.State }
+
+// WorkspaceCreateResponse is returned by WorkspaceCreate on success.
+type WorkspaceCreateResponse struct {
+	// Create a new workspace.
+	Create_workspace WorkspaceCreateCreate_workspaceWorkspace `json:"create_workspace"`
+}
+
+// GetCreate_workspace returns WorkspaceCreateResponse.Create_workspace, and is useful for accessing the field via an interface.
+func (v *WorkspaceCreateResponse) GetCreate_workspace() WorkspaceCreateCreate_workspaceWorkspace {
+	return v.Create_workspace
+}
+
+// WorkspaceDeleteDelete_workspaceWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type WorkspaceDeleteDelete_workspaceWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+}
+
+// GetId returns WorkspaceDeleteDelete_workspaceWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *WorkspaceDeleteDelete_workspaceWorkspace) GetId() string { return v.Id }
+
+// GetName returns WorkspaceDeleteDelete_workspaceWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *WorkspaceDeleteDelete_workspaceWorkspace) GetName() string { return v.Name }
+
+// WorkspaceDeleteResponse is returned by WorkspaceDelete on success.
+type WorkspaceDeleteResponse struct {
+	// Delete workspace.
+	Delete_workspace WorkspaceDeleteDelete_workspaceWorkspace `json:"delete_workspace"`
+}
+
+// GetDelete_workspace returns WorkspaceDeleteResponse.Delete_workspace, and is useful for accessing the field via an interface.
+func (v *WorkspaceDeleteResponse) GetDelete_workspace() WorkspaceDeleteDelete_workspaceWorkspace {
+	return v.Delete_workspace
+}
+
+// WorkspaceGetResponse is returned by WorkspaceGet on success.
+type WorkspaceGetResponse struct {
+	// Get a collection of workspaces.
+	Workspaces []WorkspaceGetWorkspacesWorkspace `json:"workspaces"`
+}
+
+// GetWorkspaces returns WorkspaceGetResponse.Workspaces, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetResponse) GetWorkspaces() []WorkspaceGetWorkspacesWorkspace { return v.Workspaces }
+
+// WorkspaceGetWorkspacesWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type WorkspaceGetWorkspacesWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+	// The workspace's kind (open / closed / template).
+	Kind WorkspaceKind `json:"kind"`
+	// The workspace's description.
+	Description string `json:"description"`
+	// The workspace's creation date.
+	Created_at string `json:"created_at"`
+	// The workspace's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns WorkspaceGetWorkspacesWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetId() string { return v.Id }
+
+// GetName returns WorkspaceGetWorkspacesWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetName() string { return v.Name }
+
+// GetKind returns WorkspaceGetWorkspacesWorkspace.Kind, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetKind() WorkspaceKind { return v.Kind }
+
+// GetDescription returns WorkspaceGetWorkspacesWorkspace.Description, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetDescription() string { return v.Description }
+
+// GetCreated_at returns WorkspaceGetWorkspacesWorkspace.Created_at, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetCreated_at() string { return v.Created_at }
+
+// GetState returns WorkspaceGetWorkspacesWorkspace.State, and is useful for accessing the field via an interface.
+func (v *WorkspaceGetWorkspacesWorkspace) GetState() State { return v.State }
+
 // The workspace kinds available.
 type WorkspaceKind string
 
@@ -8711,6 +9064,102 @@ var AllWorkspaceKind = []WorkspaceKind{
 	WorkspaceKindOpen,
 	WorkspaceKindTemplate,
 }
+
+// WorkspaceUpdateResponse is returned by WorkspaceUpdate on success.
+type WorkspaceUpdateResponse struct {
+	// Update an existing workspace.
+	Update_workspace WorkspaceUpdateUpdate_workspaceWorkspace `json:"update_workspace"`
+}
+
+// GetUpdate_workspace returns WorkspaceUpdateResponse.Update_workspace, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateResponse) GetUpdate_workspace() WorkspaceUpdateUpdate_workspaceWorkspace {
+	return v.Update_workspace
+}
+
+// WorkspaceUpdateUpdate_workspaceWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type WorkspaceUpdateUpdate_workspaceWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+	// The workspace's kind (open / closed / template).
+	Kind WorkspaceKind `json:"kind"`
+	// The workspace's description.
+	Description string `json:"description"`
+	// The workspace's creation date.
+	Created_at string `json:"created_at"`
+	// The workspace's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns WorkspaceUpdateUpdate_workspaceWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetId() string { return v.Id }
+
+// GetName returns WorkspaceUpdateUpdate_workspaceWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetName() string { return v.Name }
+
+// GetKind returns WorkspaceUpdateUpdate_workspaceWorkspace.Kind, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetKind() WorkspaceKind { return v.Kind }
+
+// GetDescription returns WorkspaceUpdateUpdate_workspaceWorkspace.Description, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetDescription() string { return v.Description }
+
+// GetCreated_at returns WorkspaceUpdateUpdate_workspaceWorkspace.Created_at, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetCreated_at() string { return v.Created_at }
+
+// GetState returns WorkspaceUpdateUpdate_workspaceWorkspace.State, and is useful for accessing the field via an interface.
+func (v *WorkspaceUpdateUpdate_workspaceWorkspace) GetState() State { return v.State }
+
+// WorkspacesListResponse is returned by WorkspacesList on success.
+type WorkspacesListResponse struct {
+	// Get a collection of workspaces.
+	Workspaces []WorkspacesListWorkspacesWorkspace `json:"workspaces"`
+}
+
+// GetWorkspaces returns WorkspacesListResponse.Workspaces, and is useful for accessing the field via an interface.
+func (v *WorkspacesListResponse) GetWorkspaces() []WorkspacesListWorkspacesWorkspace {
+	return v.Workspaces
+}
+
+// WorkspacesListWorkspacesWorkspace includes the requested fields of the GraphQL type Workspace.
+// The GraphQL type's documentation follows.
+//
+// A monday.com workspace.
+type WorkspacesListWorkspacesWorkspace struct {
+	// The workspace's unique identifier.
+	Id string `json:"id"`
+	// The workspace's name.
+	Name string `json:"name"`
+	// The workspace's kind (open / closed / template).
+	Kind WorkspaceKind `json:"kind"`
+	// The workspace's description.
+	Description string `json:"description"`
+	// The workspace's creation date.
+	Created_at string `json:"created_at"`
+	// The workspace's state (all / active / archived / deleted).
+	State State `json:"state"`
+}
+
+// GetId returns WorkspacesListWorkspacesWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetId() string { return v.Id }
+
+// GetName returns WorkspacesListWorkspacesWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetName() string { return v.Name }
+
+// GetKind returns WorkspacesListWorkspacesWorkspace.Kind, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetKind() WorkspaceKind { return v.Kind }
+
+// GetDescription returns WorkspacesListWorkspacesWorkspace.Description, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetDescription() string { return v.Description }
+
+// GetCreated_at returns WorkspacesListWorkspacesWorkspace.Created_at, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetCreated_at() string { return v.Created_at }
+
+// GetState returns WorkspacesListWorkspacesWorkspace.State, and is useful for accessing the field via an interface.
+func (v *WorkspacesListWorkspacesWorkspace) GetState() State { return v.State }
 
 // __BoardByIDInput is used internally by genqlient
 type __BoardByIDInput struct {
@@ -8767,6 +9216,58 @@ func (v *__BoardsListInput) GetPage() int { return v.Page }
 
 // GetWorkspaceIds returns __BoardsListInput.WorkspaceIds, and is useful for accessing the field via an interface.
 func (v *__BoardsListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
+
+// __FolderCreateInput is used internally by genqlient
+type __FolderCreateInput struct {
+	Name           string `json:"name"`
+	WorkspaceId    string `json:"workspaceId,omitempty"`
+	ParentFolderId string `json:"parentFolderId,omitempty"`
+}
+
+// GetName returns __FolderCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__FolderCreateInput) GetName() string { return v.Name }
+
+// GetWorkspaceId returns __FolderCreateInput.WorkspaceId, and is useful for accessing the field via an interface.
+func (v *__FolderCreateInput) GetWorkspaceId() string { return v.WorkspaceId }
+
+// GetParentFolderId returns __FolderCreateInput.ParentFolderId, and is useful for accessing the field via an interface.
+func (v *__FolderCreateInput) GetParentFolderId() string { return v.ParentFolderId }
+
+// __FolderDeleteInput is used internally by genqlient
+type __FolderDeleteInput struct {
+	FolderId string `json:"folderId"`
+}
+
+// GetFolderId returns __FolderDeleteInput.FolderId, and is useful for accessing the field via an interface.
+func (v *__FolderDeleteInput) GetFolderId() string { return v.FolderId }
+
+// __FolderRenameInput is used internally by genqlient
+type __FolderRenameInput struct {
+	FolderId string `json:"folderId"`
+	Name     string `json:"name"`
+}
+
+// GetFolderId returns __FolderRenameInput.FolderId, and is useful for accessing the field via an interface.
+func (v *__FolderRenameInput) GetFolderId() string { return v.FolderId }
+
+// GetName returns __FolderRenameInput.Name, and is useful for accessing the field via an interface.
+func (v *__FolderRenameInput) GetName() string { return v.Name }
+
+// __FoldersListInput is used internally by genqlient
+type __FoldersListInput struct {
+	Limit        int      `json:"limit"`
+	Page         int      `json:"page"`
+	WorkspaceIds []string `json:"workspaceIds,omitempty"`
+}
+
+// GetLimit returns __FoldersListInput.Limit, and is useful for accessing the field via an interface.
+func (v *__FoldersListInput) GetLimit() int { return v.Limit }
+
+// GetPage returns __FoldersListInput.Page, and is useful for accessing the field via an interface.
+func (v *__FoldersListInput) GetPage() int { return v.Page }
+
+// GetWorkspaceIds returns __FoldersListInput.WorkspaceIds, and is useful for accessing the field via an interface.
+func (v *__FoldersListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
 
 // __ItemCreateInput is used internally by genqlient
 type __ItemCreateInput struct {
@@ -8891,6 +9392,66 @@ func (v *__SubitemCreateInput) GetName() string { return v.Name }
 
 // GetColumnValues returns __SubitemCreateInput.ColumnValues, and is useful for accessing the field via an interface.
 func (v *__SubitemCreateInput) GetColumnValues() string { return v.ColumnValues }
+
+// __WorkspaceCreateInput is used internally by genqlient
+type __WorkspaceCreateInput struct {
+	Name        string        `json:"name"`
+	Kind        WorkspaceKind `json:"kind"`
+	Description string        `json:"description,omitempty"`
+}
+
+// GetName returns __WorkspaceCreateInput.Name, and is useful for accessing the field via an interface.
+func (v *__WorkspaceCreateInput) GetName() string { return v.Name }
+
+// GetKind returns __WorkspaceCreateInput.Kind, and is useful for accessing the field via an interface.
+func (v *__WorkspaceCreateInput) GetKind() WorkspaceKind { return v.Kind }
+
+// GetDescription returns __WorkspaceCreateInput.Description, and is useful for accessing the field via an interface.
+func (v *__WorkspaceCreateInput) GetDescription() string { return v.Description }
+
+// __WorkspaceDeleteInput is used internally by genqlient
+type __WorkspaceDeleteInput struct {
+	WorkspaceId string `json:"workspaceId"`
+}
+
+// GetWorkspaceId returns __WorkspaceDeleteInput.WorkspaceId, and is useful for accessing the field via an interface.
+func (v *__WorkspaceDeleteInput) GetWorkspaceId() string { return v.WorkspaceId }
+
+// __WorkspaceGetInput is used internally by genqlient
+type __WorkspaceGetInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __WorkspaceGetInput.Id, and is useful for accessing the field via an interface.
+func (v *__WorkspaceGetInput) GetId() string { return v.Id }
+
+// __WorkspaceUpdateInput is used internally by genqlient
+type __WorkspaceUpdateInput struct {
+	Id         string                         `json:"id"`
+	Attributes UpdateWorkspaceAttributesInput `json:"attributes"`
+}
+
+// GetId returns __WorkspaceUpdateInput.Id, and is useful for accessing the field via an interface.
+func (v *__WorkspaceUpdateInput) GetId() string { return v.Id }
+
+// GetAttributes returns __WorkspaceUpdateInput.Attributes, and is useful for accessing the field via an interface.
+func (v *__WorkspaceUpdateInput) GetAttributes() UpdateWorkspaceAttributesInput { return v.Attributes }
+
+// __WorkspacesListInput is used internally by genqlient
+type __WorkspacesListInput struct {
+	Kind  WorkspaceKind `json:"kind,omitempty"`
+	Limit int           `json:"limit"`
+	Page  int           `json:"page"`
+}
+
+// GetKind returns __WorkspacesListInput.Kind, and is useful for accessing the field via an interface.
+func (v *__WorkspacesListInput) GetKind() WorkspaceKind { return v.Kind }
+
+// GetLimit returns __WorkspacesListInput.Limit, and is useful for accessing the field via an interface.
+func (v *__WorkspacesListInput) GetLimit() int { return v.Limit }
+
+// GetPage returns __WorkspacesListInput.Page, and is useful for accessing the field via an interface.
+func (v *__WorkspacesListInput) GetPage() int { return v.Page }
 
 // The query executed by BoardByID.
 const BoardByID_Operation = `
@@ -9077,6 +9638,173 @@ func BoardsList(
 	}
 
 	data_ = &BoardsListResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by FolderCreate.
+const FolderCreate_Operation = `
+mutation FolderCreate ($name: String!, $workspaceId: ID, $parentFolderId: ID) {
+	create_folder(name: $name, workspace_id: $workspaceId, parent_folder_id: $parentFolderId) {
+		id
+		name
+		color
+		created_at
+		owner_id
+	}
+}
+`
+
+// FolderCreate creates a new folder.
+func FolderCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+	workspaceId string,
+	parentFolderId string,
+) (data_ *FolderCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "FolderCreate",
+		Query:  FolderCreate_Operation,
+		Variables: &__FolderCreateInput{
+			Name:           name,
+			WorkspaceId:    workspaceId,
+			ParentFolderId: parentFolderId,
+		},
+	}
+
+	data_ = &FolderCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by FolderDelete.
+const FolderDelete_Operation = `
+mutation FolderDelete ($folderId: ID!) {
+	delete_folder(folder_id: $folderId) {
+		id
+		name
+	}
+}
+`
+
+// FolderDelete deletes a folder.
+func FolderDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	folderId string,
+) (data_ *FolderDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "FolderDelete",
+		Query:  FolderDelete_Operation,
+		Variables: &__FolderDeleteInput{
+			FolderId: folderId,
+		},
+	}
+
+	data_ = &FolderDeleteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by FolderRename.
+const FolderRename_Operation = `
+mutation FolderRename ($folderId: ID!, $name: String!) {
+	update_folder(folder_id: $folderId, name: $name) {
+		id
+		name
+		color
+		created_at
+		owner_id
+	}
+}
+`
+
+// FolderRename renames an existing folder via update_folder.
+func FolderRename(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	folderId string,
+	name string,
+) (data_ *FolderRenameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "FolderRename",
+		Query:  FolderRename_Operation,
+		Variables: &__FolderRenameInput{
+			FolderId: folderId,
+			Name:     name,
+		},
+	}
+
+	data_ = &FolderRenameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by FoldersList.
+const FoldersList_Operation = `
+query FoldersList ($limit: Int, $page: Int, $workspaceIds: [ID]) {
+	folders(limit: $limit, page: $page, workspace_ids: $workspaceIds) {
+		id
+		name
+		color
+		created_at
+		owner_id
+	}
+}
+`
+
+// FoldersList fetches a page of folders.
+//
+// Pagination note: monday.com folders use page/limit (integer page numbers).
+// The CLI surface exposes --cursor as a string for API uniformity; the cursor
+// is encoded as the decimal page number. Page 1 is the first page.
+func FoldersList(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	limit int,
+	page int,
+	workspaceIds []string,
+) (data_ *FoldersListResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "FoldersList",
+		Query:  FoldersList_Operation,
+		Variables: &__FoldersListInput{
+			Limit:        limit,
+			Page:         page,
+			WorkspaceIds: workspaceIds,
+		},
+	}
+
+	data_ = &FoldersListResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9557,6 +10285,219 @@ func SubitemCreate(
 	}
 
 	data_ = &SubitemCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by WorkspaceCreate.
+const WorkspaceCreate_Operation = `
+mutation WorkspaceCreate ($name: String!, $kind: WorkspaceKind!, $description: String) {
+	create_workspace(name: $name, kind: $kind, description: $description) {
+		id
+		name
+		kind
+		description
+		created_at
+		state
+	}
+}
+`
+
+// WorkspaceCreate creates a new workspace.
+func WorkspaceCreate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+	kind WorkspaceKind,
+	description string,
+) (data_ *WorkspaceCreateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "WorkspaceCreate",
+		Query:  WorkspaceCreate_Operation,
+		Variables: &__WorkspaceCreateInput{
+			Name:        name,
+			Kind:        kind,
+			Description: description,
+		},
+	}
+
+	data_ = &WorkspaceCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by WorkspaceDelete.
+const WorkspaceDelete_Operation = `
+mutation WorkspaceDelete ($workspaceId: ID!) {
+	delete_workspace(workspace_id: $workspaceId) {
+		id
+		name
+	}
+}
+`
+
+// WorkspaceDelete deletes a workspace.
+func WorkspaceDelete(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	workspaceId string,
+) (data_ *WorkspaceDeleteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "WorkspaceDelete",
+		Query:  WorkspaceDelete_Operation,
+		Variables: &__WorkspaceDeleteInput{
+			WorkspaceId: workspaceId,
+		},
+	}
+
+	data_ = &WorkspaceDeleteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by WorkspaceGet.
+const WorkspaceGet_Operation = `
+query WorkspaceGet ($id: ID!) {
+	workspaces(ids: [$id]) {
+		id
+		name
+		kind
+		description
+		created_at
+		state
+	}
+}
+`
+
+// WorkspaceGet fetches a single workspace by ID.
+func WorkspaceGet(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *WorkspaceGetResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "WorkspaceGet",
+		Query:  WorkspaceGet_Operation,
+		Variables: &__WorkspaceGetInput{
+			Id: id,
+		},
+	}
+
+	data_ = &WorkspaceGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by WorkspaceUpdate.
+const WorkspaceUpdate_Operation = `
+mutation WorkspaceUpdate ($id: ID!, $attributes: UpdateWorkspaceAttributesInput!) {
+	update_workspace(id: $id, attributes: $attributes) {
+		id
+		name
+		kind
+		description
+		created_at
+		state
+	}
+}
+`
+
+// WorkspaceUpdate updates attributes on an existing workspace.
+func WorkspaceUpdate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	attributes UpdateWorkspaceAttributesInput,
+) (data_ *WorkspaceUpdateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "WorkspaceUpdate",
+		Query:  WorkspaceUpdate_Operation,
+		Variables: &__WorkspaceUpdateInput{
+			Id:         id,
+			Attributes: attributes,
+		},
+	}
+
+	data_ = &WorkspaceUpdateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by WorkspacesList.
+const WorkspacesList_Operation = `
+query WorkspacesList ($kind: WorkspaceKind, $limit: Int, $page: Int) {
+	workspaces(kind: $kind, limit: $limit, page: $page) {
+		id
+		name
+		kind
+		description
+		created_at
+		state
+	}
+}
+`
+
+// WorkspacesList fetches a page of workspaces.
+//
+// Pagination note: monday.com workspaces use page/limit (integer page numbers),
+// not cursor-based pagination. The CLI surface exposes --cursor as a string
+// for API uniformity; the cursor is encoded as the decimal page number. Page 1
+// is the first page. When results fill the limit there may be more pages; the
+// caller receives the next page number encoded as a string cursor. When fewer
+// results than limit are returned, the cursor is empty (no more pages).
+func WorkspacesList(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	kind WorkspaceKind,
+	limit int,
+	page int,
+) (data_ *WorkspacesListResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "WorkspacesList",
+		Query:  WorkspacesList_Operation,
+		Variables: &__WorkspacesListInput{
+			Kind:  kind,
+			Limit: limit,
+			Page:  page,
+		},
+	}
+
+	data_ = &WorkspacesListResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

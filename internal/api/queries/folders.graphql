@@ -1,0 +1,58 @@
+# FoldersList fetches a page of folders.
+#
+# Pagination note: monday.com folders use page/limit (integer page numbers).
+# The CLI surface exposes --cursor as a string for API uniformity; the cursor
+# is encoded as the decimal page number. Page 1 is the first page.
+query FoldersList(
+  $limit: Int,
+  $page: Int,
+  # @genqlient(omitempty: true)
+  $workspaceIds: [ID],
+) {
+  folders(limit: $limit, page: $page, workspace_ids: $workspaceIds) {
+    id
+    name
+    color
+    created_at
+    owner_id
+  }
+}
+
+# FolderCreate creates a new folder.
+mutation FolderCreate(
+  $name: String!,
+  # @genqlient(omitempty: true)
+  $workspaceId: ID,
+  # @genqlient(omitempty: true)
+  $parentFolderId: ID,
+) {
+  create_folder(name: $name, workspace_id: $workspaceId, parent_folder_id: $parentFolderId) {
+    id
+    name
+    color
+    created_at
+    owner_id
+  }
+}
+
+# FolderRename renames an existing folder via update_folder.
+mutation FolderRename(
+  $folderId: ID!,
+  $name: String!,
+) {
+  update_folder(folder_id: $folderId, name: $name) {
+    id
+    name
+    color
+    created_at
+    owner_id
+  }
+}
+
+# FolderDelete deletes a folder.
+mutation FolderDelete($folderId: ID!) {
+  delete_folder(folder_id: $folderId) {
+    id
+    name
+  }
+}
