@@ -167,6 +167,87 @@ func TestParseVarValue_InvalidJSONObject_FallsBackToString(t *testing.T) {
 	}
 }
 
+// --- coerceJSONVars tests (pure, parallel safe) ---
+
+func TestCoerceJSONVars_StringifiesMapForJSONType(t *testing.T) {
+	t.Parallel()
+	vars := map[string]any{
+		"cols":  map[string]any{"sku": "WGT-001", "price": "29.99"},
+		"board": int64(123),
+	}
+	coerceJSONVars(`mutation($board: ID!, $name: String!, $cols: JSON!) { create_item(board_id: $board, item_name: $name, column_values: $cols) { id } }`, vars)
+	s, ok := vars["cols"].(string)
+	if !ok {
+		t.Fatalf("expected cols to be string, got %T", vars["cols"])
+	}
+	var parsed map[string]any
+	if err := json.Unmarshal([]byte(s), &parsed); err != nil {
+		t.Fatalf("cols is not valid JSON string: %v", err)
+	}
+	if parsed["sku"] != "WGT-001" {
+		t.Errorf("parsed[sku] = %v, want WGT-001", parsed["sku"])
+	}
+	// board should be untouched (not JSON type)
+	if vars["board"] != int64(123) {
+		t.Errorf("board = %v, want 123", vars["board"])
+	}
+}
+
+func TestCoerceJSONVars_StringifiesArrayForJSONType(t *testing.T) {
+	t.Parallel()
+	vars := map[string]any{
+		"ids": []any{float64(1), float64(2), float64(3)},
+	}
+	coerceJSONVars(`query($ids: JSON!) { items(ids: $ids) { id } }`, vars)
+	s, ok := vars["ids"].(string)
+	if !ok {
+		t.Fatalf("expected ids to be string, got %T", vars["ids"])
+	}
+	if s != "[1,2,3]" {
+		t.Errorf("ids = %q, want [1,2,3]", s)
+	}
+}
+
+func TestCoerceJSONVars_LeavesStringAlone(t *testing.T) {
+	t.Parallel()
+	vars := map[string]any{
+		"cols": `{"already":"a string"}`,
+	}
+	coerceJSONVars(`mutation($cols: JSON!) { x }`, vars)
+	if vars["cols"] != `{"already":"a string"}` {
+		t.Errorf("cols was modified: %v", vars["cols"])
+	}
+}
+
+func TestCoerceJSONVars_HandlesNullableJSON(t *testing.T) {
+	t.Parallel()
+	vars := map[string]any{
+		"data": map[string]any{"key": "val"},
+	}
+	coerceJSONVars(`mutation($data: JSON) { x }`, vars)
+	if _, ok := vars["data"].(string); !ok {
+		t.Fatalf("expected string, got %T", vars["data"])
+	}
+}
+
+func TestCoerceJSONVars_NoVarDeclarations(t *testing.T) {
+	t.Parallel()
+	vars := map[string]any{
+		"x": map[string]any{"a": "b"},
+	}
+	coerceJSONVars(`{ boards { id } }`, vars)
+	// No declarations → no coercion
+	if _, ok := vars["x"].(map[string]any); !ok {
+		t.Errorf("x should remain a map when no declarations present")
+	}
+}
+
+func TestCoerceJSONVars_NilVars(t *testing.T) {
+	t.Parallel()
+	// Should not panic
+	coerceJSONVars(`mutation($cols: JSON!) { x }`, nil)
+}
+
 // --- parseVarFlags tests (pure, parallel safe) ---
 
 func TestParseVarFlags_Empty(t *testing.T) {
@@ -426,6 +507,46 @@ func TestQueryCmd_Integration(t *testing.T) {
 		vars, _ := payload["variables"].(map[string]any)
 		if vars["k"] != "from-flag" {
 			t.Errorf("vars[k] = %v, want 'from-flag'", vars["k"])
+		}
+	})
+
+	t.Run("JSONVar_CoercedToString_OnWire", func(t *testing.T) {
+		var capturedBody []byte
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			b, _ := io.ReadAll(r.Body)
+			capturedBody = b
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = fmt.Fprintln(w, `{"data":{"create_item":{"id":"1"}}}`)
+		}))
+		defer srv.Close()
+		installQueryFactory(t, srv)
+
+		_, err := execQuery(t,
+			`mutation($board: ID!, $cols: JSON!) { create_item(board_id: $board, column_values: $cols) { id } }`,
+			"--var", "board=123",
+			"--var", `cols={"sku":"WGT-001","price":"29.99"}`,
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		var payload map[string]any
+		if err := json.Unmarshal(capturedBody, &payload); err != nil {
+			t.Fatalf("parse body: %v", err)
+		}
+		vars, _ := payload["variables"].(map[string]any)
+		// cols should be a string on the wire, not an object
+		colsStr, ok := vars["cols"].(string)
+		if !ok {
+			t.Fatalf("vars[cols] should be string, got %T: %v", vars["cols"], vars["cols"])
+		}
+		// Verify it's valid JSON inside the string
+		var parsed map[string]any
+		if err := json.Unmarshal([]byte(colsStr), &parsed); err != nil {
+			t.Fatalf("cols string not valid JSON: %v", err)
+		}
+		if parsed["sku"] != "WGT-001" {
+			t.Errorf("parsed[sku] = %v, want WGT-001", parsed["sku"])
 		}
 	})
 
