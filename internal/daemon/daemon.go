@@ -5,9 +5,11 @@ package daemon
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync/atomic"
 )
 
@@ -27,6 +29,7 @@ type Daemon struct {
 	cfg        Config
 	httpServer *http.Server
 	ipcServer  *IPCServer
+	tunnel     *Tunnel
 	stopCh     chan struct{}
 	stopped    atomic.Bool
 }
@@ -51,19 +54,26 @@ func New(cfg Config) *Daemon {
 	}
 
 	d.ipcServer = NewIPCServer(d.sockPath(), d)
+
+	// Pre-create the Tunnel so TunnelURLChanges() is available before Start.
+	if cfg.ExternalURL == "" {
+		d.tunnel = NewTunnel(cfg.Port)
+	}
+
 	return d
 }
 
 func (d *Daemon) sockPath() string {
-	return d.cfg.ConfigDir + "/daemon.sock"
+	return filepath.Join(d.cfg.ConfigDir, "daemon.sock")
 }
 
 func (d *Daemon) pidPath() string {
-	return d.cfg.ConfigDir + "/daemon.pid"
+	return filepath.Join(d.cfg.ConfigDir, "daemon.pid")
 }
 
 // Start launches the HTTP webhook server and IPC server, then blocks until
-// Stop is called (or ctx is cancelled).
+// Stop is called (or ctx is cancelled). If cfg.ExternalURL is empty, a
+// Cloudflare Quick Tunnel is started to provide a public URL.
 func (d *Daemon) Start(ctx context.Context) error {
 	if err := os.MkdirAll(d.cfg.ConfigDir, 0o700); err != nil {
 		return fmt.Errorf("Start: create config dir: %w", err)
@@ -75,6 +85,15 @@ func (d *Daemon) Start(ctx context.Context) error {
 
 	// Remove stale socket if present.
 	_ = os.Remove(d.sockPath())
+
+	if d.tunnel != nil {
+		if err := d.tunnel.Start(ctx); err != nil {
+			// Log the error but continue: the daemon is still useful for local
+			// development even without a public tunnel URL.
+			log.Printf("daemon: tunnel unavailable: %v", err)
+			d.tunnel = nil
+		}
+	}
 
 	httpErrCh := make(chan error, 1)
 	go func() {
@@ -129,6 +148,10 @@ func (d *Daemon) shutdown() error {
 	httpErr = d.httpServer.Shutdown(ctx)
 	ipcErr = d.ipcServer.Shutdown(ctx)
 
+	if d.tunnel != nil {
+		_ = d.tunnel.Stop()
+	}
+
 	_ = RemovePID(d.pidPath())
 	_ = os.Remove(d.sockPath())
 
@@ -141,11 +164,35 @@ func (d *Daemon) shutdown() error {
 	return nil
 }
 
+// URL returns the external URL for this daemon instance. If an ExternalURL was
+// configured, that is returned. Otherwise the active tunnel URL is returned.
+func (d *Daemon) URL() string {
+	if d.cfg.ExternalURL != "" {
+		return d.cfg.ExternalURL
+	}
+	if d.tunnel != nil {
+		return d.tunnel.URL()
+	}
+	return ""
+}
+
+// TunnelURLChanges returns the tunnel's URL-change channel, or a closed
+// channel if no tunnel is configured (e.g. ExternalURL was provided).
+func (d *Daemon) TunnelURLChanges() <-chan string {
+	if d.tunnel != nil {
+		return d.tunnel.URLChanges()
+	}
+	ch := make(chan string)
+	close(ch)
+	return ch
+}
+
 // Status returns the current status of the daemon.
 func (d *Daemon) Status() StatusResponse {
 	return StatusResponse{
 		Running: true,
 		Port:    d.cfg.Port,
 		PID:     os.Getpid(),
+		URL:     d.URL(),
 	}
 }

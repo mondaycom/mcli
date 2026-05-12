@@ -54,6 +54,16 @@ func newDaemonStartCmd() *cobra.Command {
 			ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 			defer stop()
 
+			fmt.Fprintf(os.Stderr, "daemon listening on port %d\n", port)
+
+			// Listen for tunnel URL changes in the background so we can log
+			// them once the daemon has started.
+			go func() {
+				for u := range d.TunnelURLChanges() {
+					fmt.Fprintf(os.Stderr, "tunnel URL: %s\n", u)
+				}
+			}()
+
 			return d.Start(ctx)
 		},
 	}

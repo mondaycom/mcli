@@ -13,6 +13,7 @@ type StatusResponse struct {
 	Port    int    `json:"port"`
 	PID     int    `json:"pid"`
 	Version string `json:"version,omitempty"`
+	URL     string `json:"url,omitempty"`
 }
 
 // StopResponse is the JSON shape returned by POST /stop.
