@@ -24,6 +24,8 @@ const (
 	CodeConflict Code = "CONFLICT"
 	// CodeInternal indicates an unexpected internal error.
 	CodeInternal Code = "INTERNAL"
+	// CodeDaemonRequired indicates the mcli daemon is not running but is needed.
+	CodeDaemonRequired Code = "DAEMON_REQUIRED"
 )
 
 // Error is a structured error value carrying a Code, a human message, and an
@@ -82,6 +84,11 @@ func Internal(format string, args ...any) *Error {
 	return &Error{Code: CodeInternal, Message: fmt.Sprintf(format, args...)}
 }
 
+// DaemonRequired constructs a CodeDaemonRequired Error.
+func DaemonRequired(format string, args ...any) *Error {
+	return &Error{Code: CodeDaemonRequired, Message: fmt.Sprintf(format, args...)}
+}
+
 // ToExitCode maps an error to an exit code per ADR-002.
 // Returns 0 if err is nil.
 func ToExitCode(err error) int {
@@ -100,6 +107,8 @@ func ToExitCode(err error) int {
 			return 4
 		case CodeInternal:
 			return 5
+		case CodeDaemonRequired:
+			return 6
 		}
 	}
 	return 5

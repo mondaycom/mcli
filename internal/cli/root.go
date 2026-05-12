@@ -47,6 +47,9 @@ func init() {
 	rootCmd.AddCommand(newSkillCmd())
 	rootCmd.AddCommand(newQueryCmd())
 	rootCmd.AddCommand(newMutationCmd())
+	rootCmd.AddCommand(newDaemonCmd())
+	rootCmd.AddCommand(newNotificationCmd())
+	rootCmd.AddCommand(newWebhookCmd())
 }
 
 // Execute runs the root command.
