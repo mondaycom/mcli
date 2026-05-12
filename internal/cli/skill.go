@@ -77,6 +77,29 @@ Workspace → Folder → Board → { Group, Column } → Item → Subitem
 - Groups: ` + "`mcli board group list/create/rename/archive/delete`" + `
 - Columns: ` + "`mcli board column list/create/rename/describe/delete`" + `
 
+### Raw GraphQL (escape hatch)
+
+For anything not covered by structured commands. See https://developer.monday.com/api-reference/reference/about-the-api-reference for the full API.
+
+- Inline: ` + "`mcli query '<graphql>' [--var key=value]...`" + `
+- From file: ` + "`mcli query -f <file> [--var key=value]... [--vars-file vars.json]`" + `
+- From stdin: ` + "`echo '...' | mcli query -f -`" + `
+
+Variables are auto-typed: 42→int, true→bool, ` + "`{...}`" + `→JSON, else string.
+
+**Saved queries** — prepare once, run with just vars:
+
+` + "```sh" + `
+mcli query save my-report --query 'query($boardId: ID!) { boards(ids: [$boardId]) { items_page(limit:100) { items { name column_values { id text } } } } }'
+mcli query run my-report --var boardId=9832181507
+mcli query list                    # see all saved queries
+mcli query delete my-report        # remove
+` + "```" + `
+
+Saved queries live in ` + "`.mcli/queries/`" + ` (local, project-shareable) or ` + "`~/.config/mcli/queries/`" + ` (` + "`--global`" + `).
+
+Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}` + "`" + `. Exit 0 if no errors, exit 2 if errors present.
+
 ## Output Shapes
 
 | Pattern | Shape |
