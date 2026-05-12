@@ -98,6 +98,17 @@ mcli query delete my-report        # remove
 
 Saved queries live in ` + "`.mcli/queries/`" + ` (local, project-shareable) or ` + "`~/.config/mcli/queries/`" + ` (` + "`--global`" + `).
 
+**Saved mutations** — same pattern, separate namespace:
+
+` + "```sh" + `
+mcli mutation save create-task --query 'mutation($board: ID!, $name: String!) { create_item(board_id: $board, item_name: $name) { id } }'
+mcli mutation run create-task --var board=9832181507 --var name="New task"
+mcli mutation list
+mcli mutation delete create-task
+` + "```" + `
+
+Inline mutations also work: ` + "`mcli mutation '<graphql>' [--var key=value]...`" + `
+
 Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}` + "`" + `. Exit 0 if no errors, exit 2 if errors present.
 
 ## Output Shapes

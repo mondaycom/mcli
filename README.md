@@ -72,8 +72,11 @@ mcli board column list/create/rename/describe/delete
 
 mcli item list/get/create/update/move/archive/delete
 
-mcli query '<graphql>'               Raw GraphQL (inline, -f file, -f -)
+mcli query '<graphql>'               Raw GraphQL queries (inline, -f file, -f -)
 mcli query save/list/run/delete      Saved query management
+
+mcli mutation '<graphql>'            Raw GraphQL mutations (inline, -f file, -f -)
+mcli mutation save/list/run/delete   Saved mutation management
 
 mcli skill                           Print LLM skill document
 mcli version                         Print version

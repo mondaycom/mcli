@@ -46,6 +46,7 @@ func init() {
 	rootCmd.AddCommand(newFolderCmd())
 	rootCmd.AddCommand(newSkillCmd())
 	rootCmd.AddCommand(newQueryCmd())
+	rootCmd.AddCommand(newMutationCmd())
 }
 
 // Execute runs the root command.
