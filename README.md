@@ -45,7 +45,8 @@ mcli query 'query { me { id name } }'
 - **LLM-native** — designed to be driven by LLM agents. No interactive prompts on the read path. Self-describing via `mcli skill`.
 - **Single binary** — no runtime dependencies. Build once, deploy anywhere.
 - **Coherent surface** — normalizes monday.com API quirks into a consistent CLI vocabulary.
-- **Escape hatch** — `mcli query` gives raw GraphQL access for anything not covered by structured commands.
+- **Semantic layer** — saved queries/mutations create a business-level API over boards. LLMs operate in domain terms, not GraphQL.
+- **Escape hatch** — `mcli query` / `mcli mutation` give raw GraphQL access for anything not covered by structured commands.
 
 ## Authentication
 
@@ -169,23 +170,59 @@ mcli item create --board 123 --name "Task" \
 
 Use `mcli board column list --board <id>` to discover column IDs, types, and settings.
 
-## Saved Queries
+## Saved Queries & Mutations
 
-Prepare reusable GraphQL queries:
+Prepare reusable GraphQL operations — save once, run with just variables:
 
 ```sh
-# Save
+# Save a query
 mcli query save weekly-report --query 'query($board: ID!) { 
   boards(ids: [$board]) { items_page(limit:100) { items { name column_values { id text } } } } 
 }'
 
+# Save a mutation
+mcli mutation save create-task --query 'mutation($board: ID!, $name: String!, $cols: JSON!) {
+  create_item(board_id: $board, item_name: $name, column_values: $cols) { id }
+}'
+
 # Run with variables
 mcli query run weekly-report --var board=9832181507
+mcli mutation run create-task --var board=9832181507 --var name="Ship feature" \
+  --var cols='{"status":{"label":"Working on it"}}'
 
 # Variables are auto-typed: 42→int, true→bool, {...}→JSON, else string
+# Variables declared as JSON in the query are auto-stringified (no double-encoding needed)
+
+# Management
+mcli query list / mcli mutation list
+mcli query delete <name> / mcli mutation delete <name>
 ```
 
-Saved queries live in `.mcli/queries/` (local, project-shareable) or `~/.config/mcli/queries/` (`--global`).
+Saved operations live in `.mcli/queries/` and `.mcli/mutations/` (local, project-shareable) or `~/.config/mcli/queries/` / `~/.config/mcli/mutations/` (`--global`).
+
+## Semantic Layer
+
+Saved queries and mutations can form a **business-level API** over your monday.com boards. Instead of working with board IDs, column IDs, and GraphQL, you define domain-named operations like `create_order`, `list_products`, or `update_inventory` — then interact entirely in business terms.
+
+This is especially powerful for LLM agents: the conversation stays at "add 3 widgets to the order" rather than "create a subitem on board 1234 with column xyz set to 3".
+
+**Pattern:**
+
+1. Set up boards and columns (one-time)
+2. Save domain-named queries/mutations that encode the board structure
+3. Operate exclusively via `mcli query run <name>` / `mcli mutation run <name>`
+
+```sh
+# After setup, an LLM agent just needs:
+mcli query run list_products --var boardId=123
+mcli mutation run create_order --var board=456 --var name="ORD-99" \
+  --var cols='{"customer":"Acme Corp","status":{"label":"Draft"}}'
+mcli mutation run add_order_line --var parent=789 --var name="Widget x2" --var cols='{}'
+mcli mutation run update_order_status --var board=456 --var item=789 \
+  --var cols='{"status":{"label":"Ordered"}}'
+```
+
+See [`examples/ecommerce-demo.md`](examples/ecommerce-demo.md) for a full walkthrough and [`examples/ecommerce-demo.sh`](examples/ecommerce-demo.sh) for a runnable script that sets up Products, Inventory, and Orders boards with a complete semantic layer.
 
 ## Development
 
