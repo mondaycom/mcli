@@ -77,37 +77,65 @@ Workspace → Folder → Board → { Group, Column } → Item → Subitem
 - Groups: ` + "`mcli board group list/create/rename/archive/delete`" + `
 - Columns: ` + "`mcli board column list/create/rename/describe/delete`" + `
 
+### Semantic Layer (recommended workflow)
+
+Saved queries and mutations let you define a **business-level API** over monday.com
+boards. Once set up, all operations use domain names like ` + "`create_order`" + ` or
+` + "`list_products`" + ` instead of raw board IDs, column IDs, and GraphQL. This keeps
+conversations in business terms: "add 3 widgets to the order" rather than
+"create a subitem on board 1234 with col_xyz set to 3".
+
+**Setup pattern (one-time, per project):**
+
+1. Create boards and columns with ` + "`mcli board create`" + ` / ` + "`mcli board column create`" + `
+2. Save domain-named queries and mutations that encode the GraphQL + board structure
+3. Use only ` + "`mcli query run <name>`" + ` / ` + "`mcli mutation run <name>`" + ` for day-to-day operations
+
+**Check if a semantic layer exists:** ` + "`mcli query list`" + ` and ` + "`mcli mutation list`" + `.
+If saved operations exist, prefer them over raw commands.
+
+**Example — e-commerce semantic layer:**
+
+` + "```sh" + `
+# Define once:
+mcli mutation save create_order --query 'mutation($board: ID!, $name: String!, $cols: JSON!) { create_item(board_id: $board, item_name: $name, column_values: $cols) { id } }'
+mcli mutation save add_order_line --query 'mutation($parent: ID!, $name: String!, $cols: JSON!) { create_subitem(parent_item_id: $parent, item_name: $name, column_values: $cols) { id } }'
+mcli mutation save update_order_status --query 'mutation($board: ID!, $item: ID!, $cols: JSON!) { change_multiple_column_values(board_id: $board, item_id: $item, column_values: $cols) { id } }'
+mcli query save list_products --query 'query($boardId: ID!) { boards(ids: [$boardId]) { items_page(limit:100) { items { id name column_values { id text value } } } } }'
+
+# Use forever after — business language, no GraphQL knowledge needed:
+mcli mutation run create_order --var board=123 --var name="ORD-42" --var cols='{"customer":"Acme","status":{"label":"Draft"}}'
+mcli mutation run add_order_line --var parent=456 --var name="Widget x2" --var cols='{}'
+mcli mutation run update_order_status --var board=123 --var item=456 --var cols='{"status":{"label":"Ordered"}}'
+mcli query run list_products --var boardId=789
+` + "```" + `
+
+**JSON variable coercion:** Variables declared as ` + "`JSON`" + ` in the query are automatically
+stringified on the wire. Write natural JSON in ` + "`--var cols='{...}'`" + ` — no double-encoding.
+
+Saved operations live in ` + "`.mcli/queries/`" + ` and ` + "`.mcli/mutations/`" + ` (local, version-controllable)
+or ` + "`~/.config/mcli/queries/`" + ` / ` + "`~/.config/mcli/mutations/`" + ` (` + "`--global`" + `).
+
+Management: ` + "`mcli query list`" + ` · ` + "`mcli query delete <name>`" + ` · ` + "`mcli mutation list`" + ` · ` + "`mcli mutation delete <name>`" + `
+
 ### Raw GraphQL (escape hatch)
 
-For anything not covered by structured commands. See https://developer.monday.com/api-reference/reference/about-the-api-reference for the full API.
+For anything not covered by structured commands or the semantic layer.
+See https://developer.monday.com/api-reference/reference/about-the-api-reference for the full API.
 
 - Inline: ` + "`mcli query '<graphql>' [--var key=value]...`" + `
 - From file: ` + "`mcli query -f <file> [--var key=value]... [--vars-file vars.json]`" + `
 - From stdin: ` + "`echo '...' | mcli query -f -`" + `
 
 Variables are auto-typed: 42→int, true→bool, ` + "`{...}`" + `→JSON, else string.
-
-**Saved queries** — prepare once, run with just vars:
+Variables declared as ` + "`JSON`" + ` in the query are auto-stringified (no double-encoding needed).
 
 ` + "```sh" + `
 mcli query save my-report --query 'query($boardId: ID!) { boards(ids: [$boardId]) { items_page(limit:100) { items { name column_values { id text } } } } }'
 mcli query run my-report --var boardId=9832181507
-mcli query list                    # see all saved queries
-mcli query delete my-report        # remove
 ` + "```" + `
 
-Saved queries live in ` + "`.mcli/queries/`" + ` (local, project-shareable) or ` + "`~/.config/mcli/queries/`" + ` (` + "`--global`" + `).
-
-**Saved mutations** — same pattern, separate namespace:
-
-` + "```sh" + `
-mcli mutation save create-task --query 'mutation($board: ID!, $name: String!) { create_item(board_id: $board, item_name: $name) { id } }'
-mcli mutation run create-task --var board=9832181507 --var name="New task"
-mcli mutation list
-mcli mutation delete create-task
-` + "```" + `
-
-Inline mutations also work: ` + "`mcli mutation '<graphql>' [--var key=value]...`" + `
+Inline mutations: ` + "`mcli mutation '<graphql>' [--var key=value]...`" + `
 
 Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}` + "`" + `. Exit 0 if no errors, exit 2 if errors present.
 
