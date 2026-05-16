@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -73,6 +74,7 @@ func newItemCmd() *cobra.Command {
 	cmd.AddCommand(newItemGetCmd())
 	cmd.AddCommand(newItemCreateCmd())
 	cmd.AddCommand(newItemUpdateCmd())
+	cmd.AddCommand(newItemPostUpdateCmd())
 	cmd.AddCommand(newItemMoveCmd())
 	cmd.AddCommand(newItemDeleteCmd())
 	cmd.AddCommand(newItemArchiveCmd())
@@ -379,6 +381,119 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 		_, _ = fmt.Fprintf(o, "  col  → %s\n", f)
 	}
 	return err
+}
+
+// --- item post-update ---
+
+// itemPostUpdateOutput is the JSON shape for post-update responses.
+type itemPostUpdateOutput struct {
+	ID        string `json:"id"`
+	Body      string `json:"body,omitempty"`
+	TextBody  string `json:"text_body,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+}
+
+const postUpdateMaxBodyBytes = 1 << 20 // 1MB — guard against pathological input on stdin
+
+func newItemPostUpdateCmd() *cobra.Command {
+	var (
+		body     string
+		parentID string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "post-update <item-id>",
+		Short: "Post a new update (comment) to an item's Updates feed",
+		Long: `Post a new update on a monday.com item.
+
+The body comes from --body. Pass "--body -" to read the body from stdin
+(useful for multi-line text that would otherwise need shell escaping).
+
+To reply to an existing update post, pass --parent <update-id>.`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemPostUpdate(cmd, args[0], body, parentID)
+		},
+	}
+
+	cmd.Flags().StringVar(&body, "body", "", "update text; use - to read from stdin")
+	cmd.Flags().StringVar(&parentID, "parent", "", "parent update ID, when replying to an existing post")
+	_ = cmd.MarkFlagRequired("body")
+
+	return cmd
+}
+
+func runItemPostUpdate(cmd *cobra.Command, itemID, bodyFlag, parentID string) error {
+	if _, err := strconv.ParseUint(itemID, 10, 64); err != nil {
+		return errs.Usage("item id must be a numeric string, got %q", itemID)
+	}
+	if parentID != "" {
+		if _, err := strconv.ParseUint(parentID, 10, 64); err != nil {
+			return errs.Usage("parent id must be a numeric string, got %q", parentID)
+		}
+	}
+
+	resolved, err := resolvePostUpdateBody(cmd, bodyFlag)
+	if err != nil {
+		return err
+	}
+	if resolved == "" {
+		return errs.Usage("--body must not be empty")
+	}
+
+	gql, err := newItemClient()
+	if err != nil {
+		return err
+	}
+
+	resp, apiErr := gen.ItemPostUpdate(context.Background(), gql, itemID, resolved, parentID)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	out := itemPostUpdateOutput{
+		ID:        resp.Create_update.Id,
+		Body:      resp.Create_update.Body,
+		TextBody:  resp.Create_update.Text_body,
+		CreatedAt: resp.Create_update.Created_at,
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	if modeErr != nil {
+		return modeErr
+	}
+
+	if mode == ModeJSON {
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+	}
+
+	o := cmd.OutOrStdout()
+	_, err = fmt.Fprintf(o, "Posted update %s on item %s\n", out.ID, itemID)
+	return err
+}
+
+// resolvePostUpdateBody returns the trimmed body. When bodyFlag is "-", it
+// reads from cmd's stdin (cobra wires this to os.Stdin in production and
+// allows tests to inject a buffer via cmd.SetIn).
+func resolvePostUpdateBody(cmd *cobra.Command, bodyFlag string) (string, error) {
+	if bodyFlag != "-" {
+		return strings.TrimSpace(bodyFlag), nil
+	}
+	in := cmd.InOrStdin()
+	limited := io.LimitReader(in, postUpdateMaxBodyBytes+1)
+	data, err := io.ReadAll(limited)
+	if err != nil {
+		return "", fmt.Errorf("read body from stdin: %w", err)
+	}
+	if int64(len(data)) > postUpdateMaxBodyBytes {
+		return "", errs.Usage("body on stdin exceeds %d bytes", postUpdateMaxBodyBytes)
+	}
+	return strings.TrimSpace(string(data)), nil
 }
 
 // --- item move ---

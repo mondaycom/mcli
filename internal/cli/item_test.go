@@ -1273,3 +1273,152 @@ func TestItemArchive_APIError(t *testing.T) {
 		t.Fatal("expected error from API error response")
 	}
 }
+
+// --- item post-update ---
+
+// execItemPostUpdate runs 'item post-update <id>' with stdin optionally piped from `stdin`.
+func execItemPostUpdate(t *testing.T, stdin string, args ...string) (string, error) {
+	t.Helper()
+	globals = GlobalFlags{JSON: true}
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	if stdin != "" {
+		cmd.SetIn(strings.NewReader(stdin))
+	}
+	cmd.SetArgs(append([]string{"post-update"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+func sampleItemPostUpdateResponse(id string) map[string]any {
+	return map[string]any{
+		"create_update": map[string]any{
+			"id":         id,
+			"body":       "<p>hi</p>",
+			"text_body":  "hi",
+			"created_at": "2026-05-16T12:00:00Z",
+		},
+	}
+}
+
+func TestItemPostUpdate_HappyPath(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		opName, _ := body["operationName"].(string)
+		if opName != "ItemPostUpdate" {
+			t.Errorf("expected ItemPostUpdate op, got %q", opName)
+		}
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemPostUpdateResponse("9001"))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemPostUpdate(t, "", "1234567890", "--body", "Got it, looking now")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if capturedVars["itemId"] != "1234567890" {
+		t.Errorf("itemId mismatch: got %v", capturedVars["itemId"])
+	}
+	if capturedVars["body"] != "Got it, looking now" {
+		t.Errorf("body mismatch: got %v", capturedVars["body"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["id"] != "9001" {
+		t.Errorf("expected id=9001, got %v", result["id"])
+	}
+}
+
+func TestItemPostUpdate_BodyFromStdin(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemPostUpdateResponse("9002"))
+	})
+	installItemFactory(t, srv.URL)
+
+	piped := "line one\nline two\nline three"
+	_, err := execItemPostUpdate(t, piped, "1234567890", "--body", "-")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if capturedVars["body"] != piped {
+		t.Errorf("expected stdin body to round-trip; got %q", capturedVars["body"])
+	}
+}
+
+func TestItemPostUpdate_WithParent(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(sampleItemPostUpdateResponse("9003"))
+	})
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemPostUpdate(t, "",
+		"1234567890", "--body", "thread reply", "--parent", "555")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if capturedVars["parentId"] != "555" {
+		t.Errorf("parentId mismatch: got %v", capturedVars["parentId"])
+	}
+}
+
+func TestItemPostUpdate_RejectsNonNumericItemID(t *testing.T) {
+	_, err := execItemPostUpdate(t, "", "not-a-number", "--body", "x")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if errsCode(err) != "USAGE" {
+		t.Errorf("expected USAGE, got %q", errsCode(err))
+	}
+}
+
+func TestItemPostUpdate_RejectsEmptyBody(t *testing.T) {
+	_, err := execItemPostUpdate(t, "", "1234567890", "--body", "   ")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if errsCode(err) != "USAGE" {
+		t.Errorf("expected USAGE, got %q", errsCode(err))
+	}
+}
+
+func TestItemPostUpdate_RejectsNonNumericParent(t *testing.T) {
+	_, err := execItemPostUpdate(t, "", "1234567890", "--body", "x", "--parent", "abc")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if errsCode(err) != "USAGE" {
+		t.Errorf("expected USAGE, got %q", errsCode(err))
+	}
+}
+
+func TestItemPostUpdate_APIError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"errors":[{"message":"access denied","extensions":{"code":"Unauthorized"}}]}`)
+	}))
+	t.Cleanup(srv.Close)
+	installItemFactory(t, srv.URL)
+
+	_, err := execItemPostUpdate(t, "", "1234567890", "--body", "x")
+	if err == nil {
+		t.Fatal("expected error from API error response")
+	}
+}

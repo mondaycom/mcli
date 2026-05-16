@@ -3800,6 +3800,43 @@ func (v *ItemMoveToGroupResponse) GetMove_item_to_group() ItemMoveToGroupMove_it
 	return v.Move_item_to_group
 }
 
+// ItemPostUpdateCreate_updateUpdate includes the requested fields of the GraphQL type Update.
+// The GraphQL type's documentation follows.
+//
+// An update.
+type ItemPostUpdateCreate_updateUpdate struct {
+	// The update's unique identifier.
+	Id string `json:"id"`
+	// The update's html formatted body.
+	Body string `json:"body"`
+	// The update's text body.
+	Text_body string `json:"text_body"`
+	// The update's creation date.
+	Created_at string `json:"created_at"`
+}
+
+// GetId returns ItemPostUpdateCreate_updateUpdate.Id, and is useful for accessing the field via an interface.
+func (v *ItemPostUpdateCreate_updateUpdate) GetId() string { return v.Id }
+
+// GetBody returns ItemPostUpdateCreate_updateUpdate.Body, and is useful for accessing the field via an interface.
+func (v *ItemPostUpdateCreate_updateUpdate) GetBody() string { return v.Body }
+
+// GetText_body returns ItemPostUpdateCreate_updateUpdate.Text_body, and is useful for accessing the field via an interface.
+func (v *ItemPostUpdateCreate_updateUpdate) GetText_body() string { return v.Text_body }
+
+// GetCreated_at returns ItemPostUpdateCreate_updateUpdate.Created_at, and is useful for accessing the field via an interface.
+func (v *ItemPostUpdateCreate_updateUpdate) GetCreated_at() string { return v.Created_at }
+
+// ItemPostUpdateResponse is returned by ItemPostUpdate on success.
+type ItemPostUpdateResponse struct {
+	Create_update ItemPostUpdateCreate_updateUpdate `json:"create_update"`
+}
+
+// GetCreate_update returns ItemPostUpdateResponse.Create_update, and is useful for accessing the field via an interface.
+func (v *ItemPostUpdateResponse) GetCreate_update() ItemPostUpdateCreate_updateUpdate {
+	return v.Create_update
+}
+
 // ItemUpdateChange_multiple_column_valuesItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
 //
@@ -10045,6 +10082,22 @@ func (v *__ItemMoveToGroupInput) GetItemId() string { return v.ItemId }
 // GetGroupId returns __ItemMoveToGroupInput.GroupId, and is useful for accessing the field via an interface.
 func (v *__ItemMoveToGroupInput) GetGroupId() string { return v.GroupId }
 
+// __ItemPostUpdateInput is used internally by genqlient
+type __ItemPostUpdateInput struct {
+	ItemId   string `json:"itemId"`
+	Body     string `json:"body"`
+	ParentId string `json:"parentId,omitempty"`
+}
+
+// GetItemId returns __ItemPostUpdateInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__ItemPostUpdateInput) GetItemId() string { return v.ItemId }
+
+// GetBody returns __ItemPostUpdateInput.Body, and is useful for accessing the field via an interface.
+func (v *__ItemPostUpdateInput) GetBody() string { return v.Body }
+
+// GetParentId returns __ItemPostUpdateInput.ParentId, and is useful for accessing the field via an interface.
+func (v *__ItemPostUpdateInput) GetParentId() string { return v.ParentId }
+
 // __ItemUpdateInput is used internally by genqlient
 type __ItemUpdateInput struct {
 	BoardId      string `json:"boardId"`
@@ -11343,6 +11396,49 @@ func ItemMoveToGroup(
 	}
 
 	data_ = &ItemMoveToGroupResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ItemPostUpdate.
+const ItemPostUpdate_Operation = `
+mutation ItemPostUpdate ($itemId: ID!, $body: String!, $parentId: ID) {
+	create_update(item_id: $itemId, body: $body, parent_id: $parentId) {
+		id
+		body
+		text_body
+		created_at
+	}
+}
+`
+
+// ItemPostUpdate posts a new update (text comment) to an item's Updates feed.
+// When parentId is provided, the new update is a reply to that parent post.
+func ItemPostUpdate(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+	body string,
+	parentId string,
+) (data_ *ItemPostUpdateResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemPostUpdate",
+		Query:  ItemPostUpdate_Operation,
+		Variables: &__ItemPostUpdateInput{
+			ItemId:   itemId,
+			Body:     body,
+			ParentId: parentId,
+		},
+	}
+
+	data_ = &ItemPostUpdateResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

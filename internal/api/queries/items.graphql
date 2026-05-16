@@ -180,6 +180,26 @@ mutation ItemMoveToBoard(
   }
 }
 
+# ItemPostUpdate posts a new update (text comment) to an item's Updates feed.
+# When parentId is provided, the new update is a reply to that parent post.
+mutation ItemPostUpdate(
+  $itemId: ID!,
+  $body: String!,
+  # @genqlient(omitempty: true)
+  $parentId: ID,
+) {
+  create_update(
+    item_id: $itemId,
+    body: $body,
+    parent_id: $parentId,
+  ) {
+    id
+    body
+    text_body
+    created_at
+  }
+}
+
 # ItemDelete permanently deletes an item by ID.
 mutation ItemDelete($itemId: ID!) {
   delete_item(item_id: $itemId) {
