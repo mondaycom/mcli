@@ -3,9 +3,12 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"sort"
 
 	"github.com/spf13/cobra"
+
+	"github.com/mondaycom/mcli/internal/errs"
 )
 
 // webhookEventTypes lists all supported monday.com WebhookEventType values,
@@ -60,13 +63,13 @@ func newWebhookCreateCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if boardID == "" {
-				return fmt.Errorf("--board is required")
+				return errs.Usage("--board is required")
 			}
 			if event == "" {
-				return fmt.Errorf("--event is required")
+				return errs.Usage("--event is required")
 			}
 			if !validWebhookEvent(event) {
-				return fmt.Errorf("unknown event type %q; run 'mcli webhook events' to list valid types", event)
+				return errs.Usage("unknown event type %q; run 'mcli webhook events' to list valid types", event)
 			}
 
 			c, err := requireDaemon()
@@ -174,10 +177,5 @@ func newWebhookEventsCmd() *cobra.Command {
 
 // validWebhookEvent reports whether event is a known WebhookEventType.
 func validWebhookEvent(event string) bool {
-	for _, e := range webhookEventTypes {
-		if e == event {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(webhookEventTypes, event)
 }
