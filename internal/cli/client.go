@@ -1,10 +1,9 @@
 package cli
 
 import (
-	"fmt"
-
 	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
 	"github.com/mondaycom/mcli/internal/config"
+	"github.com/mondaycom/mcli/internal/errs"
 	"github.com/mondaycom/mcli/internal/secrets"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
@@ -16,7 +15,7 @@ func newGQLClient() (gqlclient.Client, error) {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return nil, fmt.Errorf("load config: %w", err)
+		return nil, errs.Internal("load config: %v", err)
 	}
 
 	var store config.Store

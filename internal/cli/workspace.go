@@ -164,7 +164,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		out := workspaceListOutput{Items: items, Cursor: nextCursor}
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -177,7 +177,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", item.ID, item.Name, item.Kind, item.State)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if nextCursor != "" {
 		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
@@ -234,7 +234,7 @@ func runWorkspaceGet(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -318,7 +318,7 @@ func runWorkspaceCreate(cmd *cobra.Command, name, kind, description string) erro
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -402,7 +402,7 @@ func runWorkspaceUpdate(cmd *cobra.Command, id, name, description, kind string) 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -459,7 +459,7 @@ func runWorkspaceDelete(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

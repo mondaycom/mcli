@@ -182,7 +182,7 @@ func runSearch(cmd *cobra.Command, query, searchType string, limit int) error {
 	case ModeJSON:
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -278,7 +278,7 @@ func writeSearchCSV(cmd *cobra.Command, out searchOutput) error {
 	}
 	w.Flush()
 	if err := w.Error(); err != nil {
-		return fmt.Errorf("write csv: %w", err)
+		return errs.Internal("write csv: %v", err)
 	}
 	return nil
 }

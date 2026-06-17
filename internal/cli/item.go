@@ -239,7 +239,7 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -344,7 +344,7 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -444,7 +444,7 @@ func runItemPostUpdate(cmd *cobra.Command, itemID, bodyFlag, parentID string) er
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -550,7 +550,7 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -615,7 +615,7 @@ func runItemDelete(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -665,7 +665,7 @@ func runItemArchive(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -928,7 +928,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -943,7 +943,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 			item.ID, item.Name, item.State, item.Group.Title, colSummary)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if nextCursor != "" {
 		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
@@ -1069,7 +1069,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

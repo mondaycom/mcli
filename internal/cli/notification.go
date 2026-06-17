@@ -52,12 +52,12 @@ func newNotificationListCmd() *cobra.Command {
 
 			result, err := c.ListNotifications(filter)
 			if err != nil {
-				return fmt.Errorf("list notifications: %w", err)
+				return errs.API("list notifications: %v", err)
 			}
 
 			data, err := json.Marshal(result)
 			if err != nil {
-				return fmt.Errorf("marshal response: %w", err)
+				return errs.Internal("marshal response: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err
@@ -86,12 +86,12 @@ func newNotificationCountCmd() *cobra.Command {
 
 			n, err := c.NotificationCount()
 			if err != nil {
-				return fmt.Errorf("notification count: %w", err)
+				return errs.API("notification count: %v", err)
 			}
 
 			data, err := json.Marshal(map[string]int{"unread": n})
 			if err != nil {
-				return fmt.Errorf("marshal response: %w", err)
+				return errs.Internal("marshal response: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err
@@ -120,11 +120,11 @@ func newNotificationAckCmd() *cobra.Command {
 
 			if all {
 				if err := c.AckAllNotifications(); err != nil {
-					return fmt.Errorf("ack all notifications: %w", err)
+					return errs.API("ack all notifications: %v", err)
 				}
 			} else {
 				if err := c.AckNotification(daemon.EventID(args[0])); err != nil {
-					return fmt.Errorf("ack notification: %w", err)
+					return errs.API("ack notification: %v", err)
 				}
 			}
 

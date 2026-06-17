@@ -12,6 +12,7 @@ import (
 	"github.com/mondaycom/mcli/internal/api/gen"
 	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
 	"github.com/mondaycom/mcli/internal/config"
+	"github.com/mondaycom/mcli/internal/errs"
 	"github.com/mondaycom/mcli/internal/secrets"
 )
 
@@ -51,7 +52,7 @@ func runMe(cmd *cobra.Command, _ []string) error {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return fmt.Errorf("load config: %w", err)
+		return errs.Internal("load config: %v", err)
 	}
 
 	var store config.Store
@@ -97,7 +98,7 @@ func runMe(cmd *cobra.Command, _ []string) error {
 	case ModeJSON:
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

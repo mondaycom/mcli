@@ -124,7 +124,7 @@ func runItemFind(cmd *cobra.Command, boardID, columnID, value string, limit int,
 	case ModeJSON:
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -148,7 +148,7 @@ func writeItemFindPretty(cmd *cobra.Command, out itemFindOutput) error {
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\n", it.ID, it.Name, it.Group.Title)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if out.Cursor != "" {
 		_, _ = fmt.Fprintf(o, "\nnext cursor: %s\n", out.Cursor)
@@ -172,7 +172,7 @@ func writeItemFindCSV(cmd *cobra.Command, out itemFindOutput) error {
 	}
 	w.Flush()
 	if err := w.Error(); err != nil {
-		return fmt.Errorf("write csv: %w", err)
+		return errs.Internal("write csv: %v", err)
 	}
 	return nil
 }

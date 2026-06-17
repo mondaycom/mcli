@@ -44,12 +44,12 @@ func saveMutation(name, mutationStr string, global bool) error {
 	}
 
 	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return fmt.Errorf("create mutations dir %s: %w", dir, err)
+		return errs.Internal("create mutations dir %s: %v", dir, err)
 	}
 
 	path := savedMutationPath(dir, name)
 	if err := os.WriteFile(path, []byte(mutationStr), 0o600); err != nil {
-		return fmt.Errorf("write mutation %s: %w", path, err)
+		return errs.Internal("write mutation %s: %v", path, err)
 	}
 	return nil
 }
@@ -92,7 +92,7 @@ func listSavedMutations() ([]savedMutationEntry, error) {
 			return nil
 		}
 		if readErr != nil {
-			return fmt.Errorf("read mutations dir %s: %w", dir, readErr)
+			return errs.Internal("read mutations dir %s: %v", dir, readErr)
 		}
 		for _, de := range des {
 			if de.IsDir() {
@@ -141,7 +141,7 @@ func deleteSavedMutation(name string, global bool) error {
 			}
 			return errs.NotFound("%s saved mutation %q not found", scope, name)
 		}
-		return fmt.Errorf("delete mutation %s: %w", path, removeErr)
+		return errs.Internal("delete mutation %s: %v", path, removeErr)
 	}
 	return nil
 }
@@ -318,7 +318,7 @@ func newMutationListCmd() *cobra.Command {
 				}
 				data, mErr := json.Marshal(listOutput{Items: entries})
 				if mErr != nil {
-					return fmt.Errorf("marshal output: %w", mErr)
+					return errs.Internal("marshal output: %v", mErr)
 				}
 				_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 				return err

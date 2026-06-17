@@ -74,6 +74,11 @@ func NotFound(format string, args ...any) *Error {
 	return &Error{Code: CodeNotFound, Message: fmt.Sprintf(format, args...)}
 }
 
+// Internal constructs a CodeInternal Error.
+func Internal(format string, args ...any) *Error {
+	return &Error{Code: CodeInternal, Message: fmt.Sprintf(format, args...)}
+}
+
 // DaemonRequired constructs a CodeDaemonRequired Error.
 func DaemonRequired(format string, args ...any) *Error {
 	return &Error{Code: CodeDaemonRequired, Message: fmt.Sprintf(format, args...)}
@@ -95,6 +100,8 @@ func ToExitCode(err error) int {
 			return 3
 		case CodeRateLimited:
 			return 4
+		case CodeInternal:
+			return 5
 		case CodeDaemonRequired:
 			return 6
 		}

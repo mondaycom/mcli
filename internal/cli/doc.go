@@ -247,7 +247,7 @@ func runDocCreate(cmd *cobra.Command, workspace, name, kind, folderID string) er
 	case ModeJSON:
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
