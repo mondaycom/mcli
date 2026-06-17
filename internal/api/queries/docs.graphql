@@ -1,0 +1,53 @@
+# DocGetByObjectID fetches a document's API id via its associated object (item) id.
+# Use this to discover the document id for an item's description doc.
+query DocGetByObjectID($objectId: ID!) {
+  docs(object_ids: [$objectId]) {
+    id
+    name
+    object_id
+  }
+}
+
+# DocGetBlockIDs fetches a document's block ids so they can be deleted before rewriting.
+query DocGetBlockIDs($docId: ID!) {
+  docs(ids: [$docId]) {
+    id
+    blocks {
+      id
+    }
+  }
+}
+
+# DocExportMarkdown exports a document's content as markdown.
+query DocExportMarkdown($docId: ID!) {
+  export_markdown_from_doc(docId: $docId) {
+    success
+    markdown
+    error
+  }
+}
+
+# DocSetItemDescription replaces an item's description with new markdown content.
+mutation DocSetItemDescription($itemId: ID!, $markdown: String!) {
+  set_item_description_content(item_id: $itemId, markdown: $markdown) {
+    success
+    block_ids
+    error
+  }
+}
+
+# DocDeleteBlocks deletes specified blocks from a document.
+mutation DocDeleteBlocks($blockIds: [ID!]!) {
+  delete_doc_blocks(block_ids: $blockIds) {
+    id
+  }
+}
+
+# DocAddMarkdown appends markdown content to a document.
+mutation DocAddMarkdown($docId: ID!, $markdown: String!) {
+  add_content_to_doc_from_markdown(docId: $docId, markdown: $markdown) {
+    success
+    block_ids
+    error
+  }
+}

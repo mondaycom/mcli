@@ -48,7 +48,7 @@ func resolveConfigPath() string {
 // In JSON mode (or non-TTY) it writes JSON to stdout; in pretty mode it writes
 // msg to cmd.OutOrStdout().
 func printAuthResult(cmd *cobra.Command, payload any, msg string) error {
-	mode, err := resolveOutputMode(os.Stdout, globals)
+	mode, err := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if err != nil {
 		return err
 	}

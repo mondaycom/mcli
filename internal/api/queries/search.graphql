@@ -1,0 +1,51 @@
+# SearchItems searches monday.com items by query string.
+query SearchItems($query: String!, $limit: Int = 10) {
+  search {
+    items(query: $query, limit: $limit) {
+      results {
+        id
+        indexed_data {
+          id
+          name
+          url
+          board_id
+          workspace_id
+        }
+      }
+    }
+  }
+}
+
+# SearchBoards searches monday.com boards by query string.
+query SearchBoards($query: String!, $limit: Int = 10) {
+  search {
+    boards(query: $query, limit: $limit) {
+      results {
+        id
+        indexed_data {
+          id
+          name
+          description
+          workspace_id
+          url
+        }
+      }
+    }
+  }
+}
+
+# SearchDocs searches monday.com docs by query string.
+query SearchDocs($query: String!, $limit: Int = 10) {
+  search {
+    docs(query: $query, limit: $limit) {
+      results {
+        id
+        indexed_data {
+          id
+          name
+          workspace_id
+        }
+      }
+    }
+  }
+}

@@ -52,15 +52,27 @@ Workspace → Folder → Board → { Group, Column } → Item → Subitem
 - ` + "`mcli board group list --board <id>`" + ` — just groups
 - ` + "`mcli board column list --board <id>`" + ` — just columns (includes settings_str with labels/options)
 
+### Search
+
+` + "`mcli search <query> [-t boards|items|docs] [--limit N]`" + `
+
+Search all entity types at once or restrict with ` + "`-t`" + `. Returns a JSON object with
+` + "`boards`" + `, ` + "`items`" + `, and ` + "`docs`" + ` arrays (empty arrays for types not searched).
+
 ### CRUD items
 
 - Create: ` + "`mcli item create --board <id> --name ... [--group <id>] [--col <col_id>=<json>]...`" + `
 - Read list: ` + "`mcli item list --board <id> [--group <id>] [--limit N] [--cursor ...]`" + `
 - Read one: ` + "`mcli item get <id>`" + ` — includes decoded column values, subitems, creator
+- Find by column value: ` + "`mcli item find --board <id> --column <col_id> --value <text>`" + `
 - Update: ` + "`mcli item update <id> --board <id> [--name ...] [--col <col_id>=<json>]...`" + `
 - Move: ` + "`mcli item move <id> --to-group <id>`" + ` or ` + "`--to-board <id> --group <id>`" + `
 - Archive: ` + "`mcli item archive <id>`" + ` (recoverable)
 - Delete: ` + "`mcli item delete <id>`" + ` (permanent)
+- Post update/comment: ` + "`mcli item post-update <id> --body <text>`" + `
+- Read updates/comments: ` + "`mcli item get-updates <id> [--limit N]`" + `
+- Read description: ` + "`mcli item description <id>`" + ` — returns markdown
+- Write description: ` + "`mcli item description <id> --set <md>`" + ` or ` + "`--set-file <path>`" + `
 
 ### Subitems
 
@@ -139,6 +151,15 @@ Inline mutations: ` + "`mcli mutation '<graphql>' [--var key=value]...`" + `
 
 Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}` + "`" + `. Exit 0 if no errors, exit 2 if errors present.
 
+### Documents
+
+- Read: ` + "`mcli doc read <doc_id>`" + ` — export full document as markdown
+- Write: ` + "`mcli doc write <doc_id> --content <md>`" + ` or ` + "`--file <path>`" + ` — replace all content
+
+### Current User
+
+` + "`mcli me`" + ` — print id, name, email, account, and team memberships.
+
 ### Daemon + Notifications (webhook inbox)
 
 1. Start daemon: ` + "`mcli daemon start`" + ` (requires ` + "`cloudflared`" + ` in PATH, or pass ` + "`--url`" + `)
@@ -147,6 +168,19 @@ Output is raw passthrough: ` + "`" + `{"data":...,"errors":...,"extensions":...}
 4. Acknowledge: ` + "`mcli notification ack <id>`" + ` or ` + "`mcli notification ack --all`" + `
 
 Available events: ` + "`mcli webhook events`" + `
+
+## Output Modes
+
+Control output format with a global flag or ` + "`mcli config set output-mode <mode>`" + `:
+
+| Flag | Config value | Description |
+|------|-------------|-------------|
+| ` + "`--json`" + ` | ` + "`json`" + ` | Machine-readable JSON (default when stdout is not a TTY) |
+| ` + "`--pretty`" + ` | ` + "`pretty`" + ` | Human-readable table/label output (default when stdout is a TTY) |
+| ` + "`--terse`" + ` | ` + "`terse`" + ` | Compact one-line-per-result output for scripting |
+| ` + "`--csv`" + ` | ` + "`csv`" + ` | Comma-separated values with header row |
+
+Precedence: explicit flag > config file > TTY detection.
 
 ## Output Shapes
 

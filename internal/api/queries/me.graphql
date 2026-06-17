@@ -2,6 +2,9 @@ query Me {
   me {
     id
     name
+    email
+    account { id name }
+    teams { id name }
   }
 }
 
@@ -9,5 +12,23 @@ query BoardByID($ids: [ID!]) {
   boards(ids: $ids) {
     id
     name
+  }
+}
+
+# UsersByEmail resolves users by email address list.
+query UsersByEmail($emails: [String!]) {
+  users(emails: $emails) {
+    id
+    name
+    email
+  }
+}
+
+# UsersByName resolves users by name (fuzzy match).
+query UsersByName($name: String) {
+  users(name: $name) {
+    id
+    name
+    email
   }
 }

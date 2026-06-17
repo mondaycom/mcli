@@ -250,7 +250,7 @@ func fetchSchema(ctx context.Context, token string) (introspSchema, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", token)
 	req.Header.Set("User-Agent", "mcli/introspect")
-	req.Header.Set("API-Version", "2025-01")
+	req.Header.Set("API-Version", "2026-07")
 
 	client := &http.Client{Timeout: httpTimeout}
 	resp, err := client.Do(req)
@@ -370,11 +370,13 @@ func renderDescription(buf *strings.Builder, desc string, indent string) {
 	if desc == "" {
 		return
 	}
+	desc = strings.ReplaceAll(desc, `"""`, `\"""`)
 	lines := strings.Split(desc, "\n")
-	if len(lines) == 1 {
-		fmt.Fprintf(buf, "%s\"\"\"%s\"\"\"\n", indent, escapeDQ(desc))
+	if len(lines) == 1 && !strings.HasSuffix(desc, `"`) {
+		fmt.Fprintf(buf, "%s\"\"\"%s\"\"\"\n", indent, desc)
 		return
 	}
+	// Multi-line form avoids ambiguity when content ends with a quote.
 	fmt.Fprintf(buf, "%s\"\"\"\n", indent)
 	for _, l := range lines {
 		if l == "" {
@@ -384,10 +386,6 @@ func renderDescription(buf *strings.Builder, desc string, indent string) {
 		}
 	}
 	fmt.Fprintf(buf, "%s\"\"\"\n", indent)
-}
-
-func escapeDQ(s string) string {
-	return strings.ReplaceAll(s, `"`, `\"`)
 }
 
 func renderScalar(buf *strings.Builder, t introspType) {

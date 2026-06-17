@@ -62,7 +62,9 @@ Credentials are stored in the OS keychain (macOS Keychain, Linux Secret Service)
 
 ```
 mcli auth login/logout/status        Authentication
-mcli me                              Current user info
+mcli me                              Current user info (id, name, email, account, teams)
+
+mcli search <query> [-t boards|items|docs] [--limit N]   Cross-entity search
 
 mcli workspace list/get/create/update/delete
 mcli folder list/create/rename/delete
@@ -72,6 +74,13 @@ mcli board group list/create/rename/archive/delete
 mcli board column list/create/rename/describe/delete
 
 mcli item list/get/create/update/move/archive/delete
+mcli item find --board <id> --column <col> --value <text>   Find by column value
+mcli item post-update <id> --body <text>                    Post a comment
+mcli item get-updates <id> [--limit N]                      Read comments/updates
+mcli item description <id> [--set <md>|--set-file <path>]   Read/write description
+
+mcli doc read <id>                   Export document as markdown
+mcli doc write <id> --content <md>   Replace document content
 
 mcli query '<graphql>'               Raw GraphQL queries (inline, -f file, -f -)
 mcli query save/list/run/delete      Saved query management
@@ -86,6 +95,22 @@ mcli notification list/count/ack     Event inbox (poll for webhook events)
 mcli skill                           Print LLM skill document
 mcli version                         Print version
 ```
+
+## Output Modes
+
+Control output format with a global flag or persist a default:
+
+```sh
+mcli config set output-mode terse   # persist preferred mode
+mcli config set output-mode default # reset to auto-detect
+```
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Machine-readable JSON (default when stdout is not a TTY) |
+| `--pretty` | Human-readable tables (default when stdout is a TTY) |
+| `--terse` | One-line-per-result compact output |
+| `--csv` | Comma-separated values with header row |
 
 Run `mcli <command> --help` for flags and usage on any command.
 
@@ -234,6 +259,10 @@ make vet           # go vet
 make fmt-check     # Check formatting
 make schema        # Refresh monday.com GraphQL schema (requires token)
 ```
+
+## Acknowledgments
+
+Thanks to Witold Sosnowski (@wito) for the ideas behind the search, doc, item description, and item find commands.
 
 ## License
 

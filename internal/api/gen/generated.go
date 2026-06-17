@@ -485,7 +485,7 @@ func (v *BoardGetBoardsBoardGroupsGroup) GetPosition() string { return v.Positio
 type BoardGetBoardsBoardOwnersUser struct {
 	// The user's unique identifier.
 	Id string `json:"id"`
-	// The user's name.
+	// The user's full name.
 	Name string `json:"name"`
 }
 
@@ -918,6 +918,234 @@ var AllColumnType = []ColumnType{
 	ColumnTypeSubtasks,
 }
 
+// DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult includes the requested fields of the GraphQL type DocBlocksFromMarkdownResult.
+// The GraphQL type's documentation follows.
+//
+// Response from adding markdown content to a document. Contains success status and the IDs of newly created blocks.
+type DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult struct {
+	// True if markdown was successfully converted and added to the document
+	Success bool `json:"success"`
+	// Array of block IDs that were created from the markdown content. Use these IDs to reference or modify the newly created blocks.
+	Block_ids []string `json:"block_ids"`
+	// Detailed error message if the operation failed. Check this when success is false.
+	Error string `json:"error"`
+}
+
+// GetSuccess returns DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult.Success, and is useful for accessing the field via an interface.
+func (v *DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult) GetSuccess() bool {
+	return v.Success
+}
+
+// GetBlock_ids returns DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult.Block_ids, and is useful for accessing the field via an interface.
+func (v *DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult) GetBlock_ids() []string {
+	return v.Block_ids
+}
+
+// GetError returns DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult.Error, and is useful for accessing the field via an interface.
+func (v *DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult) GetError() string {
+	return v.Error
+}
+
+// DocAddMarkdownResponse is returned by DocAddMarkdown on success.
+type DocAddMarkdownResponse struct {
+	// Adds markdown content to an existing document by converting it into document blocks. Use this to append content to the end of a document or insert content after a specific block. The markdown will be parsed and converted into the appropriate document block types (text, headers, lists, etc.). Returns the IDs of the newly created blocks on success.
+	Add_content_to_doc_from_markdown DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult `json:"add_content_to_doc_from_markdown"`
+}
+
+// GetAdd_content_to_doc_from_markdown returns DocAddMarkdownResponse.Add_content_to_doc_from_markdown, and is useful for accessing the field via an interface.
+func (v *DocAddMarkdownResponse) GetAdd_content_to_doc_from_markdown() DocAddMarkdownAdd_content_to_doc_from_markdownDocBlocksFromMarkdownResult {
+	return v.Add_content_to_doc_from_markdown
+}
+
+// DocDeleteBlocksDelete_doc_blocksDeletedDocBlock includes the requested fields of the GraphQL type DeletedDocBlock.
+// The GraphQL type's documentation follows.
+//
+// Represents a document block that was successfully deleted.
+type DocDeleteBlocksDelete_doc_blocksDeletedDocBlock struct {
+	// The deleted block's unique identifier.
+	Id string `json:"id"`
+}
+
+// GetId returns DocDeleteBlocksDelete_doc_blocksDeletedDocBlock.Id, and is useful for accessing the field via an interface.
+func (v *DocDeleteBlocksDelete_doc_blocksDeletedDocBlock) GetId() string { return v.Id }
+
+// DocDeleteBlocksResponse is returned by DocDeleteBlocks on success.
+type DocDeleteBlocksResponse struct {
+	// Deletes multiple document blocks in a single operation. Maximum 100 blocks per request.
+	Delete_doc_blocks []DocDeleteBlocksDelete_doc_blocksDeletedDocBlock `json:"delete_doc_blocks"`
+}
+
+// GetDelete_doc_blocks returns DocDeleteBlocksResponse.Delete_doc_blocks, and is useful for accessing the field via an interface.
+func (v *DocDeleteBlocksResponse) GetDelete_doc_blocks() []DocDeleteBlocksDelete_doc_blocksDeletedDocBlock {
+	return v.Delete_doc_blocks
+}
+
+// DocExportMarkdownExport_markdown_from_docExportMarkdownResult includes the requested fields of the GraphQL type ExportMarkdownResult.
+// The GraphQL type's documentation follows.
+//
+// Response from exporting document content as markdown. Contains the generated markdown text or error details.
+type DocExportMarkdownExport_markdown_from_docExportMarkdownResult struct {
+	// True if document content was successfully exported as markdown
+	Success bool `json:"success"`
+	// The exported markdown content as a string. Ready to use in other systems or save to files.
+	Markdown string `json:"markdown"`
+	// Detailed error message if the export failed. Check this when success is false.
+	Error string `json:"error"`
+}
+
+// GetSuccess returns DocExportMarkdownExport_markdown_from_docExportMarkdownResult.Success, and is useful for accessing the field via an interface.
+func (v *DocExportMarkdownExport_markdown_from_docExportMarkdownResult) GetSuccess() bool {
+	return v.Success
+}
+
+// GetMarkdown returns DocExportMarkdownExport_markdown_from_docExportMarkdownResult.Markdown, and is useful for accessing the field via an interface.
+func (v *DocExportMarkdownExport_markdown_from_docExportMarkdownResult) GetMarkdown() string {
+	return v.Markdown
+}
+
+// GetError returns DocExportMarkdownExport_markdown_from_docExportMarkdownResult.Error, and is useful for accessing the field via an interface.
+func (v *DocExportMarkdownExport_markdown_from_docExportMarkdownResult) GetError() string {
+	return v.Error
+}
+
+// DocExportMarkdownResponse is returned by DocExportMarkdown on success.
+type DocExportMarkdownResponse struct {
+	// Converts document content into standard markdown format for external use, backup, or processing. Exports the entire document by default, or specific blocks if block IDs are provided. Use this to extract content for integration with other systems, create backups, generate reports, or process document content with external tools. The output is clean, portable markdown that preserves formatting and structure.
+	Export_markdown_from_doc DocExportMarkdownExport_markdown_from_docExportMarkdownResult `json:"export_markdown_from_doc"`
+}
+
+// GetExport_markdown_from_doc returns DocExportMarkdownResponse.Export_markdown_from_doc, and is useful for accessing the field via an interface.
+func (v *DocExportMarkdownResponse) GetExport_markdown_from_doc() DocExportMarkdownExport_markdown_from_docExportMarkdownResult {
+	return v.Export_markdown_from_doc
+}
+
+// DocGetBlockIDsDocsDocument includes the requested fields of the GraphQL type Document.
+// The GraphQL type's documentation follows.
+//
+// Represents a monday.com doc - a rich-text page built from editable blocks (text, files, embeds, etc.).
+// A doc can belong to:
+// (1) a workspace (left-pane doc),
+// (2) an item (doc on column),
+// (3) a board view (doc as a board view).
+type DocGetBlockIDsDocsDocument struct {
+	// Unique document ID returned when the doc is created.
+	// Use this ID in every API call that references the doc.
+	// How to find it:
+	// • Call the docs() GraphQL query with object_ids to map object_id → id
+	// • Enable 'Developer Mode' in monday.labs to display it inside the doc.
+	Id string `json:"id"`
+	// The document's content blocks
+	Blocks []DocGetBlockIDsDocsDocumentBlocksDocumentBlock `json:"blocks"`
+}
+
+// GetId returns DocGetBlockIDsDocsDocument.Id, and is useful for accessing the field via an interface.
+func (v *DocGetBlockIDsDocsDocument) GetId() string { return v.Id }
+
+// GetBlocks returns DocGetBlockIDsDocsDocument.Blocks, and is useful for accessing the field via an interface.
+func (v *DocGetBlockIDsDocsDocument) GetBlocks() []DocGetBlockIDsDocsDocumentBlocksDocumentBlock {
+	return v.Blocks
+}
+
+// DocGetBlockIDsDocsDocumentBlocksDocumentBlock includes the requested fields of the GraphQL type DocumentBlock.
+// The GraphQL type's documentation follows.
+//
+// A monday.com document block.
+type DocGetBlockIDsDocsDocumentBlocksDocumentBlock struct {
+	// The block's unique identifier.
+	Id string `json:"id"`
+}
+
+// GetId returns DocGetBlockIDsDocsDocumentBlocksDocumentBlock.Id, and is useful for accessing the field via an interface.
+func (v *DocGetBlockIDsDocsDocumentBlocksDocumentBlock) GetId() string { return v.Id }
+
+// DocGetBlockIDsResponse is returned by DocGetBlockIDs on success.
+type DocGetBlockIDsResponse struct {
+	// Get a collection of docs.
+	Docs []DocGetBlockIDsDocsDocument `json:"docs"`
+}
+
+// GetDocs returns DocGetBlockIDsResponse.Docs, and is useful for accessing the field via an interface.
+func (v *DocGetBlockIDsResponse) GetDocs() []DocGetBlockIDsDocsDocument { return v.Docs }
+
+// DocGetByObjectIDDocsDocument includes the requested fields of the GraphQL type Document.
+// The GraphQL type's documentation follows.
+//
+// Represents a monday.com doc - a rich-text page built from editable blocks (text, files, embeds, etc.).
+// A doc can belong to:
+// (1) a workspace (left-pane doc),
+// (2) an item (doc on column),
+// (3) a board view (doc as a board view).
+type DocGetByObjectIDDocsDocument struct {
+	// Unique document ID returned when the doc is created.
+	// Use this ID in every API call that references the doc.
+	// How to find it:
+	// • Call the docs() GraphQL query with object_ids to map object_id → id
+	// • Enable 'Developer Mode' in monday.labs to display it inside the doc.
+	Id string `json:"id"`
+	// The document's name.
+	Name string `json:"name"`
+	// Identifier that appears in the doc's URL.
+	// Returned on creation, but DO NOT use it in API routes that expect a document ID.
+	Object_id string `json:"object_id"`
+}
+
+// GetId returns DocGetByObjectIDDocsDocument.Id, and is useful for accessing the field via an interface.
+func (v *DocGetByObjectIDDocsDocument) GetId() string { return v.Id }
+
+// GetName returns DocGetByObjectIDDocsDocument.Name, and is useful for accessing the field via an interface.
+func (v *DocGetByObjectIDDocsDocument) GetName() string { return v.Name }
+
+// GetObject_id returns DocGetByObjectIDDocsDocument.Object_id, and is useful for accessing the field via an interface.
+func (v *DocGetByObjectIDDocsDocument) GetObject_id() string { return v.Object_id }
+
+// DocGetByObjectIDResponse is returned by DocGetByObjectID on success.
+type DocGetByObjectIDResponse struct {
+	// Get a collection of docs.
+	Docs []DocGetByObjectIDDocsDocument `json:"docs"`
+}
+
+// GetDocs returns DocGetByObjectIDResponse.Docs, and is useful for accessing the field via an interface.
+func (v *DocGetByObjectIDResponse) GetDocs() []DocGetByObjectIDDocsDocument { return v.Docs }
+
+// DocSetItemDescriptionResponse is returned by DocSetItemDescription on success.
+type DocSetItemDescriptionResponse struct {
+	// Sets an item description document's content with new markdown data. This mutation converts the provided markdown into document blocks and replaces the existing content of the item's description. Returns the IDs of the newly created blocks on success. Note: Markdown does not support text colors or background highlights. Any existing colored or highlighted text will be lost after replacement.
+	Set_item_description_content DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult `json:"set_item_description_content"`
+}
+
+// GetSet_item_description_content returns DocSetItemDescriptionResponse.Set_item_description_content, and is useful for accessing the field via an interface.
+func (v *DocSetItemDescriptionResponse) GetSet_item_description_content() DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult {
+	return v.Set_item_description_content
+}
+
+// DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult includes the requested fields of the GraphQL type DocBlocksFromMarkdownResult.
+// The GraphQL type's documentation follows.
+//
+// Response from adding markdown content to a document. Contains success status and the IDs of newly created blocks.
+type DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult struct {
+	// True if markdown was successfully converted and added to the document
+	Success bool `json:"success"`
+	// Array of block IDs that were created from the markdown content. Use these IDs to reference or modify the newly created blocks.
+	Block_ids []string `json:"block_ids"`
+	// Detailed error message if the operation failed. Check this when success is false.
+	Error string `json:"error"`
+}
+
+// GetSuccess returns DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult.Success, and is useful for accessing the field via an interface.
+func (v *DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult) GetSuccess() bool {
+	return v.Success
+}
+
+// GetBlock_ids returns DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult.Block_ids, and is useful for accessing the field via an interface.
+func (v *DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult) GetBlock_ids() []string {
+	return v.Block_ids
+}
+
+// GetError returns DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult.Error, and is useful for accessing the field via an interface.
+func (v *DocSetItemDescriptionSet_item_description_contentDocBlocksFromMarkdownResult) GetError() string {
+	return v.Error
+}
+
 // One value out of a list of valid folder colors
 type FolderColor string
 
@@ -1266,6 +1494,86 @@ type ItemDeleteResponse struct {
 
 // GetDelete_item returns ItemDeleteResponse.Delete_item, and is useful for accessing the field via an interface.
 func (v *ItemDeleteResponse) GetDelete_item() ItemDeleteDelete_itemItem { return v.Delete_item }
+
+// ItemFindByColumnValueItems_page_by_column_valuesItemsResponse includes the requested fields of the GraphQL type ItemsResponse.
+type ItemFindByColumnValueItems_page_by_column_valuesItemsResponse struct {
+	// An opaque cursor that represents the position in the list after the last
+	// returned item. Use this cursor for pagination to fetch the next set of items.
+	// If the cursor is null, there are no more items to fetch.
+	Cursor string `json:"cursor"`
+	// The items associated with the cursor.
+	Items []ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem `json:"items"`
+}
+
+// GetCursor returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponse.Cursor, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponse) GetCursor() string {
+	return v.Cursor
+}
+
+// GetItems returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponse.Items, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponse) GetItems() []ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem {
+	return v.Items
+}
+
+// ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's name.
+	Name string `json:"name"`
+	// The group that contains this item.
+	Group ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup `json:"group"`
+}
+
+// GetId returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem) GetId() string {
+	return v.Id
+}
+
+// GetName returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem.Name, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem) GetName() string {
+	return v.Name
+}
+
+// GetGroup returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem.Group, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItem) GetGroup() ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup {
+	return v.Group
+}
+
+// ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup includes the requested fields of the GraphQL type Group.
+// The GraphQL type's documentation follows.
+//
+// A group of items in a board.
+type ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup struct {
+	// The group's unique identifier.
+	Id string `json:"id"`
+	// The group's title.
+	Title string `json:"title"`
+}
+
+// GetId returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup.Id, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup) GetId() string {
+	return v.Id
+}
+
+// GetTitle returns ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup.Title, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueItems_page_by_column_valuesItemsResponseItemsItemGroup) GetTitle() string {
+	return v.Title
+}
+
+// ItemFindByColumnValueResponse is returned by ItemFindByColumnValue on success.
+type ItemFindByColumnValueResponse struct {
+	// Search items by multiple columns and values.
+	Items_page_by_column_values ItemFindByColumnValueItems_page_by_column_valuesItemsResponse `json:"items_page_by_column_values"`
+}
+
+// GetItems_page_by_column_values returns ItemFindByColumnValueResponse.Items_page_by_column_values, and is useful for accessing the field via an interface.
+func (v *ItemFindByColumnValueResponse) GetItems_page_by_column_values() ItemFindByColumnValueItems_page_by_column_valuesItemsResponse {
+	return v.Items_page_by_column_values
+}
 
 // ItemGetItemsItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
@@ -3563,7 +3871,7 @@ func (v *ItemGetItemsItemColumn_valuesWorldClockValue) GetColumn() ItemGetItemsI
 type ItemGetItemsItemCreatorUser struct {
 	// The user's unique identifier.
 	Id string `json:"id"`
-	// The user's name.
+	// The user's full name.
 	Name string `json:"name"`
 }
 
@@ -3637,6 +3945,157 @@ type ItemGetResponse struct {
 
 // GetItems returns ItemGetResponse.Items, and is useful for accessing the field via an interface.
 func (v *ItemGetResponse) GetItems() []ItemGetItemsItem { return v.Items }
+
+// ItemGetUpdatesItemsItem includes the requested fields of the GraphQL type Item.
+// The GraphQL type's documentation follows.
+//
+// An item (table row).
+type ItemGetUpdatesItemsItem struct {
+	// The item's unique identifier.
+	Id string `json:"id"`
+	// The item's updates.
+	Updates []ItemGetUpdatesItemsItemUpdatesUpdate `json:"updates"`
+}
+
+// GetId returns ItemGetUpdatesItemsItem.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItem) GetId() string { return v.Id }
+
+// GetUpdates returns ItemGetUpdatesItemsItem.Updates, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItem) GetUpdates() []ItemGetUpdatesItemsItemUpdatesUpdate {
+	return v.Updates
+}
+
+// ItemGetUpdatesItemsItemUpdatesUpdate includes the requested fields of the GraphQL type Update.
+// The GraphQL type's documentation follows.
+//
+// An update.
+type ItemGetUpdatesItemsItemUpdatesUpdate struct {
+	// The update's unique identifier.
+	Id string `json:"id"`
+	// The update's html formatted body.
+	Body string `json:"body"`
+	// The update's text body.
+	Text_body string `json:"text_body"`
+	// The update's creation date.
+	Created_at string `json:"created_at"`
+	// The update's creator.
+	Creator ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser `json:"creator"`
+	// The update's replies.
+	Replies []ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply `json:"replies"`
+}
+
+// GetId returns ItemGetUpdatesItemsItemUpdatesUpdate.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetId() string { return v.Id }
+
+// GetBody returns ItemGetUpdatesItemsItemUpdatesUpdate.Body, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetBody() string { return v.Body }
+
+// GetText_body returns ItemGetUpdatesItemsItemUpdatesUpdate.Text_body, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetText_body() string { return v.Text_body }
+
+// GetCreated_at returns ItemGetUpdatesItemsItemUpdatesUpdate.Created_at, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetCreated_at() string { return v.Created_at }
+
+// GetCreator returns ItemGetUpdatesItemsItemUpdatesUpdate.Creator, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetCreator() ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser {
+	return v.Creator
+}
+
+// GetReplies returns ItemGetUpdatesItemsItemUpdatesUpdate.Replies, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdate) GetReplies() []ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply {
+	return v.Replies
+}
+
+// ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's full name.
+	Name string `json:"name"`
+	// The user's email address.
+	Email string `json:"email"`
+}
+
+// GetId returns ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser) GetId() string { return v.Id }
+
+// GetName returns ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser) GetName() string { return v.Name }
+
+// GetEmail returns ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser.Email, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateCreatorUser) GetEmail() string { return v.Email }
+
+// ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply includes the requested fields of the GraphQL type Reply.
+// The GraphQL type's documentation follows.
+//
+// A reply for an update.
+type ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply struct {
+	// The reply's unique identifier.
+	Id string `json:"id"`
+	// The reply's html formatted body.
+	Body string `json:"body"`
+	// The reply's text body.
+	Text_body string `json:"text_body"`
+	// The reply's creation date.
+	Created_at string `json:"created_at"`
+	// The reply's creator.
+	Creator ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser `json:"creator"`
+}
+
+// GetId returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply) GetId() string { return v.Id }
+
+// GetBody returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply.Body, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply) GetBody() string { return v.Body }
+
+// GetText_body returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply.Text_body, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply) GetText_body() string { return v.Text_body }
+
+// GetCreated_at returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply.Created_at, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply) GetCreated_at() string {
+	return v.Created_at
+}
+
+// GetCreator returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply.Creator, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReply) GetCreator() ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser {
+	return v.Creator
+}
+
+// ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's full name.
+	Name string `json:"name"`
+	// The user's email address.
+	Email string `json:"email"`
+}
+
+// GetId returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser.Id, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser) GetId() string { return v.Id }
+
+// GetName returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser.Name, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser) GetName() string { return v.Name }
+
+// GetEmail returns ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser.Email, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesItemsItemUpdatesUpdateRepliesReplyCreatorUser) GetEmail() string {
+	return v.Email
+}
+
+// ItemGetUpdatesResponse is returned by ItemGetUpdates on success.
+type ItemGetUpdatesResponse struct {
+	// Get a collection of items.
+	Items []ItemGetUpdatesItemsItem `json:"items"`
+}
+
+// GetItems returns ItemGetUpdatesResponse.Items, and is useful for accessing the field via an interface.
+func (v *ItemGetUpdatesResponse) GetItems() []ItemGetUpdatesItemsItem { return v.Items }
 
 // ItemMoveToBoardMove_item_to_boardItem includes the requested fields of the GraphQL type Item.
 // The GraphQL type's documentation follows.
@@ -9351,6 +9810,19 @@ type ItemsListByGroupResponse struct {
 // GetBoards returns ItemsListByGroupResponse.Boards, and is useful for accessing the field via an interface.
 func (v *ItemsListByGroupResponse) GetBoards() []ItemsListByGroupBoardsBoard { return v.Boards }
 
+type ItemsPageByColumnValuesQuery struct {
+	// The column's unique identifier.
+	Column_id string `json:"column_id"`
+	// The column values to search items by.
+	Column_values []string `json:"column_values"`
+}
+
+// GetColumn_id returns ItemsPageByColumnValuesQuery.Column_id, and is useful for accessing the field via an interface.
+func (v *ItemsPageByColumnValuesQuery) GetColumn_id() string { return v.Column_id }
+
+// GetColumn_values returns ItemsPageByColumnValuesQuery.Column_values, and is useful for accessing the field via an interface.
+func (v *ItemsPageByColumnValuesQuery) GetColumn_values() []string { return v.Column_values }
+
 // MeMeUser includes the requested fields of the GraphQL type User.
 // The GraphQL type's documentation follows.
 //
@@ -9358,8 +9830,14 @@ func (v *ItemsListByGroupResponse) GetBoards() []ItemsListByGroupBoardsBoard { r
 type MeMeUser struct {
 	// The user's unique identifier.
 	Id string `json:"id"`
-	// The user's name.
+	// The user's full name.
 	Name string `json:"name"`
+	// The user's email address.
+	Email string `json:"email"`
+	// The user's account.
+	Account MeMeUserAccount `json:"account"`
+	// The teams the user is a member in.
+	Teams []MeMeUserTeamsTeam `json:"teams"`
 }
 
 // GetId returns MeMeUser.Id, and is useful for accessing the field via an interface.
@@ -9367,6 +9845,49 @@ func (v *MeMeUser) GetId() string { return v.Id }
 
 // GetName returns MeMeUser.Name, and is useful for accessing the field via an interface.
 func (v *MeMeUser) GetName() string { return v.Name }
+
+// GetEmail returns MeMeUser.Email, and is useful for accessing the field via an interface.
+func (v *MeMeUser) GetEmail() string { return v.Email }
+
+// GetAccount returns MeMeUser.Account, and is useful for accessing the field via an interface.
+func (v *MeMeUser) GetAccount() MeMeUserAccount { return v.Account }
+
+// GetTeams returns MeMeUser.Teams, and is useful for accessing the field via an interface.
+func (v *MeMeUser) GetTeams() []MeMeUserTeamsTeam { return v.Teams }
+
+// MeMeUserAccount includes the requested fields of the GraphQL type Account.
+// The GraphQL type's documentation follows.
+//
+// Your monday.com account
+type MeMeUserAccount struct {
+	// The account's unique identifier.
+	Id string `json:"id"`
+	// The account's name.
+	Name string `json:"name"`
+}
+
+// GetId returns MeMeUserAccount.Id, and is useful for accessing the field via an interface.
+func (v *MeMeUserAccount) GetId() string { return v.Id }
+
+// GetName returns MeMeUserAccount.Name, and is useful for accessing the field via an interface.
+func (v *MeMeUserAccount) GetName() string { return v.Name }
+
+// MeMeUserTeamsTeam includes the requested fields of the GraphQL type Team.
+// The GraphQL type's documentation follows.
+//
+// A team of users.
+type MeMeUserTeamsTeam struct {
+	// The team's unique identifier.
+	Id string `json:"id"`
+	// The team's name.
+	Name string `json:"name"`
+}
+
+// GetId returns MeMeUserTeamsTeam.Id, and is useful for accessing the field via an interface.
+func (v *MeMeUserTeamsTeam) GetId() string { return v.Id }
+
+// GetName returns MeMeUserTeamsTeam.Name, and is useful for accessing the field via an interface.
+func (v *MeMeUserTeamsTeam) GetName() string { return v.Name }
 
 // MeResponse is returned by Me on success.
 type MeResponse struct {
@@ -9376,6 +9897,292 @@ type MeResponse struct {
 
 // GetMe returns MeResponse.Me, and is useful for accessing the field via an interface.
 func (v *MeResponse) GetMe() MeMeUser { return v.Me }
+
+// SearchBoardsResponse is returned by SearchBoards on success.
+type SearchBoardsResponse struct {
+	// Search API. Each field searches a single entity type with tailored filters.
+	Search SearchBoardsSearchSearchNamespace `json:"search"`
+}
+
+// GetSearch returns SearchBoardsResponse.Search, and is useful for accessing the field via an interface.
+func (v *SearchBoardsResponse) GetSearch() SearchBoardsSearchSearchNamespace { return v.Search }
+
+// SearchBoardsSearchSearchNamespace includes the requested fields of the GraphQL type SearchNamespace.
+// The GraphQL type's documentation follows.
+//
+// Per-entity search namespace. Each field searches a single entity type.
+type SearchBoardsSearchSearchNamespace struct {
+	// Search for boards.
+	Boards SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults `json:"boards"`
+}
+
+// GetBoards returns SearchBoardsSearchSearchNamespace.Boards, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespace) GetBoards() SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults {
+	return v.Boards
+}
+
+// SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults includes the requested fields of the GraphQL type SearchBoardResults.
+// The GraphQL type's documentation follows.
+//
+// Wrapper for a list of board search results.
+type SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults struct {
+	// List of board search results.
+	Results []SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult `json:"results"`
+}
+
+// GetResults returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults.Results, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResults) GetResults() []SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult {
+	return v.Results
+}
+
+// SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult includes the requested fields of the GraphQL type SearchBoardResult.
+// The GraphQL type's documentation follows.
+//
+// A single board search result with indexed and live data.
+type SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult struct {
+	// Unique identifier of the board.
+	Id string `json:"id"`
+	// Board data from the search index.
+	Indexed_data SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard `json:"indexed_data"`
+}
+
+// GetId returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult.Id, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult) GetId() string {
+	return v.Id
+}
+
+// GetIndexed_data returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult.Indexed_data, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResult) GetIndexed_data() SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard {
+	return v.Indexed_data
+}
+
+// SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard includes the requested fields of the GraphQL type SearchIndexedBoard.
+// The GraphQL type's documentation follows.
+//
+// Board data stored in the search index.
+type SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard struct {
+	// Board ID.
+	Id string `json:"id"`
+	// Board name.
+	Name string `json:"name"`
+	// Board description.
+	Description string `json:"description"`
+	// ID of the workspace containing this board.
+	Workspace_id string `json:"workspace_id"`
+	// URL to view this board.
+	Url string `json:"url"`
+}
+
+// GetId returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard.Id, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard) GetId() string {
+	return v.Id
+}
+
+// GetName returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard.Name, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard) GetName() string {
+	return v.Name
+}
+
+// GetDescription returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard.Description, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard) GetDescription() string {
+	return v.Description
+}
+
+// GetWorkspace_id returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard.Workspace_id, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard) GetWorkspace_id() string {
+	return v.Workspace_id
+}
+
+// GetUrl returns SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard.Url, and is useful for accessing the field via an interface.
+func (v *SearchBoardsSearchSearchNamespaceBoardsSearchBoardResultsResultsSearchBoardResultIndexed_dataSearchIndexedBoard) GetUrl() string {
+	return v.Url
+}
+
+// SearchDocsResponse is returned by SearchDocs on success.
+type SearchDocsResponse struct {
+	// Search API. Each field searches a single entity type with tailored filters.
+	Search SearchDocsSearchSearchNamespace `json:"search"`
+}
+
+// GetSearch returns SearchDocsResponse.Search, and is useful for accessing the field via an interface.
+func (v *SearchDocsResponse) GetSearch() SearchDocsSearchSearchNamespace { return v.Search }
+
+// SearchDocsSearchSearchNamespace includes the requested fields of the GraphQL type SearchNamespace.
+// The GraphQL type's documentation follows.
+//
+// Per-entity search namespace. Each field searches a single entity type.
+type SearchDocsSearchSearchNamespace struct {
+	// Search for documents.
+	Docs SearchDocsSearchSearchNamespaceDocsSearchDocResults `json:"docs"`
+}
+
+// GetDocs returns SearchDocsSearchSearchNamespace.Docs, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespace) GetDocs() SearchDocsSearchSearchNamespaceDocsSearchDocResults {
+	return v.Docs
+}
+
+// SearchDocsSearchSearchNamespaceDocsSearchDocResults includes the requested fields of the GraphQL type SearchDocResults.
+// The GraphQL type's documentation follows.
+//
+// Wrapper for a list of doc search results.
+type SearchDocsSearchSearchNamespaceDocsSearchDocResults struct {
+	// List of doc search results.
+	Results []SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult `json:"results"`
+}
+
+// GetResults returns SearchDocsSearchSearchNamespaceDocsSearchDocResults.Results, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResults) GetResults() []SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult {
+	return v.Results
+}
+
+// SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult includes the requested fields of the GraphQL type SearchDocResult.
+// The GraphQL type's documentation follows.
+//
+// A single doc search result with indexed and live data.
+type SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult struct {
+	// Unique identifier of the doc.
+	Id string `json:"id"`
+	// Doc data from the search index.
+	Indexed_data SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc `json:"indexed_data"`
+}
+
+// GetId returns SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult.Id, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult) GetId() string {
+	return v.Id
+}
+
+// GetIndexed_data returns SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult.Indexed_data, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResult) GetIndexed_data() SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc {
+	return v.Indexed_data
+}
+
+// SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc includes the requested fields of the GraphQL type SearchIndexedDoc.
+// The GraphQL type's documentation follows.
+//
+// Document data stored in the search index.
+type SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc struct {
+	// Document ID.
+	Id string `json:"id"`
+	// Document name.
+	Name string `json:"name"`
+	// ID of the workspace containing this document.
+	Workspace_id string `json:"workspace_id"`
+}
+
+// GetId returns SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc.Id, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc) GetId() string {
+	return v.Id
+}
+
+// GetName returns SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc.Name, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc) GetName() string {
+	return v.Name
+}
+
+// GetWorkspace_id returns SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc.Workspace_id, and is useful for accessing the field via an interface.
+func (v *SearchDocsSearchSearchNamespaceDocsSearchDocResultsResultsSearchDocResultIndexed_dataSearchIndexedDoc) GetWorkspace_id() string {
+	return v.Workspace_id
+}
+
+// SearchItemsResponse is returned by SearchItems on success.
+type SearchItemsResponse struct {
+	// Search API. Each field searches a single entity type with tailored filters.
+	Search SearchItemsSearchSearchNamespace `json:"search"`
+}
+
+// GetSearch returns SearchItemsResponse.Search, and is useful for accessing the field via an interface.
+func (v *SearchItemsResponse) GetSearch() SearchItemsSearchSearchNamespace { return v.Search }
+
+// SearchItemsSearchSearchNamespace includes the requested fields of the GraphQL type SearchNamespace.
+// The GraphQL type's documentation follows.
+//
+// Per-entity search namespace. Each field searches a single entity type.
+type SearchItemsSearchSearchNamespace struct {
+	// Search for items.
+	Items SearchItemsSearchSearchNamespaceItemsSearchItemResults `json:"items"`
+}
+
+// GetItems returns SearchItemsSearchSearchNamespace.Items, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespace) GetItems() SearchItemsSearchSearchNamespaceItemsSearchItemResults {
+	return v.Items
+}
+
+// SearchItemsSearchSearchNamespaceItemsSearchItemResults includes the requested fields of the GraphQL type SearchItemResults.
+// The GraphQL type's documentation follows.
+//
+// Wrapper for a list of item search results.
+type SearchItemsSearchSearchNamespaceItemsSearchItemResults struct {
+	// List of item search results.
+	Results []SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult `json:"results"`
+}
+
+// GetResults returns SearchItemsSearchSearchNamespaceItemsSearchItemResults.Results, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResults) GetResults() []SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult {
+	return v.Results
+}
+
+// SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult includes the requested fields of the GraphQL type SearchItemResult.
+// The GraphQL type's documentation follows.
+//
+// A single item search result with indexed and live data.
+type SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult struct {
+	// Unique identifier of the item.
+	Id string `json:"id"`
+	// Item data from the search index.
+	Indexed_data SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem `json:"indexed_data"`
+}
+
+// GetId returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult.Id, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult) GetId() string {
+	return v.Id
+}
+
+// GetIndexed_data returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult.Indexed_data, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResult) GetIndexed_data() SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem {
+	return v.Indexed_data
+}
+
+// SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem includes the requested fields of the GraphQL type SearchIndexedItem.
+// The GraphQL type's documentation follows.
+//
+// Item data stored in the search index.
+type SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem struct {
+	// Item ID.
+	Id string `json:"id"`
+	// Item name.
+	Name string `json:"name"`
+	// URL to view this item.
+	Url string `json:"url"`
+	// ID of the board containing this item.
+	Board_id string `json:"board_id"`
+	// ID of the workspace containing this item.
+	Workspace_id string `json:"workspace_id"`
+}
+
+// GetId returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem.Id, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem) GetId() string {
+	return v.Id
+}
+
+// GetName returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem.Name, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem) GetName() string {
+	return v.Name
+}
+
+// GetUrl returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem.Url, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem) GetUrl() string {
+	return v.Url
+}
+
+// GetBoard_id returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem.Board_id, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem) GetBoard_id() string {
+	return v.Board_id
+}
+
+// GetWorkspace_id returns SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem.Workspace_id, and is useful for accessing the field via an interface.
+func (v *SearchItemsSearchSearchNamespaceItemsSearchItemResultsResultsSearchItemResultIndexed_dataSearchIndexedItem) GetWorkspace_id() string {
+	return v.Workspace_id
+}
 
 // The possible states for a board or item.
 type State string
@@ -9481,6 +10288,8 @@ func (v *SubitemCreateResponse) GetCreate_subitem() SubitemCreateCreate_subitemI
 
 // Attributes of a workspace to update
 type UpdateWorkspaceAttributesInput struct {
+	// The target account product's ID to move the workspace to
+	Account_product_id string `json:"account_product_id"`
 	// The description of the workspace to update
 	Description string `json:"description"`
 	// The kind of the workspace to update (open / closed / template)
@@ -9488,6 +10297,9 @@ type UpdateWorkspaceAttributesInput struct {
 	// The name of the workspace to update
 	Name string `json:"name"`
 }
+
+// GetAccount_product_id returns UpdateWorkspaceAttributesInput.Account_product_id, and is useful for accessing the field via an interface.
+func (v *UpdateWorkspaceAttributesInput) GetAccount_product_id() string { return v.Account_product_id }
 
 // GetDescription returns UpdateWorkspaceAttributesInput.Description, and is useful for accessing the field via an interface.
 func (v *UpdateWorkspaceAttributesInput) GetDescription() string { return v.Description }
@@ -9497,6 +10309,68 @@ func (v *UpdateWorkspaceAttributesInput) GetKind() WorkspaceKind { return v.Kind
 
 // GetName returns UpdateWorkspaceAttributesInput.Name, and is useful for accessing the field via an interface.
 func (v *UpdateWorkspaceAttributesInput) GetName() string { return v.Name }
+
+// UsersByEmailResponse is returned by UsersByEmail on success.
+type UsersByEmailResponse struct {
+	// Get users.
+	Users []UsersByEmailUsersUser `json:"users"`
+}
+
+// GetUsers returns UsersByEmailResponse.Users, and is useful for accessing the field via an interface.
+func (v *UsersByEmailResponse) GetUsers() []UsersByEmailUsersUser { return v.Users }
+
+// UsersByEmailUsersUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type UsersByEmailUsersUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's full name.
+	Name string `json:"name"`
+	// The user's email address.
+	Email string `json:"email"`
+}
+
+// GetId returns UsersByEmailUsersUser.Id, and is useful for accessing the field via an interface.
+func (v *UsersByEmailUsersUser) GetId() string { return v.Id }
+
+// GetName returns UsersByEmailUsersUser.Name, and is useful for accessing the field via an interface.
+func (v *UsersByEmailUsersUser) GetName() string { return v.Name }
+
+// GetEmail returns UsersByEmailUsersUser.Email, and is useful for accessing the field via an interface.
+func (v *UsersByEmailUsersUser) GetEmail() string { return v.Email }
+
+// UsersByNameResponse is returned by UsersByName on success.
+type UsersByNameResponse struct {
+	// Get users.
+	Users []UsersByNameUsersUser `json:"users"`
+}
+
+// GetUsers returns UsersByNameResponse.Users, and is useful for accessing the field via an interface.
+func (v *UsersByNameResponse) GetUsers() []UsersByNameUsersUser { return v.Users }
+
+// UsersByNameUsersUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A monday.com user.
+type UsersByNameUsersUser struct {
+	// The user's unique identifier.
+	Id string `json:"id"`
+	// The user's full name.
+	Name string `json:"name"`
+	// The user's email address.
+	Email string `json:"email"`
+}
+
+// GetId returns UsersByNameUsersUser.Id, and is useful for accessing the field via an interface.
+func (v *UsersByNameUsersUser) GetId() string { return v.Id }
+
+// GetName returns UsersByNameUsersUser.Name, and is useful for accessing the field via an interface.
+func (v *UsersByNameUsersUser) GetName() string { return v.Name }
+
+// GetEmail returns UsersByNameUsersUser.Email, and is useful for accessing the field via an interface.
+func (v *UsersByNameUsersUser) GetEmail() string { return v.Email }
 
 // WorkspaceCreateCreate_workspaceWorkspace includes the requested fields of the GraphQL type Workspace.
 // The GraphQL type's documentation follows.
@@ -9958,6 +10832,62 @@ func (v *__BoardsListInput) GetPage() int { return v.Page }
 // GetWorkspaceIds returns __BoardsListInput.WorkspaceIds, and is useful for accessing the field via an interface.
 func (v *__BoardsListInput) GetWorkspaceIds() []string { return v.WorkspaceIds }
 
+// __DocAddMarkdownInput is used internally by genqlient
+type __DocAddMarkdownInput struct {
+	DocId    string `json:"docId"`
+	Markdown string `json:"markdown"`
+}
+
+// GetDocId returns __DocAddMarkdownInput.DocId, and is useful for accessing the field via an interface.
+func (v *__DocAddMarkdownInput) GetDocId() string { return v.DocId }
+
+// GetMarkdown returns __DocAddMarkdownInput.Markdown, and is useful for accessing the field via an interface.
+func (v *__DocAddMarkdownInput) GetMarkdown() string { return v.Markdown }
+
+// __DocDeleteBlocksInput is used internally by genqlient
+type __DocDeleteBlocksInput struct {
+	BlockIds []string `json:"blockIds"`
+}
+
+// GetBlockIds returns __DocDeleteBlocksInput.BlockIds, and is useful for accessing the field via an interface.
+func (v *__DocDeleteBlocksInput) GetBlockIds() []string { return v.BlockIds }
+
+// __DocExportMarkdownInput is used internally by genqlient
+type __DocExportMarkdownInput struct {
+	DocId string `json:"docId"`
+}
+
+// GetDocId returns __DocExportMarkdownInput.DocId, and is useful for accessing the field via an interface.
+func (v *__DocExportMarkdownInput) GetDocId() string { return v.DocId }
+
+// __DocGetBlockIDsInput is used internally by genqlient
+type __DocGetBlockIDsInput struct {
+	DocId string `json:"docId"`
+}
+
+// GetDocId returns __DocGetBlockIDsInput.DocId, and is useful for accessing the field via an interface.
+func (v *__DocGetBlockIDsInput) GetDocId() string { return v.DocId }
+
+// __DocGetByObjectIDInput is used internally by genqlient
+type __DocGetByObjectIDInput struct {
+	ObjectId string `json:"objectId"`
+}
+
+// GetObjectId returns __DocGetByObjectIDInput.ObjectId, and is useful for accessing the field via an interface.
+func (v *__DocGetByObjectIDInput) GetObjectId() string { return v.ObjectId }
+
+// __DocSetItemDescriptionInput is used internally by genqlient
+type __DocSetItemDescriptionInput struct {
+	ItemId   string `json:"itemId"`
+	Markdown string `json:"markdown"`
+}
+
+// GetItemId returns __DocSetItemDescriptionInput.ItemId, and is useful for accessing the field via an interface.
+func (v *__DocSetItemDescriptionInput) GetItemId() string { return v.ItemId }
+
+// GetMarkdown returns __DocSetItemDescriptionInput.Markdown, and is useful for accessing the field via an interface.
+func (v *__DocSetItemDescriptionInput) GetMarkdown() string { return v.Markdown }
+
 // __FolderCreateInput is used internally by genqlient
 type __FolderCreateInput struct {
 	Name           string `json:"name"`
@@ -10046,6 +10976,26 @@ type __ItemDeleteInput struct {
 // GetItemId returns __ItemDeleteInput.ItemId, and is useful for accessing the field via an interface.
 func (v *__ItemDeleteInput) GetItemId() string { return v.ItemId }
 
+// __ItemFindByColumnValueInput is used internally by genqlient
+type __ItemFindByColumnValueInput struct {
+	BoardId string                         `json:"boardId"`
+	Columns []ItemsPageByColumnValuesQuery `json:"columns"`
+	Limit   int                            `json:"limit"`
+	Cursor  string                         `json:"cursor,omitempty"`
+}
+
+// GetBoardId returns __ItemFindByColumnValueInput.BoardId, and is useful for accessing the field via an interface.
+func (v *__ItemFindByColumnValueInput) GetBoardId() string { return v.BoardId }
+
+// GetColumns returns __ItemFindByColumnValueInput.Columns, and is useful for accessing the field via an interface.
+func (v *__ItemFindByColumnValueInput) GetColumns() []ItemsPageByColumnValuesQuery { return v.Columns }
+
+// GetLimit returns __ItemFindByColumnValueInput.Limit, and is useful for accessing the field via an interface.
+func (v *__ItemFindByColumnValueInput) GetLimit() int { return v.Limit }
+
+// GetCursor returns __ItemFindByColumnValueInput.Cursor, and is useful for accessing the field via an interface.
+func (v *__ItemFindByColumnValueInput) GetCursor() string { return v.Cursor }
+
 // __ItemGetInput is used internally by genqlient
 type __ItemGetInput struct {
 	Id string `json:"id"`
@@ -10053,6 +11003,18 @@ type __ItemGetInput struct {
 
 // GetId returns __ItemGetInput.Id, and is useful for accessing the field via an interface.
 func (v *__ItemGetInput) GetId() string { return v.Id }
+
+// __ItemGetUpdatesInput is used internally by genqlient
+type __ItemGetUpdatesInput struct {
+	Id    string `json:"id"`
+	Limit int    `json:"limit"`
+}
+
+// GetId returns __ItemGetUpdatesInput.Id, and is useful for accessing the field via an interface.
+func (v *__ItemGetUpdatesInput) GetId() string { return v.Id }
+
+// GetLimit returns __ItemGetUpdatesInput.Limit, and is useful for accessing the field via an interface.
+func (v *__ItemGetUpdatesInput) GetLimit() int { return v.Limit }
 
 // __ItemMoveToBoardInput is used internally by genqlient
 type __ItemMoveToBoardInput struct {
@@ -10150,6 +11112,42 @@ func (v *__ItemsListByGroupInput) GetLimit() int { return v.Limit }
 // GetCursor returns __ItemsListByGroupInput.Cursor, and is useful for accessing the field via an interface.
 func (v *__ItemsListByGroupInput) GetCursor() string { return v.Cursor }
 
+// __SearchBoardsInput is used internally by genqlient
+type __SearchBoardsInput struct {
+	Query string `json:"query"`
+	Limit int    `json:"limit"`
+}
+
+// GetQuery returns __SearchBoardsInput.Query, and is useful for accessing the field via an interface.
+func (v *__SearchBoardsInput) GetQuery() string { return v.Query }
+
+// GetLimit returns __SearchBoardsInput.Limit, and is useful for accessing the field via an interface.
+func (v *__SearchBoardsInput) GetLimit() int { return v.Limit }
+
+// __SearchDocsInput is used internally by genqlient
+type __SearchDocsInput struct {
+	Query string `json:"query"`
+	Limit int    `json:"limit"`
+}
+
+// GetQuery returns __SearchDocsInput.Query, and is useful for accessing the field via an interface.
+func (v *__SearchDocsInput) GetQuery() string { return v.Query }
+
+// GetLimit returns __SearchDocsInput.Limit, and is useful for accessing the field via an interface.
+func (v *__SearchDocsInput) GetLimit() int { return v.Limit }
+
+// __SearchItemsInput is used internally by genqlient
+type __SearchItemsInput struct {
+	Query string `json:"query"`
+	Limit int    `json:"limit"`
+}
+
+// GetQuery returns __SearchItemsInput.Query, and is useful for accessing the field via an interface.
+func (v *__SearchItemsInput) GetQuery() string { return v.Query }
+
+// GetLimit returns __SearchItemsInput.Limit, and is useful for accessing the field via an interface.
+func (v *__SearchItemsInput) GetLimit() int { return v.Limit }
+
 // __SubitemCreateInput is used internally by genqlient
 type __SubitemCreateInput struct {
 	ParentId     string `json:"parentId"`
@@ -10165,6 +11163,22 @@ func (v *__SubitemCreateInput) GetName() string { return v.Name }
 
 // GetColumnValues returns __SubitemCreateInput.ColumnValues, and is useful for accessing the field via an interface.
 func (v *__SubitemCreateInput) GetColumnValues() string { return v.ColumnValues }
+
+// __UsersByEmailInput is used internally by genqlient
+type __UsersByEmailInput struct {
+	Emails []string `json:"emails"`
+}
+
+// GetEmails returns __UsersByEmailInput.Emails, and is useful for accessing the field via an interface.
+func (v *__UsersByEmailInput) GetEmails() []string { return v.Emails }
+
+// __UsersByNameInput is used internally by genqlient
+type __UsersByNameInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __UsersByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__UsersByNameInput) GetName() string { return v.Name }
 
 // __WorkspaceCreateInput is used internally by genqlient
 type __WorkspaceCreateInput struct {
@@ -10947,6 +11961,232 @@ func BoardsList(
 	return data_, err_
 }
 
+// The mutation executed by DocAddMarkdown.
+const DocAddMarkdown_Operation = `
+mutation DocAddMarkdown ($docId: ID!, $markdown: String!) {
+	add_content_to_doc_from_markdown(docId: $docId, markdown: $markdown) {
+		success
+		block_ids
+		error
+	}
+}
+`
+
+// DocAddMarkdown appends markdown content to a document.
+func DocAddMarkdown(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	docId string,
+	markdown string,
+) (data_ *DocAddMarkdownResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocAddMarkdown",
+		Query:  DocAddMarkdown_Operation,
+		Variables: &__DocAddMarkdownInput{
+			DocId:    docId,
+			Markdown: markdown,
+		},
+	}
+
+	data_ = &DocAddMarkdownResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DocDeleteBlocks.
+const DocDeleteBlocks_Operation = `
+mutation DocDeleteBlocks ($blockIds: [ID!]!) {
+	delete_doc_blocks(block_ids: $blockIds) {
+		id
+	}
+}
+`
+
+// DocDeleteBlocks deletes specified blocks from a document.
+func DocDeleteBlocks(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	blockIds []string,
+) (data_ *DocDeleteBlocksResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocDeleteBlocks",
+		Query:  DocDeleteBlocks_Operation,
+		Variables: &__DocDeleteBlocksInput{
+			BlockIds: blockIds,
+		},
+	}
+
+	data_ = &DocDeleteBlocksResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by DocExportMarkdown.
+const DocExportMarkdown_Operation = `
+query DocExportMarkdown ($docId: ID!) {
+	export_markdown_from_doc(docId: $docId) {
+		success
+		markdown
+		error
+	}
+}
+`
+
+// DocExportMarkdown exports a document's content as markdown.
+func DocExportMarkdown(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	docId string,
+) (data_ *DocExportMarkdownResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocExportMarkdown",
+		Query:  DocExportMarkdown_Operation,
+		Variables: &__DocExportMarkdownInput{
+			DocId: docId,
+		},
+	}
+
+	data_ = &DocExportMarkdownResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by DocGetBlockIDs.
+const DocGetBlockIDs_Operation = `
+query DocGetBlockIDs ($docId: ID!) {
+	docs(ids: [$docId]) {
+		id
+		blocks {
+			id
+		}
+	}
+}
+`
+
+// DocGetBlockIDs fetches a document's block ids so they can be deleted before rewriting.
+func DocGetBlockIDs(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	docId string,
+) (data_ *DocGetBlockIDsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocGetBlockIDs",
+		Query:  DocGetBlockIDs_Operation,
+		Variables: &__DocGetBlockIDsInput{
+			DocId: docId,
+		},
+	}
+
+	data_ = &DocGetBlockIDsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by DocGetByObjectID.
+const DocGetByObjectID_Operation = `
+query DocGetByObjectID ($objectId: ID!) {
+	docs(object_ids: [$objectId]) {
+		id
+		name
+		object_id
+	}
+}
+`
+
+// DocGetByObjectID fetches a document's API id via its associated object (item) id.
+// Use this to discover the document id for an item's description doc.
+func DocGetByObjectID(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	objectId string,
+) (data_ *DocGetByObjectIDResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocGetByObjectID",
+		Query:  DocGetByObjectID_Operation,
+		Variables: &__DocGetByObjectIDInput{
+			ObjectId: objectId,
+		},
+	}
+
+	data_ = &DocGetByObjectIDResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DocSetItemDescription.
+const DocSetItemDescription_Operation = `
+mutation DocSetItemDescription ($itemId: ID!, $markdown: String!) {
+	set_item_description_content(item_id: $itemId, markdown: $markdown) {
+		success
+		block_ids
+		error
+	}
+}
+`
+
+// DocSetItemDescription replaces an item's description with new markdown content.
+func DocSetItemDescription(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	itemId string,
+	markdown string,
+) (data_ *DocSetItemDescriptionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocSetItemDescription",
+		Query:  DocSetItemDescription_Operation,
+		Variables: &__DocSetItemDescriptionInput{
+			ItemId:   itemId,
+			Markdown: markdown,
+		},
+	}
+
+	data_ = &DocSetItemDescriptionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by FolderCreate.
 const FolderCreate_Operation = `
 mutation FolderCreate ($name: String!, $workspaceId: ID, $parentFolderId: ID) {
@@ -11239,6 +12479,56 @@ func ItemDelete(
 	return data_, err_
 }
 
+// The query executed by ItemFindByColumnValue.
+const ItemFindByColumnValue_Operation = `
+query ItemFindByColumnValue ($boardId: ID!, $columns: [ItemsPageByColumnValuesQuery!], $limit: Int! = 25, $cursor: String) {
+	items_page_by_column_values(board_id: $boardId, columns: $columns, limit: $limit, cursor: $cursor) {
+		cursor
+		items {
+			id
+			name
+			group {
+				id
+				title
+			}
+		}
+	}
+}
+`
+
+// ItemFindByColumnValue searches items by one column value on a board.
+// columns is a list of {column_id, column_values} filters; all must match.
+func ItemFindByColumnValue(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	boardId string,
+	columns []ItemsPageByColumnValuesQuery,
+	limit int,
+	cursor string,
+) (data_ *ItemFindByColumnValueResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemFindByColumnValue",
+		Query:  ItemFindByColumnValue_Operation,
+		Variables: &__ItemFindByColumnValueInput{
+			BoardId: boardId,
+			Columns: columns,
+			Limit:   limit,
+			Cursor:  cursor,
+		},
+	}
+
+	data_ = &ItemFindByColumnValueResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by ItemGet.
 const ItemGet_Operation = `
 query ItemGet ($id: ID!) {
@@ -11300,6 +12590,65 @@ func ItemGet(
 	}
 
 	data_ = &ItemGetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ItemGetUpdates.
+const ItemGetUpdates_Operation = `
+query ItemGetUpdates ($id: ID!, $limit: Int = 25) {
+	items(ids: [$id]) {
+		id
+		updates(limit: $limit) {
+			id
+			body
+			text_body
+			created_at
+			creator {
+				id
+				name
+				email
+			}
+			replies {
+				id
+				body
+				text_body
+				created_at
+				creator {
+					id
+					name
+					email
+				}
+			}
+		}
+	}
+}
+`
+
+// ItemGetUpdates fetches updates (comments) on an item.
+func ItemGetUpdates(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	limit int,
+) (data_ *ItemGetUpdatesResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ItemGetUpdates",
+		Query:  ItemGetUpdates_Operation,
+		Variables: &__ItemGetUpdatesInput{
+			Id:    id,
+			Limit: limit,
+		},
+	}
+
+	data_ = &ItemGetUpdatesResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11637,6 +12986,15 @@ query Me {
 	me {
 		id
 		name
+		email
+		account {
+			id
+			name
+		}
+		teams {
+			id
+			name
+		}
 	}
 }
 `
@@ -11651,6 +13009,148 @@ func Me(
 	}
 
 	data_ = &MeResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by SearchBoards.
+const SearchBoards_Operation = `
+query SearchBoards ($query: String!, $limit: Int = 10) {
+	search {
+		boards(query: $query, limit: $limit) {
+			results {
+				id
+				indexed_data {
+					id
+					name
+					description
+					workspace_id
+					url
+				}
+			}
+		}
+	}
+}
+`
+
+// SearchBoards searches monday.com boards by query string.
+func SearchBoards(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	query string,
+	limit int,
+) (data_ *SearchBoardsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "SearchBoards",
+		Query:  SearchBoards_Operation,
+		Variables: &__SearchBoardsInput{
+			Query: query,
+			Limit: limit,
+		},
+	}
+
+	data_ = &SearchBoardsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by SearchDocs.
+const SearchDocs_Operation = `
+query SearchDocs ($query: String!, $limit: Int = 10) {
+	search {
+		docs(query: $query, limit: $limit) {
+			results {
+				id
+				indexed_data {
+					id
+					name
+					workspace_id
+				}
+			}
+		}
+	}
+}
+`
+
+// SearchDocs searches monday.com docs by query string.
+func SearchDocs(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	query string,
+	limit int,
+) (data_ *SearchDocsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "SearchDocs",
+		Query:  SearchDocs_Operation,
+		Variables: &__SearchDocsInput{
+			Query: query,
+			Limit: limit,
+		},
+	}
+
+	data_ = &SearchDocsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by SearchItems.
+const SearchItems_Operation = `
+query SearchItems ($query: String!, $limit: Int = 10) {
+	search {
+		items(query: $query, limit: $limit) {
+			results {
+				id
+				indexed_data {
+					id
+					name
+					url
+					board_id
+					workspace_id
+				}
+			}
+		}
+	}
+}
+`
+
+// SearchItems searches monday.com items by query string.
+func SearchItems(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	query string,
+	limit int,
+) (data_ *SearchItemsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "SearchItems",
+		Query:  SearchItems_Operation,
+		Variables: &__SearchItemsInput{
+			Query: query,
+			Limit: limit,
+		},
+	}
+
+	data_ = &SearchItemsResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11700,6 +13200,80 @@ func SubitemCreate(
 	}
 
 	data_ = &SubitemCreateResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by UsersByEmail.
+const UsersByEmail_Operation = `
+query UsersByEmail ($emails: [String!]) {
+	users(emails: $emails) {
+		id
+		name
+		email
+	}
+}
+`
+
+// UsersByEmail resolves users by email address list.
+func UsersByEmail(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	emails []string,
+) (data_ *UsersByEmailResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "UsersByEmail",
+		Query:  UsersByEmail_Operation,
+		Variables: &__UsersByEmailInput{
+			Emails: emails,
+		},
+	}
+
+	data_ = &UsersByEmailResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by UsersByName.
+const UsersByName_Operation = `
+query UsersByName ($name: String) {
+	users(name: $name) {
+		id
+		name
+		email
+	}
+}
+`
+
+// UsersByName resolves users by name (fuzzy match).
+func UsersByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *UsersByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "UsersByName",
+		Query:  UsersByName_Operation,
+		Variables: &__UsersByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &UsersByNameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

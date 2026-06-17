@@ -27,12 +27,14 @@ const (
 // Config holds the persistent mcli configuration.
 type Config struct {
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
+	OutputMode  string        `yaml:"output_mode,omitempty"`
 }
 
 // legacyConfig is used during Load to detect and migrate a legacy plaintext token.
 type legacyConfig struct {
 	Token       string        `yaml:"token"`
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
+	OutputMode  string        `yaml:"output_mode,omitempty"`
 }
 
 // DefaultPath returns the default config file path.
@@ -66,7 +68,7 @@ func Load(path string) (Config, error) {
 		return Config{}, fmt.Errorf("parse config %s: %w", path, err)
 	}
 
-	cfg := Config{SecretStore: legacy.SecretStore}
+	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode}
 
 	if legacy.Token != "" {
 		_, _ = fmt.Fprintf(os.Stderr,
