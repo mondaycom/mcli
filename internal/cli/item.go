@@ -13,11 +13,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/mondaycom/mcli/internal/api/gen"
-	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
 	"github.com/mondaycom/mcli/internal/api/items/columns"
-	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
-	"github.com/mondaycom/mcli/internal/secrets"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
 )
@@ -39,29 +36,7 @@ func newItemClient() (gqlclient.Client, error) {
 	if itemClientFactory != nil {
 		return itemClientFactory()
 	}
-
-	cfgPath := resolveConfigPath()
-	cfg, err := config.Load(cfgPath)
-	if err != nil {
-		return nil, fmt.Errorf("load config: %w", err)
-	}
-
-	var store config.Store
-	if cfg.SecretStore != "" {
-		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
-		if openErr != nil {
-			return nil, openErr
-		}
-		store = st
-	}
-
-	token, err := config.ResolveToken(cfg, globals.Token, store)
-	if err != nil {
-		return nil, err
-	}
-
-	c := apigraphql.New(token, version)
-	return c.GQL(), nil
+	return newGQLClient()
 }
 
 // newItemCmd returns the 'mcli item' parent command.
@@ -264,7 +239,7 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -369,7 +344,7 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -469,7 +444,7 @@ func runItemPostUpdate(cmd *cobra.Command, itemID, bodyFlag, parentID string) er
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -575,7 +550,7 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -640,7 +615,7 @@ func runItemDelete(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -690,7 +665,7 @@ func runItemArchive(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -953,7 +928,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -968,7 +943,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 			item.ID, item.Name, item.State, item.Group.Title, colSummary)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if nextCursor != "" {
 		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
@@ -1094,7 +1069,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

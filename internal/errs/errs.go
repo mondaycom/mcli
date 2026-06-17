@@ -74,11 +74,6 @@ func NotFound(format string, args ...any) *Error {
 	return &Error{Code: CodeNotFound, Message: fmt.Sprintf(format, args...)}
 }
 
-// Conflict constructs a CodeConflict Error.
-func Conflict(format string, args ...any) *Error {
-	return &Error{Code: CodeConflict, Message: fmt.Sprintf(format, args...)}
-}
-
 // Internal constructs a CodeInternal Error.
 func Internal(format string, args ...any) *Error {
 	return &Error{Code: CodeInternal, Message: fmt.Sprintf(format, args...)}
@@ -99,7 +94,7 @@ func ToExitCode(err error) int {
 		switch e.Code {
 		case CodeUsage:
 			return 1
-		case CodeAPI, CodeNotFound, CodeConflict:
+		case CodeAPI, CodeNotFound:
 			return 2
 		case CodeAuth:
 			return 3

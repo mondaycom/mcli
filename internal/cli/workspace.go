@@ -11,10 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/mondaycom/mcli/internal/api/gen"
-	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
-	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
-	"github.com/mondaycom/mcli/internal/secrets"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
 )
@@ -36,29 +33,7 @@ func newWorkspaceClient() (gqlclient.Client, error) {
 	if workspaceClientFactory != nil {
 		return workspaceClientFactory()
 	}
-
-	cfgPath := resolveConfigPath()
-	cfg, err := config.Load(cfgPath)
-	if err != nil {
-		return nil, fmt.Errorf("load config: %w", err)
-	}
-
-	var store config.Store
-	if cfg.SecretStore != "" {
-		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
-		if openErr != nil {
-			return nil, openErr
-		}
-		store = st
-	}
-
-	token, err := config.ResolveToken(cfg, globals.Token, store)
-	if err != nil {
-		return nil, err
-	}
-
-	c := apigraphql.New(token, version)
-	return c.GQL(), nil
+	return newGQLClient()
 }
 
 // newWorkspaceCmd returns the 'mcli workspace' parent command.
@@ -189,7 +164,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		out := workspaceListOutput{Items: items, Cursor: nextCursor}
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -202,7 +177,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", item.ID, item.Name, item.Kind, item.State)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if nextCursor != "" {
 		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
@@ -259,7 +234,7 @@ func runWorkspaceGet(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -343,7 +318,7 @@ func runWorkspaceCreate(cmd *cobra.Command, name, kind, description string) erro
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -427,7 +402,7 @@ func runWorkspaceUpdate(cmd *cobra.Command, id, name, description, kind string) 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -484,7 +459,7 @@ func runWorkspaceDelete(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

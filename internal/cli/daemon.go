@@ -92,7 +92,7 @@ func resolveToken() (string, error) {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return "", fmt.Errorf("load config: %w", err)
+		return "", errs.Internal("load config: %v", err)
 	}
 
 	var store config.Store
@@ -123,7 +123,7 @@ func newDaemonStopCmd() *cobra.Command {
 				return err
 			}
 			if err := c.Stop(); err != nil {
-				return fmt.Errorf("stop daemon: %w", err)
+				return errs.API("stop daemon: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), `{"stopping":true}`)
 			return err
@@ -144,7 +144,7 @@ func newDaemonStatusCmd() *cobra.Command {
 				out := map[string]any{"running": false, "error": err.Error()}
 				data, mErr := json.Marshal(out)
 				if mErr != nil {
-					return fmt.Errorf("marshal status: %w", mErr)
+					return errs.Internal("marshal status: %v", mErr)
 				}
 				_, _ = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 				return nil
@@ -152,12 +152,12 @@ func newDaemonStatusCmd() *cobra.Command {
 
 			sr, err := c.Status()
 			if err != nil {
-				return fmt.Errorf("query daemon status: %w", err)
+				return errs.API("query daemon status: %v", err)
 			}
 
 			data, err := json.Marshal(sr)
 			if err != nil {
-				return fmt.Errorf("marshal status: %w", err)
+				return errs.Internal("marshal status: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err

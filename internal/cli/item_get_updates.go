@@ -114,7 +114,7 @@ func runItemGetUpdates(cmd *cobra.Command, id string, limit int) error {
 	case ModeJSON:
 		data, mErr := json.Marshal(updates)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -175,7 +175,7 @@ func writeGetUpdatesCSV(cmd *cobra.Command, updates []updateItem) error {
 	}
 	w.Flush()
 	if err := w.Error(); err != nil {
-		return fmt.Errorf("write csv: %w", err)
+		return errs.Internal("write csv: %v", err)
 	}
 	return nil
 }

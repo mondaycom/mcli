@@ -100,7 +100,7 @@ func runBoardGroupList(cmd *cobra.Command, boardID string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -174,7 +174,7 @@ func runBoardGroupCreate(cmd *cobra.Command, boardID, name, color string) error 
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -243,7 +243,7 @@ func runBoardGroupDelete(cmd *cobra.Command, boardID, groupID string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -306,7 +306,7 @@ func runBoardGroupArchive(cmd *cobra.Command, boardID, groupID string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -380,7 +380,7 @@ func runBoardGroupRename(cmd *cobra.Command, boardID, groupID, name string) erro
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

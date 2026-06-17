@@ -55,7 +55,7 @@ func printAuthResult(cmd *cobra.Command, payload any, msg string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(payload)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -96,7 +96,7 @@ func newAuthLoginCmd() *cobra.Command {
 				return err
 			}
 			if err := st.Put(config.APIToken(tokenFlag)); err != nil {
-				return fmt.Errorf("store token: %w", err)
+				return errs.Internal("store token: %v", err)
 			}
 
 			cfgPath := resolveConfigPath()
@@ -107,7 +107,7 @@ func newAuthLoginCmd() *cobra.Command {
 			}
 			cfg.SecretStore = backend
 			if err := config.Save(cfgPath, cfg); err != nil {
-				return fmt.Errorf("save config: %w", err)
+				return errs.Internal("save config: %v", err)
 			}
 
 			return printAuthResult(cmd,
@@ -133,7 +133,7 @@ func newAuthLogoutCmd() *cobra.Command {
 			cfgPath := resolveConfigPath()
 			cfg, err := config.Load(cfgPath)
 			if err != nil {
-				return fmt.Errorf("load config: %w", err)
+				return errs.Internal("load config: %v", err)
 			}
 			if cfg.SecretStore == "" {
 				return errs.NotFound("no token stored")
@@ -144,12 +144,12 @@ func newAuthLogoutCmd() *cobra.Command {
 				return err
 			}
 			if err := st.Delete(); err != nil {
-				return fmt.Errorf("delete token: %w", err)
+				return errs.Internal("delete token: %v", err)
 			}
 
 			cfg.SecretStore = ""
 			if err := config.Save(cfgPath, cfg); err != nil {
-				return fmt.Errorf("save config: %w", err)
+				return errs.Internal("save config: %v", err)
 			}
 
 			return printAuthResult(cmd,
@@ -171,7 +171,7 @@ func newAuthStatusCmd() *cobra.Command {
 			cfgPath := resolveConfigPath()
 			cfg, err := config.Load(cfgPath)
 			if err != nil {
-				return fmt.Errorf("load config: %w", err)
+				return errs.Internal("load config: %v", err)
 			}
 
 			if cfg.SecretStore == "" {
@@ -193,7 +193,7 @@ func newAuthStatusCmd() *cobra.Command {
 				if ok && e.Code == errs.CodeNotFound {
 					stored = false
 				} else {
-					return fmt.Errorf("check token: %w", getErr)
+					return errs.Auth("check token: %v", getErr)
 				}
 			}
 

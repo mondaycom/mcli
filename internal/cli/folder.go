@@ -11,10 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/mondaycom/mcli/internal/api/gen"
-	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
-	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
-	"github.com/mondaycom/mcli/internal/secrets"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
 )
@@ -36,29 +33,7 @@ func newFolderClient() (gqlclient.Client, error) {
 	if folderClientFactory != nil {
 		return folderClientFactory()
 	}
-
-	cfgPath := resolveConfigPath()
-	cfg, err := config.Load(cfgPath)
-	if err != nil {
-		return nil, fmt.Errorf("load config: %w", err)
-	}
-
-	var store config.Store
-	if cfg.SecretStore != "" {
-		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
-		if openErr != nil {
-			return nil, openErr
-		}
-		store = st
-	}
-
-	token, err := config.ResolveToken(cfg, globals.Token, store)
-	if err != nil {
-		return nil, err
-	}
-
-	c := apigraphql.New(token, version)
-	return c.GQL(), nil
+	return newGQLClient()
 }
 
 // newFolderCmd returns the 'mcli folder' parent command.
@@ -173,7 +148,7 @@ func runFolderList(cmd *cobra.Command, workspaceID string, limit int, cursor str
 		out := folderListOutput{Items: items, Cursor: nextCursor}
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -186,7 +161,7 @@ func runFolderList(cmd *cobra.Command, workspaceID string, limit int, cursor str
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", item.ID, item.Name, item.Color, item.OwnerID)
 	}
 	if err := w.Flush(); err != nil {
-		return fmt.Errorf("flush table: %w", err)
+		return errs.Internal("flush table: %v", err)
 	}
 	if nextCursor != "" {
 		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
@@ -251,7 +226,7 @@ func runFolderCreate(cmd *cobra.Command, name, workspaceID, parentID string) err
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -305,7 +280,7 @@ func runFolderRename(cmd *cobra.Command, id, name string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
@@ -362,7 +337,7 @@ func runFolderDelete(cmd *cobra.Command, id string) error {
 	if mode == ModeJSON {
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
-			return fmt.Errorf("marshal output: %w", mErr)
+			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err

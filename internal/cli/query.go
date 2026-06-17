@@ -35,7 +35,7 @@ func newQueryHTTPClient() (*http.Client, string, error) {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return nil, "", fmt.Errorf("load config: %w", err)
+		return nil, "", errs.Internal("load config: %v", err)
 	}
 
 	var store config.Store
@@ -132,7 +132,7 @@ func parseVarFlags(varFlags []string) (map[string]any, error) {
 func mergeVarsFile(dst map[string]any, path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("read vars file: %w", err)
+		return errs.Usage("read vars file %q: %v", path, err)
 	}
 	var fileVars map[string]any
 	if err := json.Unmarshal(data, &fileVars); err != nil {
@@ -195,29 +195,29 @@ func executeRawQuery(cmd *cobra.Command, queryStr string, vars map[string]any) e
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("marshal query payload: %w", err)
+		return errs.Internal("marshal query payload: %v", err)
 	}
 
 	req, err := http.NewRequestWithContext(cmd.Context(), http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
-		return fmt.Errorf("build request: %w", err)
+		return errs.Internal("build request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("execute query: %w", err)
+		return errs.API("execute query: %v", err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("read response: %w", err)
+		return errs.API("read response: %v", err)
 	}
 
 	_, err = fmt.Fprintln(cmd.OutOrStdout(), string(respBody))
 	if err != nil {
-		return fmt.Errorf("write output: %w", err)
+		return errs.Internal("write output: %v", err)
 	}
 
 	// Check for GraphQL-level errors to set exit code 2.

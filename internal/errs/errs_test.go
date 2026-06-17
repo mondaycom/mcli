@@ -20,10 +20,9 @@ func TestToExitCode(t *testing.T) {
 		{"usage", errs.Usage("bad flag"), 1},
 		{"api", errs.API("api error"), 2},
 		{"not_found", errs.NotFound("missing"), 2},
-		{"conflict", errs.Conflict("dup"), 2},
+		{"internal", errs.Internal("unexpected"), 5},
 		{"auth", errs.Auth("no token"), 3},
 		{"rate_limited", errs.RateLimited("429"), 4},
-		{"internal", errs.Internal("unexpected"), 5},
 		{"unknown non-errs error", fmt.Errorf("something else"), 5},
 		{"wrapped usage", fmt.Errorf("wrap: %w", errs.Usage("bad")), 1},
 		{"wrapped auth", fmt.Errorf("wrap: %w", errs.Auth("no token")), 3},
@@ -86,12 +85,11 @@ func TestAllConstructors(t *testing.T) {
 		code errs.Code
 	}{
 		{errs.Usage("u"), errs.CodeUsage},
+		{errs.Internal("i"), errs.CodeInternal},
 		{errs.Auth("a"), errs.CodeAuth},
 		{errs.API("ap"), errs.CodeAPI},
 		{errs.RateLimited("r"), errs.CodeRateLimited},
 		{errs.NotFound("n"), errs.CodeNotFound},
-		{errs.Conflict("c"), errs.CodeConflict},
-		{errs.Internal("i"), errs.CodeInternal},
 	}
 	for _, tc := range cases {
 		t.Run(string(tc.code), func(t *testing.T) {

@@ -54,12 +54,12 @@ func saveSavedQuery(name, queryStr string, global bool) error {
 	}
 
 	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return fmt.Errorf("create queries dir %s: %w", dir, err)
+		return errs.Internal("create queries dir %s: %v", dir, err)
 	}
 
 	path := savedQueryPath(dir, name)
 	if err := os.WriteFile(path, []byte(queryStr), 0o600); err != nil {
-		return fmt.Errorf("write query %s: %w", path, err)
+		return errs.Internal("write query %s: %v", path, err)
 	}
 	return nil
 }
@@ -110,7 +110,7 @@ func listSavedQueries() ([]savedQueryEntry, error) {
 			return nil
 		}
 		if readErr != nil {
-			return fmt.Errorf("read queries dir %s: %w", dir, readErr)
+			return errs.Internal("read queries dir %s: %v", dir, readErr)
 		}
 		for _, de := range des {
 			if de.IsDir() {
@@ -160,7 +160,7 @@ func deleteSavedQuery(name string, global bool) error {
 			}
 			return errs.NotFound("%s saved query %q not found", scope, name)
 		}
-		return fmt.Errorf("delete query %s: %w", path, removeErr)
+		return errs.Internal("delete query %s: %v", path, removeErr)
 	}
 	return nil
 }
@@ -242,7 +242,7 @@ func newQueryListCmd() *cobra.Command {
 				}
 				data, mErr := json.Marshal(listOutput{Items: entries})
 				if mErr != nil {
-					return fmt.Errorf("marshal output: %w", mErr)
+					return errs.Internal("marshal output: %v", mErr)
 				}
 				_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 				return err
