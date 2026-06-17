@@ -2,7 +2,9 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -52,8 +54,9 @@ func newDocClient() (gqlclient.Client, error) {
 func newDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "doc",
-		Short: "Read and write monday.com documents",
+		Short: "Create, read and write monday.com documents",
 	}
+	cmd.AddCommand(newDocCreateCmd())
 	cmd.AddCommand(newDocReadCmd())
 	cmd.AddCommand(newDocWriteCmd())
 	return cmd
@@ -184,4 +187,109 @@ func runDocWrite(cmd *cobra.Command, docID, content, filePath string) error {
 	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Updated doc %s (%d block(s) created)\n",
 		docID, len(result.Block_ids))
 	return err
+}
+
+// --- doc create ---
+
+// docCreateOutput is the JSON shape for 'mcli doc create'.
+type docCreateOutput struct {
+	ID       string `json:"id"`
+	ObjectID string `json:"object_id"`
+	Name     string `json:"name"`
+	Kind     string `json:"kind"`
+	URL      string `json:"url,omitempty"`
+}
+
+func newDocCreateCmd() *cobra.Command {
+	var (
+		workspace string
+		name      string
+		kind      string
+		folderID  string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a new document in a workspace",
+		Long: `Create a new monday.com document in the specified workspace.
+
+The document is created empty. Use 'mcli doc write <id>' to add content.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return runDocCreate(cmd, workspace, name, kind, folderID)
+		},
+	}
+
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace ID (required)")
+	cmd.Flags().StringVar(&name, "name", "", "document name (required)")
+	cmd.Flags().StringVar(&kind, "kind", "public", "document kind: public, private, or share")
+	cmd.Flags().StringVar(&folderID, "folder", "", "folder ID (optional)")
+
+	_ = cmd.MarkFlagRequired("workspace")
+	_ = cmd.MarkFlagRequired("name")
+
+	return cmd
+}
+
+func runDocCreate(cmd *cobra.Command, workspace, name, kind, folderID string) error {
+	var bk gen.BoardKind
+	switch kind {
+	case "public":
+		bk = gen.BoardKindPublic
+	case "private":
+		bk = gen.BoardKindPrivate
+	case "share":
+		bk = gen.BoardKindShare
+	default:
+		return errs.Usage("invalid --kind %q: must be public, private, or share", kind)
+	}
+
+	gql, err := newDocClient()
+	if err != nil {
+		return err
+	}
+
+	resp, apiErr := gen.DocCreateInWorkspace(context.Background(), gql, workspace, name, bk, folderID)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	doc := resp.Create_doc
+	out := docCreateOutput{
+		ID:       doc.Id,
+		ObjectID: doc.Object_id,
+		Name:     doc.Name,
+		Kind:     string(doc.Doc_kind),
+		URL:      doc.Relative_url,
+	}
+
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
+	if modeErr != nil {
+		return modeErr
+	}
+
+	switch mode {
+	case ModeJSON:
+		data, mErr := json.Marshal(out)
+		if mErr != nil {
+			return fmt.Errorf("marshal output: %w", mErr)
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
+		return err
+
+	case ModeTerse:
+		_, err = fmt.Fprintf(cmd.OutOrStdout(), "doc:%s:%s:kind=%s\n", out.ID, out.Name, out.Kind)
+		return err
+
+	default:
+		o := cmd.OutOrStdout()
+		_, _ = fmt.Fprintf(o, "id:        %s\n", out.ID)
+		_, _ = fmt.Fprintf(o, "object_id: %s\n", out.ObjectID)
+		_, _ = fmt.Fprintf(o, "name:      %s\n", out.Name)
+		_, _ = fmt.Fprintf(o, "kind:      %s\n", out.Kind)
+		if out.URL != "" {
+			_, _ = fmt.Fprintf(o, "url:       %s\n", out.URL)
+		}
+		return nil
+	}
 }

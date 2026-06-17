@@ -957,6 +957,58 @@ func (v *DocAddMarkdownResponse) GetAdd_content_to_doc_from_markdown() DocAddMar
 	return v.Add_content_to_doc_from_markdown
 }
 
+// DocCreateInWorkspaceCreate_docDocument includes the requested fields of the GraphQL type Document.
+// The GraphQL type's documentation follows.
+//
+// Represents a monday.com doc - a rich-text page built from editable blocks (text, files, embeds, etc.).
+// A doc can belong to:
+// (1) a workspace (left-pane doc),
+// (2) an item (doc on column),
+// (3) a board view (doc as a board view).
+type DocCreateInWorkspaceCreate_docDocument struct {
+	// Unique document ID returned when the doc is created.
+	// Use this ID in every API call that references the doc.
+	// How to find it:
+	// • Call the docs() GraphQL query with object_ids to map object_id → id
+	// • Enable 'Developer Mode' in monday.labs to display it inside the doc.
+	Id string `json:"id"`
+	// Identifier that appears in the doc's URL.
+	// Returned on creation, but DO NOT use it in API routes that expect a document ID.
+	Object_id string `json:"object_id"`
+	// The document's name.
+	Name string `json:"name"`
+	// The document's kind (public / private / share).
+	Doc_kind BoardKind `json:"doc_kind"`
+	// The document's relative url
+	Relative_url string `json:"relative_url"`
+}
+
+// GetId returns DocCreateInWorkspaceCreate_docDocument.Id, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceCreate_docDocument) GetId() string { return v.Id }
+
+// GetObject_id returns DocCreateInWorkspaceCreate_docDocument.Object_id, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceCreate_docDocument) GetObject_id() string { return v.Object_id }
+
+// GetName returns DocCreateInWorkspaceCreate_docDocument.Name, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceCreate_docDocument) GetName() string { return v.Name }
+
+// GetDoc_kind returns DocCreateInWorkspaceCreate_docDocument.Doc_kind, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceCreate_docDocument) GetDoc_kind() BoardKind { return v.Doc_kind }
+
+// GetRelative_url returns DocCreateInWorkspaceCreate_docDocument.Relative_url, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceCreate_docDocument) GetRelative_url() string { return v.Relative_url }
+
+// DocCreateInWorkspaceResponse is returned by DocCreateInWorkspace on success.
+type DocCreateInWorkspaceResponse struct {
+	// Create a new doc.
+	Create_doc DocCreateInWorkspaceCreate_docDocument `json:"create_doc"`
+}
+
+// GetCreate_doc returns DocCreateInWorkspaceResponse.Create_doc, and is useful for accessing the field via an interface.
+func (v *DocCreateInWorkspaceResponse) GetCreate_doc() DocCreateInWorkspaceCreate_docDocument {
+	return v.Create_doc
+}
+
 // DocDeleteBlocksDelete_doc_blocksDeletedDocBlock includes the requested fields of the GraphQL type DeletedDocBlock.
 // The GraphQL type's documentation follows.
 //
@@ -10844,6 +10896,26 @@ func (v *__DocAddMarkdownInput) GetDocId() string { return v.DocId }
 // GetMarkdown returns __DocAddMarkdownInput.Markdown, and is useful for accessing the field via an interface.
 func (v *__DocAddMarkdownInput) GetMarkdown() string { return v.Markdown }
 
+// __DocCreateInWorkspaceInput is used internally by genqlient
+type __DocCreateInWorkspaceInput struct {
+	WorkspaceId string    `json:"workspaceId"`
+	Name        string    `json:"name"`
+	Kind        BoardKind `json:"kind,omitempty"`
+	FolderId    string    `json:"folderId,omitempty"`
+}
+
+// GetWorkspaceId returns __DocCreateInWorkspaceInput.WorkspaceId, and is useful for accessing the field via an interface.
+func (v *__DocCreateInWorkspaceInput) GetWorkspaceId() string { return v.WorkspaceId }
+
+// GetName returns __DocCreateInWorkspaceInput.Name, and is useful for accessing the field via an interface.
+func (v *__DocCreateInWorkspaceInput) GetName() string { return v.Name }
+
+// GetKind returns __DocCreateInWorkspaceInput.Kind, and is useful for accessing the field via an interface.
+func (v *__DocCreateInWorkspaceInput) GetKind() BoardKind { return v.Kind }
+
+// GetFolderId returns __DocCreateInWorkspaceInput.FolderId, and is useful for accessing the field via an interface.
+func (v *__DocCreateInWorkspaceInput) GetFolderId() string { return v.FolderId }
+
 // __DocDeleteBlocksInput is used internally by genqlient
 type __DocDeleteBlocksInput struct {
 	BlockIds []string `json:"blockIds"`
@@ -11989,6 +12061,51 @@ func DocAddMarkdown(
 	}
 
 	data_ = &DocAddMarkdownResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DocCreateInWorkspace.
+const DocCreateInWorkspace_Operation = `
+mutation DocCreateInWorkspace ($workspaceId: ID!, $name: String!, $kind: BoardKind, $folderId: ID) {
+	create_doc(location: {workspace:{workspace_id:$workspaceId,name:$name,kind:$kind,folder_id:$folderId}}) {
+		id
+		object_id
+		name
+		doc_kind
+		relative_url
+	}
+}
+`
+
+// DocCreateInWorkspace creates a new document in a workspace.
+func DocCreateInWorkspace(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	workspaceId string,
+	name string,
+	kind BoardKind,
+	folderId string,
+) (data_ *DocCreateInWorkspaceResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DocCreateInWorkspace",
+		Query:  DocCreateInWorkspace_Operation,
+		Variables: &__DocCreateInWorkspaceInput{
+			WorkspaceId: workspaceId,
+			Name:        name,
+			Kind:        kind,
+			FolderId:    folderId,
+		},
+	}
+
+	data_ = &DocCreateInWorkspaceResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

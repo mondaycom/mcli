@@ -51,3 +51,21 @@ mutation DocAddMarkdown($docId: ID!, $markdown: String!) {
     error
   }
 }
+
+# DocCreateInWorkspace creates a new document in a workspace.
+mutation DocCreateInWorkspace(
+  $workspaceId: ID!,
+  $name: String!,
+  # @genqlient(omitempty: true)
+  $kind: BoardKind,
+  # @genqlient(omitempty: true)
+  $folderId: ID,
+) {
+  create_doc(location: { workspace: { workspace_id: $workspaceId, name: $name, kind: $kind, folder_id: $folderId } }) {
+    id
+    object_id
+    name
+    doc_kind
+    relative_url
+  }
+}
