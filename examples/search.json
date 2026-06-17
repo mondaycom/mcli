@@ -1,0 +1,40 @@
+{
+  "boards": [
+    {
+      "id": "9832181507",
+      "name": "Engineering Roadmap",
+      "description": "Tracks all engineering initiatives and milestones",
+      "workspace_id": "42",
+      "url": "https://monday.com/boards/9832181507"
+    },
+    {
+      "id": "9832181508",
+      "name": "Sprint Planning",
+      "workspace_id": "42",
+      "url": "https://monday.com/boards/9832181508"
+    }
+  ],
+  "items": [
+    {
+      "id": "1234567890",
+      "name": "Build authentication service",
+      "url": "https://monday.com/items/1234567890",
+      "board_id": "9832181507",
+      "workspace_id": "42"
+    },
+    {
+      "id": "2345678901",
+      "name": "Integrate OAuth2 provider",
+      "url": "https://monday.com/items/2345678901",
+      "board_id": "9832181508",
+      "workspace_id": "42"
+    }
+  ],
+  "docs": [
+    {
+      "id": "doc_7890abcd",
+      "name": "Authentication Architecture",
+      "workspace_id": "42"
+    }
+  ]
+}

@@ -123,7 +123,7 @@ func resolveMarkdownInput(cmd *cobra.Command, inline, filePath string) (string, 
 		if err != nil {
 			return "", fmt.Errorf("open %s: %w", filePath, err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		r = f
 	}
 

@@ -9,30 +9,7 @@ import (
 	"testing"
 
 	gqlclient "github.com/Khan/genqlient/graphql"
-
-	apigraphql "github.com/mondaycom/mcli/internal/api/graphql"
 )
-
-// meTestClient builds a graphql.Client pointing at the given URL using a
-// no-auth graphql API wrapper (version string is enough for header inclusion).
-func meTestClient(srvURL string) gqlclient.Client {
-	_ = apigraphql.New // keep import alive
-	return gqlclient.NewClient(srvURL, http.DefaultClient)
-}
-
-// execMe runs 'mcli me' with JSON output forced and returns stdout + error.
-func execMe(t *testing.T) (string, error) {
-	t.Helper()
-	// me builds its own client directly from config; we redirect the underlying
-	// HTTP server by patching the apigraphql.New inside the test via the
-	// standard httptest approach. However, since me.go doesn't use a factory
-	// seam, we verify the JSON output shape via a real fake server wired
-	// through the item client factory (for structural tests only).
-	//
-	// For the JSON output shape test we use a minimal server that replays a
-	// canned Me response.
-	return "", nil
-}
 
 // TestMe_OutputShape verifies that me.go builds the expected JSON envelope
 // using a canned response from a test HTTP server wired through itemClientFactory.

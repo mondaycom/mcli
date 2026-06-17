@@ -22,7 +22,7 @@ func freePort(t *testing.T) int {
 		t.Fatalf("freePort: %v", err)
 	}
 	port := ln.Addr().(*net.TCPAddr).Port
-	ln.Close()
+	_ = ln.Close()
 	return port
 }
 
