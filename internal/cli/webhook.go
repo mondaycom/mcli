@@ -79,7 +79,7 @@ func newWebhookCreateCmd() *cobra.Command {
 
 			rec, err := c.RegisterWebhook(boardID, event)
 			if err != nil {
-				return fmt.Errorf("register webhook: %w", err)
+				return errs.API("register webhook: %v", err)
 			}
 
 			data, err := json.Marshal(rec)
@@ -112,7 +112,7 @@ func newWebhookListCmd() *cobra.Command {
 
 			records, err := c.ListWebhooks(boardID)
 			if err != nil {
-				return fmt.Errorf("list webhooks: %w", err)
+				return errs.API("list webhooks: %v", err)
 			}
 
 			data, err := json.Marshal(records)
@@ -143,7 +143,7 @@ func newWebhookDeleteCmd() *cobra.Command {
 			}
 
 			if err := c.DeleteWebhook(id); err != nil {
-				return fmt.Errorf("delete webhook: %w", err)
+				return errs.API("delete webhook: %v", err)
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), `{"deleted":true}`)

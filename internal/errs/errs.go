@@ -89,14 +89,12 @@ func ToExitCode(err error) int {
 		switch e.Code {
 		case CodeUsage:
 			return 1
-		case CodeAPI, CodeNotFound, CodeConflict:
+		case CodeAPI, CodeNotFound:
 			return 2
 		case CodeAuth:
 			return 3
 		case CodeRateLimited:
 			return 4
-		case CodeInternal:
-			return 5
 		case CodeDaemonRequired:
 			return 6
 		}
