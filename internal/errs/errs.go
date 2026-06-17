@@ -74,16 +74,6 @@ func NotFound(format string, args ...any) *Error {
 	return &Error{Code: CodeNotFound, Message: fmt.Sprintf(format, args...)}
 }
 
-// Conflict constructs a CodeConflict Error.
-func Conflict(format string, args ...any) *Error {
-	return &Error{Code: CodeConflict, Message: fmt.Sprintf(format, args...)}
-}
-
-// Internal constructs a CodeInternal Error.
-func Internal(format string, args ...any) *Error {
-	return &Error{Code: CodeInternal, Message: fmt.Sprintf(format, args...)}
-}
-
 // DaemonRequired constructs a CodeDaemonRequired Error.
 func DaemonRequired(format string, args ...any) *Error {
 	return &Error{Code: CodeDaemonRequired, Message: fmt.Sprintf(format, args...)}
