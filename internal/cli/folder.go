@@ -164,7 +164,7 @@ func runFolderList(cmd *cobra.Command, workspaceID string, limit int, cursor str
 		nextCursor = strconv.Itoa(page + 1)
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -243,7 +243,7 @@ func runFolderCreate(cmd *cobra.Command, name, workspaceID, parentID string) err
 		OwnerID:   f.Owner_id,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -297,7 +297,7 @@ func runFolderRename(cmd *cobra.Command, id, name string) error {
 		OwnerID:   f.Owner_id,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -354,7 +354,7 @@ func runFolderDelete(cmd *cobra.Command, id string) error {
 		Name: f.Name,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}

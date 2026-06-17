@@ -9,6 +9,8 @@ import (
 type GlobalFlags struct {
 	JSON    bool
 	Pretty  bool
+	Terse   bool
+	CSV     bool
 	Config  string
 	Token   string
 	Verbose bool
@@ -32,6 +34,8 @@ func init() {
 	pf := rootCmd.PersistentFlags()
 	pf.BoolVar(&globals.JSON, "json", false, "force JSON output")
 	pf.BoolVar(&globals.Pretty, "pretty", false, "force human-readable output")
+	pf.BoolVar(&globals.Terse, "terse", false, "force terse single-line output")
+	pf.BoolVar(&globals.CSV, "csv", false, "force CSV output")
 	pf.StringVar(&globals.Config, "config", "", "config file path (default: $XDG_CONFIG_HOME/mcli/config.yaml)")
 	pf.StringVar(&globals.Token, "token", "", "monday.com API token (env: MONDAY_API_TOKEN)")
 	pf.BoolVarP(&globals.Verbose, "verbose", "v", false, "emit request/response metadata to stderr")
@@ -39,6 +43,7 @@ func init() {
 
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newAuthCmd())
+	rootCmd.AddCommand(newConfigCmd())
 	rootCmd.AddCommand(newMeCmd())
 	rootCmd.AddCommand(newBoardCmd())
 	rootCmd.AddCommand(newItemCmd())
@@ -50,6 +55,8 @@ func init() {
 	rootCmd.AddCommand(newDaemonCmd())
 	rootCmd.AddCommand(newNotificationCmd())
 	rootCmd.AddCommand(newWebhookCmd())
+	rootCmd.AddCommand(newSearchCmd())
+	rootCmd.AddCommand(newDocCmd())
 }
 
 // Execute runs the root command.

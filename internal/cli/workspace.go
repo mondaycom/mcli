@@ -180,7 +180,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		nextCursor = strconv.Itoa(page + 1)
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -251,7 +251,7 @@ func runWorkspaceGet(cmd *cobra.Command, id string) error {
 		State:       string(w.State),
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -335,7 +335,7 @@ func runWorkspaceCreate(cmd *cobra.Command, name, kind, description string) erro
 		State:       string(w.State),
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -419,7 +419,7 @@ func runWorkspaceUpdate(cmd *cobra.Command, id, name, description, kind string) 
 		State:       string(w.State),
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -476,7 +476,7 @@ func runWorkspaceDelete(cmd *cobra.Command, id string) error {
 		Name: w.Name,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}

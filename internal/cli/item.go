@@ -78,6 +78,9 @@ func newItemCmd() *cobra.Command {
 	cmd.AddCommand(newItemMoveCmd())
 	cmd.AddCommand(newItemDeleteCmd())
 	cmd.AddCommand(newItemArchiveCmd())
+	cmd.AddCommand(newItemFindCmd())
+	cmd.AddCommand(newItemGetUpdatesCmd())
+	cmd.AddCommand(newItemDescriptionCmd())
 	return cmd
 }
 
@@ -253,7 +256,7 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 		}
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -358,7 +361,7 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 		out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -458,7 +461,7 @@ func runItemPostUpdate(cmd *cobra.Command, itemID, bodyFlag, parentID string) er
 		CreatedAt: resp.Create_update.Created_at,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -564,7 +567,7 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 		}
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -629,7 +632,7 @@ func runItemDelete(cmd *cobra.Command, id string) error {
 	it := resp.Delete_item
 	out := itemDeleteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -679,7 +682,7 @@ func runItemArchive(cmd *cobra.Command, id string) error {
 	it := resp.Archive_item
 	out := itemDeleteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -942,7 +945,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 		Cursor: nextCursor,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -1083,7 +1086,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 		out.ParentItem = &itemGetParent{ID: it.Parent_item.Id, Name: it.Parent_item.Name}
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}

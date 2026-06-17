@@ -149,7 +149,7 @@ func (s *Store) ListEvents(f EventFilter) ([]Event, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ListEvents: query: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []Event
 	for rows.Next() {

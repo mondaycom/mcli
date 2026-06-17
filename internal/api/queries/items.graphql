@@ -217,3 +217,48 @@ mutation ItemArchive($itemId: ID!) {
     state
   }
 }
+
+# ItemFindByColumnValue searches items by one column value on a board.
+# columns is a list of {column_id, column_values} filters; all must match.
+query ItemFindByColumnValue(
+  $boardId: ID!,
+  $columns: [ItemsPageByColumnValuesQuery!],
+  $limit: Int! = 25,
+  # @genqlient(omitempty: true)
+  $cursor: String,
+) {
+  items_page_by_column_values(
+    board_id: $boardId,
+    columns: $columns,
+    limit: $limit,
+    cursor: $cursor,
+  ) {
+    cursor
+    items {
+      id
+      name
+      group { id title }
+    }
+  }
+}
+
+# ItemGetUpdates fetches updates (comments) on an item.
+query ItemGetUpdates($id: ID!, $limit: Int = 25) {
+  items(ids: [$id]) {
+    id
+    updates(limit: $limit) {
+      id
+      body
+      text_body
+      created_at
+      creator { id name email }
+      replies {
+        id
+        body
+        text_body
+        created_at
+        creator { id name email }
+      }
+    }
+  }
+}

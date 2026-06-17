@@ -37,7 +37,7 @@ func (c *Client) Status() (*StatusResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Status: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Status: unexpected status %d", resp.StatusCode)
 	}
@@ -54,7 +54,7 @@ func (c *Client) Stop() error {
 	if err != nil {
 		return fmt.Errorf("Stop: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Stop: unexpected status %d", resp.StatusCode)
 	}
@@ -81,7 +81,7 @@ func (c *Client) RegisterWebhook(boardID, event string) (*WebhookRecord, error) 
 	if err != nil {
 		return nil, fmt.Errorf("RegisterWebhook: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("RegisterWebhook: unexpected status %d", resp.StatusCode)
 	}
@@ -103,7 +103,7 @@ func (c *Client) ListWebhooks(boardID string) ([]WebhookRecord, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ListWebhooks: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("ListWebhooks: unexpected status %d", resp.StatusCode)
 	}
@@ -124,7 +124,7 @@ func (c *Client) DeleteWebhook(id string) error {
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("DeleteWebhook: unexpected status %d", resp.StatusCode)
 	}
@@ -158,7 +158,7 @@ func (c *Client) ListNotifications(filter EventFilter) (*NotificationListRespons
 	if err != nil {
 		return nil, fmt.Errorf("ListNotifications: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("ListNotifications: unexpected status %d", resp.StatusCode)
 	}
@@ -179,7 +179,7 @@ func (c *Client) AckNotification(id EventID) error {
 	if err != nil {
 		return fmt.Errorf("AckNotification: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("AckNotification: unexpected status %d", resp.StatusCode)
 	}
@@ -196,7 +196,7 @@ func (c *Client) AckAllNotifications() error {
 	if err != nil {
 		return fmt.Errorf("AckAllNotifications: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("AckAllNotifications: unexpected status %d", resp.StatusCode)
 	}
@@ -209,7 +209,7 @@ func (c *Client) NotificationCount() (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("NotificationCount: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return 0, fmt.Errorf("NotificationCount: unexpected status %d", resp.StatusCode)
 	}

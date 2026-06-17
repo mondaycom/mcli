@@ -304,7 +304,7 @@ func newMutationListCmd() *cobra.Command {
 				return err
 			}
 
-			mode, modeErr := resolveOutputMode(os.Stdout, globals)
+			mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 			if modeErr != nil {
 				return modeErr
 			}

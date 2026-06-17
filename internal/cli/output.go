@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
 )
 
@@ -18,22 +19,51 @@ const (
 	ModeJSON OutputMode = iota
 	// ModePretty emits human-readable text to stdout for results, stderr for errors.
 	ModePretty
+	// ModeTerse emits a compact single-line summary per result to stdout.
+	ModeTerse
+	// ModeCSV emits comma-separated values with a header row to stdout.
+	ModeCSV
 )
 
-// resolveOutputMode picks the effective output mode using globals and a TTY probe.
+// resolveOutputMode picks the effective output mode using globals, a config default, and a TTY probe.
 // Precedence:
-//  1. If both --json and --pretty are set → USAGE error.
-//  2. If --json is set → ModeJSON.
-//  3. If --pretty is set → ModePretty.
-//  4. Otherwise: ModePretty when stdout is a TTY, ModeJSON when not.
-func resolveOutputMode(stdout *os.File, g GlobalFlags) (OutputMode, error) {
-	if g.JSON && g.Pretty {
-		return 0, errs.Usage("--json and --pretty are mutually exclusive")
+//  1. Multiple explicit flags set simultaneously → USAGE error.
+//  2. --json → ModeJSON.
+//  3. --csv → ModeCSV.
+//  4. --terse → ModeTerse.
+//  5. --pretty → ModePretty.
+//  6. configMode ("json"|"csv"|"terse"|"pretty") → corresponding mode.
+//  7. TTY detect: ModePretty when stdout is a TTY, ModeJSON otherwise.
+func resolveOutputMode(stdout *os.File, g GlobalFlags, configMode string) (OutputMode, error) {
+	explicit := 0
+	for _, v := range []bool{g.JSON, g.CSV, g.Terse, g.Pretty} {
+		if v {
+			explicit++
+		}
+	}
+	if explicit > 1 {
+		return 0, errs.Usage("--json, --csv, --terse, and --pretty are mutually exclusive")
 	}
 	if g.JSON {
 		return ModeJSON, nil
 	}
+	if g.CSV {
+		return ModeCSV, nil
+	}
+	if g.Terse {
+		return ModeTerse, nil
+	}
 	if g.Pretty {
+		return ModePretty, nil
+	}
+	switch configMode {
+	case "json":
+		return ModeJSON, nil
+	case "csv":
+		return ModeCSV, nil
+	case "terse":
+		return ModeTerse, nil
+	case "pretty":
 		return ModePretty, nil
 	}
 	if isCharDevice(stdout) {
@@ -51,6 +81,16 @@ func isCharDevice(f *os.File) bool {
 	return info.Mode()&os.ModeCharDevice != 0
 }
 
+// configOutputMode loads the output_mode field from the active config file.
+// Returns "" on any error so that callers fall through to TTY detection.
+func configOutputMode() string {
+	cfg, err := config.Load(resolveConfigPath())
+	if err != nil {
+		return ""
+	}
+	return cfg.OutputMode
+}
+
 // PrintError renders err per ADR-002:
 //   - In ModeJSON the structured JSON object is the last line of stdout.
 //   - In ModePretty a human-readable message is written to stderr.
@@ -60,7 +100,7 @@ func PrintError(err error) {
 	if err == nil {
 		return
 	}
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		// If mode resolution itself failed (conflicting flags), prefer JSON to
 		// stderr so the error is still machine-parseable.

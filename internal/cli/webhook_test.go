@@ -97,7 +97,6 @@ func mondayCreateWebhookHandler(t *testing.T, webhookID string) http.Handler {
 	})
 }
 
-
 // TestWebhookEvents does not need a daemon.
 func TestWebhookEvents(t *testing.T) {
 	t.Parallel()

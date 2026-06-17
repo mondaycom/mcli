@@ -173,7 +173,7 @@ func runBoardList(cmd *cobra.Command, workspaceID string, limit int, cursor stri
 		nextCursor = strconv.Itoa(page + 1)
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -339,7 +339,7 @@ func runBoardCreate(cmd *cobra.Command, name, workspaceID, kind, description str
 		Description: b.Description,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -422,7 +422,7 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 		}
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -515,7 +515,7 @@ func runBoardRename(cmd *cobra.Command, id, name string) error {
 
 	out := boardRenameOutput{ID: id, Name: name}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -569,7 +569,7 @@ func runBoardDelete(cmd *cobra.Command, id string) error {
 	b := resp.Delete_board
 	out := boardDeleteOutput{ID: b.Id, Name: b.Name}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -617,7 +617,7 @@ func runBoardArchive(cmd *cobra.Command, id string) error {
 	b := resp.Archive_board
 	out := boardDeleteOutput{ID: b.Id, Name: b.Name}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}

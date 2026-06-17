@@ -94,7 +94,7 @@ func (d *Daemon) Start(ctx context.Context) error {
 	whMux := http.NewServeMux()
 	whMux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"status":"ok"}`)
+		_, _ = fmt.Fprint(w, `{"status":"ok"}`)
 	})
 	whMux.Handle("/webhook", NewWebhookHandler(d.store))
 	d.httpServer.Handler = whMux
@@ -344,7 +344,7 @@ func (d *Daemon) createMondayWebhook(ctx context.Context, boardID, event, url st
 	if err != nil {
 		return "", fmt.Errorf("createMondayWebhook: request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -393,7 +393,7 @@ func (d *Daemon) deleteMondayWebhook(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("deleteMondayWebhook: request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

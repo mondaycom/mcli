@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "id": "1234567890",
+      "name": "Build authentication service",
+      "group": {
+        "id": "topics",
+        "title": "Sprint 1"
+      }
+    },
+    {
+      "id": "3456789012",
+      "name": "Write integration tests for auth",
+      "group": {
+        "id": "new_group",
+        "title": "Sprint 2"
+      }
+    }
+  ],
+  "cursor": ""
+}

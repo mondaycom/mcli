@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	apiVersion    = "2026-07"
 	maxRetries    = 3
 	baseBackoff   = 100 * time.Millisecond
 	backoffFactor = 4.0
@@ -37,6 +38,7 @@ func (t *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", string(t.token))
 	req.Header.Set("User-Agent", t.userAgent)
+	req.Header.Set("API-Version", apiVersion)
 
 	// Ensure the request body can be replayed across retries.
 	// If GetBody is not set but a body is present, buffer it once and install

@@ -92,7 +92,7 @@ func runBoardGroupList(cmd *cobra.Command, boardID string) error {
 
 	out := groupListOutput{BoardID: boardID, Items: items}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -166,7 +166,7 @@ func runBoardGroupCreate(cmd *cobra.Command, boardID, name, color string) error 
 		Position: g.Position,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -235,7 +235,7 @@ func runBoardGroupDelete(cmd *cobra.Command, boardID, groupID string) error {
 	g := resp.Delete_group
 	out := groupDeleteOutput{ID: g.Id, Title: g.Title}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -298,7 +298,7 @@ func runBoardGroupArchive(cmd *cobra.Command, boardID, groupID string) error {
 	g := resp.Archive_group
 	out := groupDeleteOutput{ID: g.Id, Title: g.Title}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -372,7 +372,7 @@ func runBoardGroupRename(cmd *cobra.Command, boardID, groupID, name string) erro
 		Position: g.Position,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}

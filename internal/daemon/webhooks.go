@@ -48,7 +48,7 @@ func (s *Store) ListWebhooks() ([]WebhookRecord, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ListWebhooks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanWebhookRows(rows)
 }
 
@@ -61,7 +61,7 @@ func (s *Store) ListWebhooksByBoard(boardID string) ([]WebhookRecord, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ListWebhooksByBoard: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanWebhookRows(rows)
 }
 
@@ -92,7 +92,7 @@ func (s *Store) AllWebhooksByURL(url string) ([]WebhookRecord, error) {
 	if err != nil {
 		return nil, fmt.Errorf("AllWebhooksByURL: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanWebhookRows(rows)
 }
 

@@ -156,7 +156,7 @@ func runBoardColumnList(cmd *cobra.Command, boardID string) error {
 
 	out := columnListOutput{BoardID: boardID, Items: items}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -255,7 +255,7 @@ func runBoardColumnCreate(cmd *cobra.Command, boardID, title, columnType, descri
 		Archived:    c.Archived,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -324,7 +324,7 @@ func runBoardColumnDelete(cmd *cobra.Command, boardID, columnID string) error {
 	c := resp.Delete_column
 	out := columnDeleteOutput{ID: c.Id, Title: c.Title}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -400,7 +400,7 @@ func runBoardColumnRename(cmd *cobra.Command, boardID, columnID, title string) e
 		Archived:    c.Archived,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
@@ -476,7 +476,7 @@ func runBoardColumnDescribe(cmd *cobra.Command, boardID, columnID, description s
 		Archived:    c.Archived,
 	}
 
-	mode, modeErr := resolveOutputMode(os.Stdout, globals)
+	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
 	}
