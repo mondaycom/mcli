@@ -95,6 +95,21 @@ func TestDefaultSelection_depth1(t *testing.T) {
 	}
 }
 
+func TestDefaultSelection_scalar(t *testing.T) {
+	t.Parallel()
+	s, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	// Boolean and String scalars must produce empty selection (no { id } wrapper).
+	if sel := DefaultSelection("Boolean", s, 2); sel != "" {
+		t.Errorf("Boolean selection should be empty, got %q", sel)
+	}
+	if sel := DefaultSelection("String", s, 2); sel != "" {
+		t.Errorf("String selection should be empty, got %q", sel)
+	}
+}
+
 func TestCoerceArgs(t *testing.T) {
 	t.Parallel()
 

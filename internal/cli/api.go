@@ -16,21 +16,20 @@ import (
 // command that already covers that operation. Used by 'api list' and
 // 'api describe' to surface alternatives.
 var builtinEquivalents = map[string]string{
-	"boards":              "mcli board list",
-	"board":               "mcli board get",
-	"create_board":        "mcli board create",
-	"delete_board":        "mcli board delete",
-	"archive_board":       "mcli board archive",
-	"items_page":          "mcli item list",
-	"create_item":         "mcli item create",
-	"delete_item":         "mcli item delete",
-	"create_webhook":      "mcli webhook create",
-	"delete_webhook":      "mcli webhook delete",
-	"get_webhooks":        "mcli webhook list",
-	"create_notification": "mcli notification list",
-	"me":                  "mcli me",
-	"workspaces":          "mcli workspace list",
-	"folders":             "mcli folder list",
+	"boards":         "mcli board list",
+	"board":          "mcli board get",
+	"create_board":   "mcli board create",
+	"delete_board":   "mcli board delete",
+	"archive_board":  "mcli board archive",
+	"items_page":     "mcli item list",
+	"create_item":    "mcli item create",
+	"delete_item":    "mcli item delete",
+	"create_webhook": "mcli webhook create",
+	"delete_webhook": "mcli webhook delete",
+	"get_webhooks":   "mcli webhook list",
+	"me":             "mcli me",
+	"workspaces":     "mcli workspace list",
+	"folders":        "mcli folder list",
 }
 
 // newAPICmd returns the 'mcli api' command with dynamic dispatch.

@@ -19,7 +19,15 @@ func DefaultSelection(typeName string, s *ast.Schema, depth int) string {
 		return "{ id }"
 	}
 	def := s.Types[typeName]
-	if def == nil || (def.Kind != ast.Object && def.Kind != ast.Interface) {
+	if def == nil {
+		return "{ id }"
+	}
+	// Scalar, enum, and input types have no selection set in GraphQL.
+	switch def.Kind {
+	case ast.Scalar, ast.Enum, ast.InputObject:
+		return ""
+	}
+	if def.Kind != ast.Object && def.Kind != ast.Interface {
 		return "{ id }"
 	}
 	visited := map[string]bool{}
