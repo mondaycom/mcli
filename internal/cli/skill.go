@@ -130,6 +130,14 @@ or ` + "`~/.config/mcli/queries/`" + ` / ` + "`~/.config/mcli/mutations/`" + ` (
 
 Management: ` + "`mcli query list`" + ` · ` + "`mcli query delete <name>`" + ` · ` + "`mcli mutation list`" + ` · ` + "`mcli mutation delete <name>`" + `
 
+### Generic API (any operation)
+
+For operations not covered by built-in commands:
+` + "`mcli api list`" + ` · ` + "`mcli api describe <op>`" + ` · ` + "`mcli api <op> --arg key=value...`" + `
+
+JSON args are auto-coerced — pass natural JSON (no double-encoding).
+Override selection: ` + "`--select \"id,name,column_values{id,text}\"`" + `. Preview: ` + "`--dry-run`" + `.
+
 ### Raw GraphQL (escape hatch)
 
 For anything not covered by structured commands or the semantic layer.
