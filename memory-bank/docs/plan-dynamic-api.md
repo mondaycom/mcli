@@ -1,6 +1,6 @@
 # Plan: Dynamic GraphQL API Commands + LLM Skill Exposure
 
-**Status**: IN PROGRESS (Phases 1–4 complete, Phase 5 deferred)
+**Status**: COMPLETED (Phase 5 deferred — selection set intelligence)
 **Created**: 2026-06-21  
 **Updated**: 2026-06-22  
 **Branch**: `worktree-feat+dynamic-api`  
