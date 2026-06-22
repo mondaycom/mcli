@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"sync"
 	"sync/atomic"
+
+	"github.com/mondaycom/mcli/internal/config"
 )
 
 // Config holds the parameters needed to construct a Daemon.
@@ -298,7 +300,7 @@ var mondayAPIURLMu sync.RWMutex
 
 // mondayAPIURL is the monday.com GraphQL endpoint. It is a variable so tests
 // can override it to point at a local test server.
-var mondayAPIURL = "https://api.monday.com/v2"
+var mondayAPIURL = config.ResolveEndpoint()
 
 // getMondayAPIURL returns the current monday.com API endpoint URL.
 func getMondayAPIURL() string {

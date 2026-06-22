@@ -106,6 +106,15 @@ type Store interface {
 	Get() (APIToken, error)
 }
 
+// ResolveEndpoint returns the monday.com API endpoint, reading MONDAY_API_URL
+// from the environment and falling back to the production URL.
+func ResolveEndpoint() string {
+	if url := os.Getenv("MONDAY_API_URL"); url != "" {
+		return url
+	}
+	return "https://api.monday.com/v2"
+}
+
 // ResolveToken returns the API token using ADR-004 precedence:
 // flag > MONDAY_API_TOKEN env > configured secret store.
 // store may be nil (when cfg.SecretStore is unset); in that case only

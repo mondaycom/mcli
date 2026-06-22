@@ -19,7 +19,7 @@ import (
 	"github.com/mondaycom/mcli/internal/secrets"
 )
 
-const mondayAPIEndpoint = "https://api.monday.com/v2"
+var mondayAPIEndpoint = config.ResolveEndpoint()
 
 // queryHTTPFactory is a test seam for the raw HTTP client used by query commands.
 // Production code leaves this nil, causing newQueryHTTPClient to build a real client.
