@@ -57,6 +57,7 @@ func init() {
 	rootCmd.AddCommand(newWebhookCmd())
 	rootCmd.AddCommand(newSearchCmd())
 	rootCmd.AddCommand(newDocCmd())
+	rootCmd.AddCommand(newAPICmd())
 }
 
 // Execute runs the root command.
