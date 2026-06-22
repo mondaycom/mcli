@@ -84,7 +84,7 @@ func newWebhookCreateCmd() *cobra.Command {
 
 			data, err := json.Marshal(rec)
 			if err != nil {
-				return fmt.Errorf("marshal response: %w", err)
+				return errs.Internal("marshal response: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err
@@ -117,7 +117,7 @@ func newWebhookListCmd() *cobra.Command {
 
 			data, err := json.Marshal(records)
 			if err != nil {
-				return fmt.Errorf("marshal response: %w", err)
+				return errs.Internal("marshal response: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err
@@ -167,7 +167,7 @@ func newWebhookEventsCmd() *cobra.Command {
 
 			data, err := json.Marshal(types)
 			if err != nil {
-				return fmt.Errorf("marshal event types: %w", err)
+				return errs.Internal("marshal event types: %v", err)
 			}
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			return err

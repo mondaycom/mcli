@@ -141,31 +141,32 @@ Monday's `column_values` are JSON-string blobs whose shape varies per column typ
 - AC-5.2: Variables from flags and from file produce identical requests. ✅
 - AC-5.3: A query with GraphQL errors exits 2. ✅
 
-## Phase 6 — LLM skill API
+## Phase 6 — LLM skill API (partially complete)
 
-**Deliverables:**
-- `mcli describe [command-path]` returns the manifest as defined in ADR-003.
-- `mcli describe --format=skill-md` renders Markdown suitable for LLM loading.
-- `docs/SKILL.md` generated + committed.
-- CI drift check: regenerating SKILL.md produces no diff.
-- CI schema check: every example JSON validates against its command's output schema.
+**Status:** `mcli skill` (alias `mcli describe`) ships a static goal-oriented Markdown skill doc. The original plan called for structured JSON manifest per ADR-003 + CI drift checks; those are deferred — the static skill doc is sufficient for LLM consumption in v0.
 
-**Acceptance:**
-- AC-6.1: `mcli describe --json` emits valid JSON matching the ADR-003 shape.
-- AC-6.2: Every command has at least one example; CI fails if any command has zero.
-- AC-6.3: CI regenerates SKILL.md with zero diff.
+**Shipped:**
+- `mcli skill` / `mcli describe` — prints concise goal-oriented skill doc (~120 lines)
+- Covers: hierarchy, CRUD goals, raw GraphQL, saved queries/mutations, column values, output shapes, error codes.
 
-## Phase 7 — Release
+**Deferred to post-v0:**
+- `mcli describe --json` structured manifest (ADR-003 shape)
+- CI drift check: regenerating SKILL.md produces no diff
+- CI schema check: every example JSON validates against its command's output schema
 
-**Deliverables:**
-- `README.md` with quickstart, install, 3-5 example invocations.
+## Phase 7 — Release (partially complete)
+
+**Shipped:**
+- `README.md` with quickstart, install, design principles, commands, LLM integration, column values, saved queries, development section.
+
+**Remaining:**
 - GitHub Actions release workflow: on tag push, build darwin/linux × amd64/arm64, attach to GitHub Release.
 - Install instructions: direct binary download + checksums. Homebrew tap deferred to post-v0.
 - Versioning: start at `v0.1.0`. Semver applies once v1.0.0 ships.
 
 **Acceptance:**
 - AC-7.1: A tag push produces a GitHub Release with all four platform binaries.
-- AC-7.2: The README quickstart works end-to-end against a real token.
+- AC-7.2: The README quickstart works end-to-end against a real token. ✅
 
 ## Out of scope (v0)
 Explicitly deferred, each a candidate for its own later plan:
@@ -174,7 +175,7 @@ Explicitly deferred, each a candidate for its own later plan:
 - Webhooks CRUD.
 - Teams, users CRUD, notifications.
 - Docs (Monday's "Docs" product).
-- Workspace, group CRUD.
+- ~~Workspace, group CRUD.~~ (done in Phase 4.5)
 - Mirror / formula column *writes* (read-through is fine).
 - OAuth.
 - Homebrew tap.
@@ -198,3 +199,4 @@ Explicitly deferred, each a candidate for its own later plan:
 - 2026-05-11: Phase 4 complete — items CRUD + column-value normalization. 4a: Decode registry (14 types + passthrough). 4b: item list (cursor-based items_page) + item get (full detail w/ subitems, creator, columns). 4c: item create (--board/--parent mutually exclusive, --col passthrough), item update (--name as bare JSON string, --col). 4d: item move (--to-group XOR --to-board+--group). Name column fix: monday expects bare string, not {"name":...}. Live verified all commands against board 9832181507.
 - 2026-05-12: Phase 4.5 complete — board structure + workspace + skill. 4.5a: workspace list/get/create/update/delete + folder list/create/rename/delete. 4.5b: board rename/delete/archive, group CRUD (list/create/delete/archive/rename), column CRUD (list/create/delete/rename/describe). 4.5c: item delete/archive + `mcli skill`/`mcli describe` (1028-line LLM skill doc generated from command tree). All live-verified. 50 command sections in skill doc.
 - 2026-05-12: Phase 5 complete — `mcli query` raw GraphQL escape hatch. Inline query as first arg, -f file/stdin, --var with auto-typing, --vars-file. Saved queries (save/list/run/delete) with local (.mcli/queries/) + global (~/.config/mcli/queries/) storage. Skill doc rewritten to 107-line goal-oriented format with raw query section.
+- 2026-05-12: `mcli mutation` — mirrors query with separate namespace (.mcli/mutations/ local, ~/.config/mcli/mutations/ global). Save/list/run/delete subcommands. Live verified full lifecycle. README added with quickstart + commands reference.
