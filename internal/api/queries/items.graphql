@@ -95,6 +95,7 @@ mutation ItemCreate(
     item_name: $name,
     group_id: $groupId,
     column_values: $columnValues,
+    create_labels_if_missing: true,
   ) {
     id
     name
@@ -115,6 +116,7 @@ mutation SubitemCreate(
     parent_item_id: $parentId,
     item_name: $name,
     column_values: $columnValues,
+    create_labels_if_missing: true,
   ) {
     id
     name
@@ -135,6 +137,7 @@ mutation ItemUpdate(
     board_id: $boardId,
     item_id: $itemId,
     column_values: $columnValues,
+    create_labels_if_missing: true,
   ) {
     id
     name

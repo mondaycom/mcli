@@ -12511,7 +12511,7 @@ func ItemArchive(
 // The mutation executed by ItemCreate.
 const ItemCreate_Operation = `
 mutation ItemCreate ($boardId: ID!, $name: String!, $groupId: String, $columnValues: JSON) {
-	create_item(board_id: $boardId, item_name: $name, group_id: $groupId, column_values: $columnValues) {
+	create_item(board_id: $boardId, item_name: $name, group_id: $groupId, column_values: $columnValues, create_labels_if_missing: true) {
 		id
 		name
 		state
@@ -12919,7 +12919,7 @@ func ItemPostUpdate(
 // The mutation executed by ItemUpdate.
 const ItemUpdate_Operation = `
 mutation ItemUpdate ($boardId: ID!, $itemId: ID!, $columnValues: JSON!) {
-	change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $columnValues) {
+	change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $columnValues, create_labels_if_missing: true) {
 		id
 		name
 		state
@@ -13282,7 +13282,7 @@ func SearchItems(
 // The mutation executed by SubitemCreate.
 const SubitemCreate_Operation = `
 mutation SubitemCreate ($parentId: ID!, $name: String!, $columnValues: JSON) {
-	create_subitem(parent_item_id: $parentId, item_name: $name, column_values: $columnValues) {
+	create_subitem(parent_item_id: $parentId, item_name: $name, column_values: $columnValues, create_labels_if_missing: true) {
 		id
 		name
 		state
