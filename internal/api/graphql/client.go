@@ -29,11 +29,19 @@ func WithEndpoint(url string) Option {
 	}
 }
 
+// WithAPIVersion overrides the monday.com API version header sent with each request.
+func WithAPIVersion(v string) Option {
+	return func(c *Client) {
+		c.apiVersion = v
+	}
+}
+
 // Client is a typed GraphQL client for the monday.com API.
 // It wraps an authenticated httpx.Client and a genqlient graphql.Client,
 // adding error normalisation and complexity-budget retry on top.
 type Client struct {
 	endpoint   string
+	apiVersion string
 	inner      gqlclient.Client
 	complexity complexityStore
 }
@@ -42,13 +50,14 @@ type Client struct {
 // opts may be used to override defaults (e.g. endpoint for testing).
 func New(token config.APIToken, version string, opts ...Option) *Client {
 	c := &Client{
-		endpoint: config.ResolveEndpoint(),
+		endpoint:   config.ResolveEndpoint(),
+		apiVersion: config.ResolveAPIVersion(config.Config{}),
 	}
 	for _, o := range opts {
 		o(c)
 	}
 
-	httpClient := httpx.NewClient(token, version)
+	httpClient := httpx.NewClient(token, version, c.apiVersion)
 	c.inner = gqlclient.NewClient(c.endpoint, httpClient)
 	return c
 }

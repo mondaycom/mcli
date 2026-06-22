@@ -4,6 +4,8 @@ package apischema
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 
 	gqlparser "github.com/vektah/gqlparser/v2"
@@ -32,23 +34,68 @@ type ArgDef struct {
 }
 
 var (
-	loadOnce     sync.Once
-	loadedSchema *ast.Schema
-	loadErr      error
+	mu           sync.Mutex
+	cachedSchema *ast.Schema
+	cacheErr     error
+	cacheDir     string
+	cacheLoaded  bool
 )
 
-// Load parses the embedded SDL once and caches the result.
+// SetConfigDir sets the directory used to locate a cached schema.graphql file.
+// It resets the cache so the next Load() call re-resolves from the new directory.
+// Call with an empty string to revert to the embedded fallback.
+func SetConfigDir(dir string) {
+	mu.Lock()
+	defer mu.Unlock()
+	cacheDir = dir
+	cacheLoaded = false
+	cachedSchema = nil
+	cacheErr = nil
+}
+
+// CachedSchemaPath returns the path to the locally cached schema file.
+func CachedSchemaPath(configDir string) string {
+	return filepath.Join(configDir, "schema.graphql")
+}
+
+// Load parses the GraphQL schema and caches the result.
+// If a cacheDir is set and a schema.graphql file exists there, it is used.
+// On any read or parse error it falls back to the embedded SDL.
 func Load() (*ast.Schema, error) {
-	loadOnce.Do(func() {
-		src := &ast.Source{Name: "monday.graphql", Input: rawschema.SDL}
-		s, err := gqlparser.LoadSchema(src)
-		if err != nil {
-			loadErr = fmt.Errorf("parse schema: %w", err)
-			return
+	mu.Lock()
+	defer mu.Unlock()
+
+	if cacheLoaded {
+		return cachedSchema, cacheErr
+	}
+
+	var s *ast.Schema
+	var err error
+
+	if cacheDir != "" {
+		data, readErr := os.ReadFile(filepath.Join(cacheDir, "schema.graphql"))
+		if readErr == nil {
+			src := &ast.Source{Name: "schema.graphql", Input: string(data)}
+			s, err = gqlparser.LoadSchema(src)
+			if err != nil {
+				err = fmt.Errorf("parse local schema: %w", err)
+			}
 		}
-		loadedSchema = s
-	})
-	return loadedSchema, loadErr
+	}
+
+	if s == nil {
+		src := &ast.Source{Name: "monday.graphql", Input: rawschema.SDL}
+		s, err = gqlparser.LoadSchema(src)
+		if err != nil {
+			err = fmt.Errorf("parse schema: %w", err)
+		}
+	}
+
+	cachedSchema = s
+	cacheErr = err
+	cacheLoaded = true
+
+	return cachedSchema, cacheErr
 }
 
 // QueryFields returns FieldDef for each field on the Query type.

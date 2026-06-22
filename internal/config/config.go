@@ -28,6 +28,7 @@ const (
 type Config struct {
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
+	APIVersion  string        `yaml:"api_version,omitempty"`
 }
 
 // legacyConfig is used during Load to detect and migrate a legacy plaintext token.
@@ -35,6 +36,7 @@ type legacyConfig struct {
 	Token       string        `yaml:"token"`
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
+	APIVersion  string        `yaml:"api_version,omitempty"`
 }
 
 // DefaultPath returns the default config file path.
@@ -68,7 +70,7 @@ func Load(path string) (Config, error) {
 		return Config{}, fmt.Errorf("parse config %s: %w", path, err)
 	}
 
-	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode}
+	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode, APIVersion: legacy.APIVersion}
 
 	if legacy.Token != "" {
 		_, _ = fmt.Fprintf(os.Stderr,
@@ -113,6 +115,18 @@ func ResolveEndpoint() string {
 		return url
 	}
 	return "https://api.monday.com/v2"
+}
+
+// ResolveAPIVersion returns the monday.com API version to use.
+// Precedence: MONDAY_API_VERSION env > cfg.APIVersion > "2026-07".
+func ResolveAPIVersion(cfg Config) string {
+	if v := os.Getenv("MONDAY_API_VERSION"); v != "" {
+		return v
+	}
+	if cfg.APIVersion != "" {
+		return cfg.APIVersion
+	}
+	return "2026-07"
 }
 
 // ResolveToken returns the API token using ADR-004 precedence:
