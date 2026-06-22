@@ -58,6 +58,14 @@ Token resolution (first match wins):
 
 Credentials are stored in the OS keychain (macOS Keychain, Linux Secret Service) or an age-encrypted file. Never plaintext on disk.
 
+**Environment overrides:**
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `MONDAY_API_TOKEN` | API token | — |
+| `MONDAY_API_URL` | API endpoint (e.g. staging) | `https://api.monday.com/v2` |
+| `MONDAY_API_VERSION` | API version header | `2026-07` |
+
 ## Commands
 
 ```
@@ -82,6 +90,11 @@ mcli item description <id> [--set <md>|--set-file <path>]   Read/write descripti
 mcli doc read <id>                   Export document as markdown
 mcli doc write <id> --content <md>   Replace document content
 
+mcli api list [--type query|mutation]          List all ~250 API operations from the schema
+mcli api describe <operation|type>            Inspect signature and argument types
+mcli api <operation> [--arg k=v]...           Execute any operation; JSON args auto-coerced
+                                              --dry-run prints generated GraphQL without executing
+
 mcli query '<graphql>'               Raw GraphQL queries (inline, -f file, -f -)
 mcli query save/list/run/delete      Saved query management
 
@@ -94,6 +107,44 @@ mcli notification list/count/ack     Event inbox (poll for webhook events)
 
 mcli skill                           Print LLM skill document
 mcli version                         Print version
+```
+
+## Dynamic API (`mcli api`)
+
+Every monday.com API operation is available without writing GraphQL. The schema is embedded in the binary and refreshed on demand.
+
+```sh
+# Browse all available operations
+mcli api list
+mcli api list --type mutation | grep team
+
+# Inspect an operation or type
+mcli api describe create_notification
+mcli api describe Board
+
+# Execute any operation
+mcli api create_notification \
+  --arg user_id=12345 --arg text="Hello" \
+  --arg target_id=67890 --arg target_type=Project
+
+# JSON arguments are auto-coerced — pass natural JSON, no double-encoding
+mcli api change_column_value \
+  --arg board_id=123 --arg item_id=456 \
+  --arg column_id=status --arg value='{"label":"Done"}'
+
+# Preview generated GraphQL without executing
+mcli api boards --arg limit=5 --dry-run
+
+# Override the auto-selected return fields
+mcli api boards --arg limit=5 --select "id,name,state"
+```
+
+**Update the schema** when you upgrade to a new API version:
+
+```sh
+mcli config set api-version 2026-08   # fetches + caches schema; reverts on error
+mcli config get api-version
+mcli config set api-version default   # revert to built-in schema (2026-07)
 ```
 
 ## Output Modes

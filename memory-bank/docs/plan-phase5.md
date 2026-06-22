@@ -11,26 +11,26 @@ The Deno wrapper (`mcli` shim) adds search, doc read/write, item description, it
 The output system today has two modes: `ModeJSON` (non-TTY default) and `ModePretty` (TTY). LLM consumers pay per-token, so a `terse` mode (minimal formatting, no padding) and `csv` mode are needed.
 
 ## Phase 5a: Output Mode Infrastructure
-**Status**: pending
+**Status**: completed
 
 **Goal**: Add `terse` and `csv` output modes with persistent config default.
 
 ### Tasks:
-- [ ] Add `output_mode` field to `Config` struct (`"verbose"` | `"terse"` | `""`)
-- [ ] Add `mcli config` command: `mcli config set output-mode <mode>` / `mcli config get output-mode`
-- [ ] Extend `OutputMode` enum: `ModeJSON`, `ModePretty`, `ModeTerse`, `ModeCSV`
-- [ ] Add `--terse` and `--csv` global flags to `rootCmd`
-- [ ] Update `resolveOutputMode` precedence: `--json` > `--csv` > `--terse` > `--pretty` > config default > TTY-detect (pretty for TTY, json for non-TTY)
-- [ ] Add terse formatters to existing commands: `board list`, `board get`, `item list`, `item get`, `me`
-- [ ] Terse format spec: one line per entity, pipe or tab-separated key fields, no alignment padding
-- [ ] CSV format: standard RFC 4180, headers on first line
-- [ ] Unit tests for resolveOutputMode with all flag/config combinations
+- [x] Add `output_mode` field to `Config` struct
+- [x] Add `mcli config` command: `mcli config set output-mode <mode>` / `mcli config get output-mode`
+- [x] Extend `OutputMode` enum: `ModeJSON`, `ModePretty`, `ModeTerse`, `ModeCSV`
+- [x] Add `--terse` and `--csv` global flags to `rootCmd`
+- [x] Update `resolveOutputMode` precedence: `--json` > `--csv` > `--terse` > `--pretty` > config default > TTY-detect
+- [x] Add terse formatters to existing commands: `board list`, `board get`, `item list`, `item get`, `me`
+- [x] Terse format spec: one line per entity, pipe or tab-separated key fields, no alignment padding
+- [x] CSV format: standard RFC 4180, headers on first line
+- [x] Unit tests for resolveOutputMode with all flag/config combinations
 
 ### Acceptance Criteria:
-- [ ] `AC-5a-1`: `mcli config set output-mode terse` persists; subsequent commands default to terse
-- [ ] `AC-5a-2`: `--json`, `--csv`, `--terse`, `--pretty` flags override config
-- [ ] `AC-5a-3`: Existing JSON/pretty behavior unchanged when no config set
-- [ ] `AC-5a-4`: Terse output for `item list` is ≤50% the token count of pretty output
+- [x] `AC-5a-1`: `mcli config set output-mode terse` persists; subsequent commands default to terse
+- [x] `AC-5a-2`: `--json`, `--csv`, `--terse`, `--pretty` flags override config
+- [x] `AC-5a-3`: Existing JSON/pretty behavior unchanged when no config set
+- [x] `AC-5a-4`: Terse output for `item list` is ≤50% the token count of pretty output
 
 ## Phase 5b: Search Command
 **Status**: pending
