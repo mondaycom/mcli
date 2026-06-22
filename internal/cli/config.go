@@ -42,7 +42,7 @@ func newConfigSetCmd() *cobra.Command {
 
 Supported keys:
   output-mode   Default output mode: default, json, pretty, terse, or csv
-  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07)`,
+  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07; or "default" to reset)`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key, value := args[0], args[1]
@@ -61,8 +61,11 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 			value = ""
 		}
 	case "api-version":
-		if !apiVersionRE.MatchString(value) {
-			return errs.Usage("invalid api-version %q: must match YYYY-MM (e.g. 2026-07)", value)
+		if value != "default" && !apiVersionRE.MatchString(value) {
+			return errs.Usage("invalid api-version %q: must match YYYY-MM (e.g. 2026-07) or \"default\" to reset", value)
+		}
+		if value == "default" {
+			value = ""
 		}
 	default:
 		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version", key)
@@ -95,9 +98,23 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 }
 
 // runConfigSetAPIVersion handles 'config set api-version <value>'.
-// It saves the version tentatively, attempts to fetch and cache the schema,
-// and reverts the config if the fetch fails.
+// value is already normalised: "" means reset to default, a YYYY-MM string means set.
+// On set: saves tentatively, fetches schema, writes cache, busts in-memory cache.
+// On reset: clears config and removes cached schema.
+// Reverts config if the fetch fails.
 func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Config, value string) error {
+	if value == "" {
+		cfg.APIVersion = ""
+		if err := config.Save(cfgPath, cfg); err != nil {
+			return errs.Internal("save config: %v", err)
+		}
+		schemaPath := apischema.CachedSchemaPath(resolveConfigDir())
+		_ = os.Remove(schemaPath)
+		apischema.SetConfigDir(resolveConfigDir())
+		_, err := fmt.Fprintf(cmd.OutOrStdout(), "api-version reset to default (%s)\n", config.ResolveAPIVersion(config.Config{}))
+		return err
+	}
+
 	// Tentative save so token resolution picks up any saved secret store.
 	cfg.APIVersion = value
 	if err := config.Save(cfgPath, cfg); err != nil {
