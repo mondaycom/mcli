@@ -60,7 +60,7 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return fmt.Errorf("load config: %w", err)
+		return errs.Internal("load config: %v", err)
 	}
 
 	switch key {
@@ -69,7 +69,7 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	}
 
 	if err := config.Save(cfgPath, cfg); err != nil {
-		return fmt.Errorf("save config: %w", err)
+		return errs.Internal("save config: %v", err)
 	}
 
 	_, err = fmt.Fprintf(cmd.OutOrStdout(), "set %s = %q\n", key, value)
@@ -101,7 +101,7 @@ func runConfigGet(cmd *cobra.Command, key string) error {
 	cfgPath := resolveConfigPath()
 	cfg, err := config.Load(cfgPath)
 	if err != nil {
-		return fmt.Errorf("load config: %w", err)
+		return errs.Internal("load config: %v", err)
 	}
 
 	var value string
