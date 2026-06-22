@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	apiVersion    = "2026-07"
 	maxRetries    = 3
 	baseBackoff   = 100 * time.Millisecond
 	backoffFactor = 4.0
@@ -28,9 +27,10 @@ const (
 // transport without re-implementing construction.
 type RetryTransport struct {
 	// Base is the underlying transport. Defaults to http.DefaultTransport.
-	Base      http.RoundTripper
-	token     config.APIToken
-	userAgent string
+	Base       http.RoundTripper
+	token      config.APIToken
+	userAgent  string
+	apiVersion string
 }
 
 // RoundTrip implements http.RoundTripper.
@@ -38,7 +38,7 @@ func (t *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", string(t.token))
 	req.Header.Set("User-Agent", t.userAgent)
-	req.Header.Set("API-Version", apiVersion)
+	req.Header.Set("API-Version", t.apiVersion)
 
 	// Ensure the request body can be replayed across retries.
 	// If GetBody is not set but a body is present, buffer it once and install
@@ -116,13 +116,15 @@ func shouldRetry(code int) bool {
 // NewClient constructs an *http.Client that:
 //   - injects Authorization: <token> (raw, no "Bearer" prefix per Monday docs),
 //   - injects User-Agent: mcli/<version>,
+//   - injects API-Version: <apiVersion>,
 //   - retries on 429 and 5xx with exponential backoff (max 3 retries).
-func NewClient(token config.APIToken, version string) *http.Client {
+func NewClient(token config.APIToken, version string, apiVersion string) *http.Client {
 	return &http.Client{
 		Transport: &RetryTransport{
-			Base:      http.DefaultTransport,
-			token:     token,
-			userAgent: "mcli/" + version,
+			Base:       http.DefaultTransport,
+			token:      token,
+			userAgent:  "mcli/" + version,
+			apiVersion: apiVersion,
 		},
 	}
 }

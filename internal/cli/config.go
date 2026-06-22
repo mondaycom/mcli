@@ -2,12 +2,18 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"regexp"
 
 	"github.com/spf13/cobra"
 
+	apischema "github.com/mondaycom/mcli/internal/api/schema"
 	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
+	"github.com/mondaycom/mcli/internal/secrets"
 )
+
+var apiVersionRE = regexp.MustCompile(`^\d{4}-\d{2}$`)
 
 var validOutputModes = map[string]bool{
 	"":        true,
@@ -35,7 +41,8 @@ func newConfigSetCmd() *cobra.Command {
 		Long: `Set a configuration value and persist it to config.yaml.
 
 Supported keys:
-  output-mode   Default output mode: default, json, pretty, terse, or csv`,
+  output-mode   Default output mode: default, json, pretty, terse, or csv
+  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07)`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key, value := args[0], args[1]
@@ -53,8 +60,12 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 		if value == "default" {
 			value = ""
 		}
+	case "api-version":
+		if !apiVersionRE.MatchString(value) {
+			return errs.Usage("invalid api-version %q: must match YYYY-MM (e.g. 2026-07)", value)
+		}
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -66,6 +77,13 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	switch key {
 	case "output-mode":
 		cfg.OutputMode = value
+		if err := config.Save(cfgPath, cfg); err != nil {
+			return errs.Internal("save config: %v", err)
+		}
+		_, err = fmt.Fprintf(cmd.OutOrStdout(), "set %s = %q\n", key, value)
+		return err
+	case "api-version":
+		return runConfigSetAPIVersion(cmd, cfgPath, cfg, value)
 	}
 
 	if err := config.Save(cfgPath, cfg); err != nil {
@@ -76,6 +94,54 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	return err
 }
 
+// runConfigSetAPIVersion handles 'config set api-version <value>'.
+// It saves the version tentatively, attempts to fetch and cache the schema,
+// and reverts the config if the fetch fails.
+func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Config, value string) error {
+	// Tentative save so token resolution picks up any saved secret store.
+	cfg.APIVersion = value
+	if err := config.Save(cfgPath, cfg); err != nil {
+		return errs.Internal("save config: %v", err)
+	}
+
+	// Resolve token to fetch the schema. Missing token is non-fatal: warn and return.
+	var store config.Store
+	if cfg.SecretStore != "" {
+		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
+		if openErr == nil {
+			store = st
+		}
+	}
+	token, tokenErr := config.ResolveToken(cfg, globals.Token, store)
+	if tokenErr != nil {
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(),
+			"api-version saved; run 'mcli auth login' then 'mcli config set api-version %s' to refresh schema\n",
+			value)
+		return nil
+	}
+
+	sdl, fetchErr := apischema.FetchSchema(cmd.Context(), token, config.ResolveEndpoint(), value)
+	if fetchErr != nil {
+		// Revert the saved version.
+		cfg.APIVersion = ""
+		if revertErr := config.Save(cfgPath, cfg); revertErr != nil {
+			return errs.Internal("revert config: %v", revertErr)
+		}
+		return errs.Usage("api version %q not available: %v — reverted to default (%s)",
+			value, fetchErr, config.ResolveAPIVersion(config.Config{}))
+	}
+
+	schemaPath := apischema.CachedSchemaPath(resolveConfigDir())
+	if err := os.WriteFile(schemaPath, []byte(sdl), 0o600); err != nil {
+		return errs.Internal("write schema cache: %v", err)
+	}
+
+	apischema.SetConfigDir(resolveConfigDir())
+
+	_, err := fmt.Fprintf(cmd.OutOrStdout(), "fetched schema for %s → %s\n", value, schemaPath)
+	return err
+}
+
 func newConfigGetCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get <key>",
@@ -83,7 +149,8 @@ func newConfigGetCmd() *cobra.Command {
 		Long: `Get a configuration value from config.yaml.
 
 Supported keys:
-  output-mode   Default output mode`,
+  output-mode   Default output mode
+  api-version   monday.com API version (empty means default: 2026-07)`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runConfigGet(cmd, args[0])
@@ -93,9 +160,9 @@ Supported keys:
 
 func runConfigGet(cmd *cobra.Command, key string) error {
 	switch key {
-	case "output-mode":
+	case "output-mode", "api-version":
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -108,6 +175,8 @@ func runConfigGet(cmd *cobra.Command, key string) error {
 	switch key {
 	case "output-mode":
 		value = cfg.OutputMode
+	case "api-version":
+		value = cfg.APIVersion
 	}
 
 	_, err = fmt.Fprintln(cmd.OutOrStdout(), value)

@@ -28,7 +28,7 @@ const testVersion = "1.2.3"
 // newTestClient returns a client whose base transport is redirected to the
 // given test server, bypassing TLS and default-transport pooling.
 func newTestClient(srv *httptest.Server) *http.Client {
-	c := httpx.NewClient(config.APIToken(testToken), testVersion)
+	c := httpx.NewClient(config.APIToken(testToken), testVersion, "2026-07")
 	// Replace default transport with the test server's client transport so
 	// requests are routed to the test server.
 	c.Transport.(*httpx.RetryTransport).Base = srv.Client().Transport

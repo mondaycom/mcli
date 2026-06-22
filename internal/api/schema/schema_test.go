@@ -1,18 +1,47 @@
 package apischema
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestLoad(t *testing.T) {
-	t.Parallel()
 	s, err := Load()
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
 	if s.Query == nil {
 		t.Fatal("Query type is nil after load")
+	}
+}
+
+func TestLoad_localFileOverride(t *testing.T) {
+	dir := t.TempDir()
+
+	// Minimal valid SDL with a custom type to verify it was loaded.
+	const minimalSDL = `
+type Query {
+  hello: String
+}
+type CustomTestType {
+  id: ID!
+}
+`
+	if err := os.WriteFile(filepath.Join(dir, "schema.graphql"), []byte(minimalSDL), 0o600); err != nil {
+		t.Fatalf("write schema file: %v", err)
+	}
+
+	SetConfigDir(dir)
+	t.Cleanup(func() { SetConfigDir("") })
+
+	s, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if _, ok := s.Types["CustomTestType"]; !ok {
+		t.Error("expected CustomTestType from local file override, not found in schema")
 	}
 }
 

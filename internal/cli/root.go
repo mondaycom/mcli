@@ -3,6 +3,8 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
+
+	apischema "github.com/mondaycom/mcli/internal/api/schema"
 )
 
 // GlobalFlags holds the values of flags available on every command.
@@ -58,6 +60,8 @@ func init() {
 	rootCmd.AddCommand(newSearchCmd())
 	rootCmd.AddCommand(newDocCmd())
 	rootCmd.AddCommand(newAPICmd())
+
+	apischema.SetConfigDir(resolveConfigDir())
 }
 
 // Execute runs the root command.
