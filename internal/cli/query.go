@@ -52,7 +52,7 @@ func newQueryHTTPClient() (*http.Client, string, error) {
 		return nil, "", err
 	}
 
-	client := httpx.NewClient(token, version, config.ResolveAPIVersion(cfg))
+	client := httpx.NewClient(token, version, config.ResolveAPIVersion(cfg), config.ResolveRoutingKey(cfg))
 	return client, mondayAPIEndpoint, nil
 }
 

@@ -31,6 +31,7 @@ type RetryTransport struct {
 	token      config.APIToken
 	userAgent  string
 	apiVersion string
+	routingKey string
 }
 
 // RoundTrip implements http.RoundTripper.
@@ -39,6 +40,9 @@ func (t *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", string(t.token))
 	req.Header.Set("User-Agent", t.userAgent)
 	req.Header.Set("API-Version", t.apiVersion)
+	if t.routingKey != "" {
+		req.Header.Set("baggage", "routingKey="+t.routingKey)
+	}
 
 	// Ensure the request body can be replayed across retries.
 	// If GetBody is not set but a body is present, buffer it once and install
@@ -117,14 +121,16 @@ func shouldRetry(code int) bool {
 //   - injects Authorization: <token> (raw, no "Bearer" prefix per Monday docs),
 //   - injects User-Agent: mcli/<version>,
 //   - injects API-Version: <apiVersion>,
+//   - injects baggage: routingKey=<routingKey> when routingKey is non-empty,
 //   - retries on 429 and 5xx with exponential backoff (max 3 retries).
-func NewClient(token config.APIToken, version string, apiVersion string) *http.Client {
+func NewClient(token config.APIToken, version string, apiVersion string, routingKey string) *http.Client {
 	return &http.Client{
 		Transport: &RetryTransport{
 			Base:       http.DefaultTransport,
 			token:      token,
 			userAgent:  "mcli/" + version,
 			apiVersion: apiVersion,
+			routingKey: routingKey,
 		},
 	}
 }

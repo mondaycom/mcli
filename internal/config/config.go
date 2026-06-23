@@ -29,6 +29,7 @@ type Config struct {
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
 	APIVersion  string        `yaml:"api_version,omitempty"`
+	RoutingKey  string        `yaml:"routing_key,omitempty"`
 }
 
 // legacyConfig is used during Load to detect and migrate a legacy plaintext token.
@@ -37,6 +38,7 @@ type legacyConfig struct {
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
 	APIVersion  string        `yaml:"api_version,omitempty"`
+	RoutingKey  string        `yaml:"routing_key,omitempty"`
 }
 
 // DefaultPath returns the default config file path.
@@ -70,7 +72,7 @@ func Load(path string) (Config, error) {
 		return Config{}, fmt.Errorf("parse config %s: %w", path, err)
 	}
 
-	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode, APIVersion: legacy.APIVersion}
+	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode, APIVersion: legacy.APIVersion, RoutingKey: legacy.RoutingKey}
 
 	if legacy.Token != "" {
 		_, _ = fmt.Fprintf(os.Stderr,
@@ -127,6 +129,16 @@ func ResolveAPIVersion(cfg Config) string {
 		return cfg.APIVersion
 	}
 	return "2026-07"
+}
+
+// ResolveRoutingKey returns the routing key for local-api-proxy debugging.
+// Precedence: MONDAY_ROUTING_KEY env > cfg.RoutingKey.
+// Returns "" when not set — callers must omit the header in that case.
+func ResolveRoutingKey(cfg Config) string {
+	if v := os.Getenv("MONDAY_ROUTING_KEY"); v != "" {
+		return v
+	}
+	return cfg.RoutingKey
 }
 
 // ResolveToken returns the API token using ADR-004 precedence:

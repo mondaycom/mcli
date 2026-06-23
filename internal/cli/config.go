@@ -42,7 +42,8 @@ func newConfigSetCmd() *cobra.Command {
 
 Supported keys:
   output-mode   Default output mode: default, json, pretty, terse, or csv
-  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07; or "default" to reset)`,
+  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07; or "default" to reset)
+  routing-key   Routing key for local-api-proxy debugging (baggage: routingKey=<value>); omit to clear`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key, value := args[0], args[1]
@@ -67,8 +68,10 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 		if value == "default" {
 			value = ""
 		}
+	case "routing-key":
+		// any non-empty string is valid; empty string clears the key
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version, routing-key", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -80,13 +83,10 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	switch key {
 	case "output-mode":
 		cfg.OutputMode = value
-		if err := config.Save(cfgPath, cfg); err != nil {
-			return errs.Internal("save config: %v", err)
-		}
-		_, err = fmt.Fprintf(cmd.OutOrStdout(), "set %s = %q\n", key, value)
-		return err
 	case "api-version":
 		return runConfigSetAPIVersion(cmd, cfgPath, cfg, value)
+	case "routing-key":
+		cfg.RoutingKey = value
 	}
 
 	if err := config.Save(cfgPath, cfg); err != nil {
@@ -167,7 +167,8 @@ func newConfigGetCmd() *cobra.Command {
 
 Supported keys:
   output-mode   Default output mode
-  api-version   monday.com API version (empty means default: 2026-07)`,
+  api-version   monday.com API version (empty means default: 2026-07)
+  routing-key   Routing key for local-api-proxy debugging`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runConfigGet(cmd, args[0])
@@ -177,9 +178,9 @@ Supported keys:
 
 func runConfigGet(cmd *cobra.Command, key string) error {
 	switch key {
-	case "output-mode", "api-version":
+	case "output-mode", "api-version", "routing-key":
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version, routing-key", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -194,6 +195,8 @@ func runConfigGet(cmd *cobra.Command, key string) error {
 		value = cfg.OutputMode
 	case "api-version":
 		value = cfg.APIVersion
+	case "routing-key":
+		value = cfg.RoutingKey
 	}
 
 	_, err = fmt.Fprintln(cmd.OutOrStdout(), value)
