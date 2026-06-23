@@ -36,12 +36,20 @@ func WithAPIVersion(v string) Option {
 	}
 }
 
+// WithRoutingKey sets the baggage: routingKey=<v> header for local-api-proxy debugging.
+func WithRoutingKey(v string) Option {
+	return func(c *Client) {
+		c.routingKey = v
+	}
+}
+
 // Client is a typed GraphQL client for the monday.com API.
 // It wraps an authenticated httpx.Client and a genqlient graphql.Client,
 // adding error normalisation and complexity-budget retry on top.
 type Client struct {
 	endpoint   string
 	apiVersion string
+	routingKey string
 	inner      gqlclient.Client
 	complexity complexityStore
 }
@@ -57,7 +65,7 @@ func New(token config.APIToken, version string, opts ...Option) *Client {
 		o(c)
 	}
 
-	httpClient := httpx.NewClient(token, version, c.apiVersion)
+	httpClient := httpx.NewClient(token, version, c.apiVersion, c.routingKey)
 	c.inner = gqlclient.NewClient(c.endpoint, httpClient)
 	return c
 }
