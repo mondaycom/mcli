@@ -58,6 +58,15 @@ Token resolution (first match wins):
 
 Credentials are stored in the OS keychain (macOS Keychain, Linux Secret Service) or an age-encrypted file. Never plaintext on disk.
 
+**Environment overrides** (take precedence over config file):
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `MONDAY_API_TOKEN` | API token | — |
+| `MONDAY_API_URL` | API endpoint | `https://api.monday.com/v2` |
+| `MONDAY_API_VERSION` | API version header | `2026-07` |
+| `MONDAY_ROUTING_KEY` | Routing key for local-api-proxy debugging | — |
+
 ## Commands
 
 ```
@@ -82,6 +91,10 @@ mcli item description <id> [--set <md>|--set-file <path>]   Read/write descripti
 mcli doc read <id>                   Export document as markdown
 mcli doc write <id> --content <md>   Replace document content
 
+mcli api list [--type query|mutation]        Browse all ~250 API operations from the schema
+mcli api describe <operation|type>          Inspect signature and argument types
+mcli api <operation> [--arg k=v]...         Execute any operation; JSON args auto-coerced
+
 mcli query '<graphql>'               Raw GraphQL queries (inline, -f file, -f -)
 mcli query save/list/run/delete      Saved query management
 
@@ -94,6 +107,43 @@ mcli notification list/count/ack     Event inbox (poll for webhook events)
 
 mcli skill                           Print LLM skill document
 mcli version                         Print version
+```
+
+## Dynamic API (`mcli api`)
+
+Every monday.com API operation is available without writing GraphQL. The schema (~250 operations) is embedded in the binary and can be refreshed for a specific API version.
+
+```sh
+# Browse all operations
+mcli api list
+mcli api list --type mutation | grep team
+
+# Inspect an operation or type
+mcli api describe create_notification
+mcli api describe Board
+
+# Execute any operation — JSON arguments are auto-coerced, no double-encoding needed
+mcli api create_notification \
+  --arg user_id=12345 --arg text="Hello" \
+  --arg target_id=67890 --arg target_type=Project
+
+mcli api change_column_value \
+  --arg board_id=123 --arg item_id=456 \
+  --arg column_id=status --arg value='{"label":"Done"}'
+
+# Preview generated GraphQL without executing
+mcli api boards --arg limit=5 --dry-run
+
+# Override the auto-selected return fields
+mcli api boards --arg limit=5 --select "id,name,state"
+```
+
+**Config keys** for API behaviour:
+
+```sh
+mcli config set api-version 2026-08   # fetch + cache schema for this version; "default" to reset
+mcli config set routing-key arnonro   # add baggage: routingKey=arnonro header (local-api-proxy)
+mcli config set routing-key ""        # clear routing key
 ```
 
 ## Output Modes
@@ -258,6 +308,37 @@ make lint          # golangci-lint
 make vet           # go vet
 make fmt-check     # Check formatting
 make schema        # Refresh monday.com GraphQL schema (requires token)
+```
+
+### Running against staging
+
+```sh
+export MONDAY_API_URL=https://api.mondaystaging.com/v2
+export MONDAY_API_TOKEN=<staging-token>
+bin/mcli board list
+```
+
+### Debugging with local-api-proxy
+
+[local-api-proxy](~/projects/local-api-proxy) lets you intercept API calls locally. Set a routing key so requests are routed through your local mirror instance:
+
+```sh
+# Persist for the session (stored in ~/.config/mcli/config.yaml)
+mcli config set routing-key <your-username>
+
+# Or per-command via env
+MONDAY_ROUTING_KEY=<your-username> bin/mcli board list
+
+# Clear when done
+mcli config set routing-key ""
+```
+
+Combine with staging for local end-to-end debugging:
+
+```sh
+MONDAY_API_URL=https://api.mondaystaging.com/v2 \
+MONDAY_ROUTING_KEY=<your-username> \
+bin/mcli board list
 ```
 
 ## Acknowledgments
