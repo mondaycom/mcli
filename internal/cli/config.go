@@ -13,7 +13,9 @@ import (
 	"github.com/mondaycom/mcli/internal/secrets"
 )
 
-var apiVersionRE = regexp.MustCompile(`^\d{4}-\d{2}$`)
+// apiVersionRE accepts YYYY-MM calendar versions (e.g. 2026-07) or named
+// versions used on non-production environments (e.g. dev, staging, latest).
+var apiVersionRE = regexp.MustCompile(`^(\d{4}-\d{2}|[a-z][a-z0-9-]*)$`)
 
 var validOutputModes = map[string]bool{
 	"":        true,
@@ -43,7 +45,7 @@ func newConfigSetCmd() *cobra.Command {
 Supported keys:
   output-mode   Default output mode: default, json, pretty, terse, or csv
   api-url       monday.com API endpoint URL (e.g. https://api.mondaystaging.com/v2); empty to reset
-  api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07; or "default" to reset)
+  api-version   monday.com API version: YYYY-MM (e.g. 2026-07), named (e.g. dev), or "default" to reset
   routing-key   Routing key for local-api-proxy debugging (baggage: routingKey=<value>); empty to clear`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -66,7 +68,7 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 		// any URL string is valid; empty string resets to default
 	case "api-version":
 		if value != "default" && !apiVersionRE.MatchString(value) {
-			return errs.Usage("invalid api-version %q: must match YYYY-MM (e.g. 2026-07) or \"default\" to reset", value)
+			return errs.Usage("invalid api-version %q: must be YYYY-MM (e.g. 2026-07), a named version (e.g. dev), or \"default\" to reset", value)
 		}
 		if value == "default" {
 			value = ""

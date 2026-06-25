@@ -120,7 +120,7 @@ All config keys are stored in `~/.config/mcli/config.yaml` (or `$XDG_CONFIG_HOME
 |-----|--------|-------------|
 | `output-mode` | `default`, `json`, `pretty`, `terse`, `csv` | Default output format; `default` auto-detects (pretty on TTY, JSON otherwise) |
 | `api-url` | any URL, or `""` to reset | monday.com API endpoint (e.g. `https://api.mondaystaging.com/v2`) |
-| `api-version` | `YYYY-MM` (e.g. `2026-07`), or `default` to reset | monday.com API version; triggers schema fetch and cache on set |
+| `api-version` | `YYYY-MM` (e.g. `2026-07`), named (e.g. `dev`), or `default` to reset | monday.com API version; triggers schema fetch and cache on set |
 | `routing-key` | any string, or `""` to clear | Adds `baggage: routingKey=<v>` header for local-api-proxy debugging |
 
 ```sh
