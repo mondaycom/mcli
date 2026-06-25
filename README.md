@@ -105,9 +105,33 @@ mcli daemon start/stop/status        Background daemon (webhook receiver)
 mcli webhook create/list/delete/events  Webhook registration management
 mcli notification list/count/ack     Event inbox (poll for webhook events)
 
+mcli config set <key> <value>        Persist a configuration value
+mcli config get <key>                Read a configuration value
+
 mcli skill                           Print LLM skill document
 mcli version                         Print version
 ```
+
+## Configuration
+
+All config keys are stored in `~/.config/mcli/config.yaml` (or `$XDG_CONFIG_HOME/mcli/config.yaml`).
+
+| Key | Values | Description |
+|-----|--------|-------------|
+| `output-mode` | `default`, `json`, `pretty`, `terse`, `csv` | Default output format; `default` auto-detects (pretty on TTY, JSON otherwise) |
+| `api-version` | `YYYY-MM` (e.g. `2026-07`), or `default` to reset | monday.com API version; triggers schema fetch and cache on set |
+| `routing-key` | any string, or `""` to clear | Adds `baggage: routingKey=<v>` header for [local-api-proxy](~/projects/local-api-proxy) debugging |
+
+```sh
+mcli config set output-mode terse
+mcli config set api-version 2026-08   # fetches and caches schema
+mcli config set api-version default   # revert to built-in schema
+mcli config set routing-key arnonro   # enable local-api-proxy routing
+mcli config set routing-key ""        # disable
+mcli config get api-version
+```
+
+Environment variables override config file values — see the table in [Authentication](#authentication).
 
 ## Dynamic API (`mcli api`)
 
