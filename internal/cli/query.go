@@ -19,7 +19,8 @@ import (
 	"github.com/mondaycom/mcli/internal/secrets"
 )
 
-var mondayAPIEndpoint = config.ResolveEndpoint()
+// mondayAPIEndpoint is a test seam; nil means use config.ResolveEndpoint at call time.
+var mondayAPIEndpoint string
 
 // queryHTTPFactory is a test seam for the raw HTTP client used by query commands.
 // Production code leaves this nil, causing newQueryHTTPClient to build a real client.
@@ -52,8 +53,12 @@ func newQueryHTTPClient() (*http.Client, string, error) {
 		return nil, "", err
 	}
 
+	endpoint := mondayAPIEndpoint
+	if endpoint == "" {
+		endpoint = config.ResolveEndpoint(cfg)
+	}
 	client := httpx.NewClient(token, version, config.ResolveAPIVersion(cfg), config.ResolveRoutingKey(cfg))
-	return client, mondayAPIEndpoint, nil
+	return client, endpoint, nil
 }
 
 // jsonVarTypeRE matches variable declarations like "$cols: JSON!" or "$x: JSON"

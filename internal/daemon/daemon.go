@@ -300,7 +300,7 @@ var mondayAPIURLMu sync.RWMutex
 
 // mondayAPIURL is the monday.com GraphQL endpoint. It is a variable so tests
 // can override it to point at a local test server.
-var mondayAPIURL = config.ResolveEndpoint()
+var mondayAPIURL = config.ResolveEndpoint(config.Config{})
 
 // getMondayAPIURL returns the current monday.com API endpoint URL.
 func getMondayAPIURL() string {

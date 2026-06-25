@@ -33,6 +33,7 @@ func newGQLClient() (gqlclient.Client, error) {
 	}
 
 	c := apigraphql.New(token, version,
+		apigraphql.WithEndpoint(config.ResolveEndpoint(cfg)),
 		apigraphql.WithAPIVersion(config.ResolveAPIVersion(cfg)),
 		apigraphql.WithRoutingKey(config.ResolveRoutingKey(cfg)),
 	)

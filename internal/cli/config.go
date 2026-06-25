@@ -42,8 +42,9 @@ func newConfigSetCmd() *cobra.Command {
 
 Supported keys:
   output-mode   Default output mode: default, json, pretty, terse, or csv
+  api-url       monday.com API endpoint URL (e.g. https://api.mondaystaging.com/v2); empty to reset
   api-version   monday.com API version to use (format: YYYY-MM, e.g. 2026-07; or "default" to reset)
-  routing-key   Routing key for local-api-proxy debugging (baggage: routingKey=<value>); omit to clear`,
+  routing-key   Routing key for local-api-proxy debugging (baggage: routingKey=<value>); empty to clear`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key, value := args[0], args[1]
@@ -61,6 +62,8 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 		if value == "default" {
 			value = ""
 		}
+	case "api-url":
+		// any URL string is valid; empty string resets to default
 	case "api-version":
 		if value != "default" && !apiVersionRE.MatchString(value) {
 			return errs.Usage("invalid api-version %q: must match YYYY-MM (e.g. 2026-07) or \"default\" to reset", value)
@@ -71,7 +74,7 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	case "routing-key":
 		// any non-empty string is valid; empty string clears the key
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version, routing-key", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-url, api-version, routing-key", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -83,6 +86,8 @@ func runConfigSet(cmd *cobra.Command, key, value string) error {
 	switch key {
 	case "output-mode":
 		cfg.OutputMode = value
+	case "api-url":
+		cfg.APIURL = value
 	case "api-version":
 		return runConfigSetAPIVersion(cmd, cfgPath, cfg, value)
 	case "routing-key":
@@ -137,7 +142,7 @@ func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Confi
 		return nil
 	}
 
-	sdl, fetchErr := apischema.FetchSchema(cmd.Context(), token, config.ResolveEndpoint(), value)
+	sdl, fetchErr := apischema.FetchSchema(cmd.Context(), token, config.ResolveEndpoint(cfg), value)
 	if fetchErr != nil {
 		// Revert the saved version.
 		cfg.APIVersion = ""
@@ -167,6 +172,7 @@ func newConfigGetCmd() *cobra.Command {
 
 Supported keys:
   output-mode   Default output mode
+  api-url       monday.com API endpoint URL (empty means default production URL)
   api-version   monday.com API version (empty means default: 2026-07)
   routing-key   Routing key for local-api-proxy debugging`,
 		Args: cobra.ExactArgs(1),
@@ -178,9 +184,9 @@ Supported keys:
 
 func runConfigGet(cmd *cobra.Command, key string) error {
 	switch key {
-	case "output-mode", "api-version", "routing-key":
+	case "output-mode", "api-url", "api-version", "routing-key":
 	default:
-		return errs.Usage("unknown config key %q: supported keys: output-mode, api-version, routing-key", key)
+		return errs.Usage("unknown config key %q: supported keys: output-mode, api-url, api-version, routing-key", key)
 	}
 
 	cfgPath := resolveConfigPath()
@@ -193,6 +199,8 @@ func runConfigGet(cmd *cobra.Command, key string) error {
 	switch key {
 	case "output-mode":
 		value = cfg.OutputMode
+	case "api-url":
+		value = cfg.APIURL
 	case "api-version":
 		value = cfg.APIVersion
 	case "routing-key":
