@@ -58,7 +58,7 @@ type Client struct {
 // opts may be used to override defaults (e.g. endpoint for testing).
 func New(token config.APIToken, version string, opts ...Option) *Client {
 	c := &Client{
-		endpoint:   config.ResolveEndpoint(),
+		endpoint:   defaultEndpoint,
 		apiVersion: config.ResolveAPIVersion(config.Config{}),
 	}
 	for _, o := range opts {

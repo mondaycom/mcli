@@ -28,6 +28,7 @@ const (
 type Config struct {
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
+	APIURL      string        `yaml:"api_url,omitempty"`
 	APIVersion  string        `yaml:"api_version,omitempty"`
 	RoutingKey  string        `yaml:"routing_key,omitempty"`
 }
@@ -37,6 +38,7 @@ type legacyConfig struct {
 	Token       string        `yaml:"token"`
 	SecretStore SecretBackend `yaml:"secret_store,omitempty"`
 	OutputMode  string        `yaml:"output_mode,omitempty"`
+	APIURL      string        `yaml:"api_url,omitempty"`
 	APIVersion  string        `yaml:"api_version,omitempty"`
 	RoutingKey  string        `yaml:"routing_key,omitempty"`
 }
@@ -72,7 +74,7 @@ func Load(path string) (Config, error) {
 		return Config{}, fmt.Errorf("parse config %s: %w", path, err)
 	}
 
-	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode, APIVersion: legacy.APIVersion, RoutingKey: legacy.RoutingKey}
+	cfg := Config{SecretStore: legacy.SecretStore, OutputMode: legacy.OutputMode, APIURL: legacy.APIURL, APIVersion: legacy.APIVersion, RoutingKey: legacy.RoutingKey}
 
 	if legacy.Token != "" {
 		_, _ = fmt.Fprintf(os.Stderr,
@@ -110,11 +112,14 @@ type Store interface {
 	Get() (APIToken, error)
 }
 
-// ResolveEndpoint returns the monday.com API endpoint, reading MONDAY_API_URL
-// from the environment and falling back to the production URL.
-func ResolveEndpoint() string {
+// ResolveEndpoint returns the monday.com API endpoint.
+// Precedence: MONDAY_API_URL env > cfg.APIURL > production URL.
+func ResolveEndpoint(cfg Config) string {
 	if url := os.Getenv("MONDAY_API_URL"); url != "" {
 		return url
+	}
+	if cfg.APIURL != "" {
+		return cfg.APIURL
 	}
 	return "https://api.monday.com/v2"
 }

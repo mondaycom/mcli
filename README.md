@@ -105,9 +105,36 @@ mcli daemon start/stop/status        Background daemon (webhook receiver)
 mcli webhook create/list/delete/events  Webhook registration management
 mcli notification list/count/ack     Event inbox (poll for webhook events)
 
+mcli config set <key> <value>        Persist a configuration value
+mcli config get <key>                Read a configuration value
+
 mcli skill                           Print LLM skill document
 mcli version                         Print version
 ```
+
+## Configuration
+
+All config keys are stored in `~/.config/mcli/config.yaml` (or `$XDG_CONFIG_HOME/mcli/config.yaml`).
+
+| Key | Values | Description |
+|-----|--------|-------------|
+| `output-mode` | `default`, `json`, `pretty`, `terse`, `csv` | Default output format; `default` auto-detects (pretty on TTY, JSON otherwise) |
+| `api-url` | any URL, or `""` to reset | monday.com API endpoint (e.g. `https://api.mondaystaging.com/v2`) |
+| `api-version` | `YYYY-MM` (e.g. `2026-07`), named (e.g. `dev`), or `default` to reset | monday.com API version; triggers schema fetch and cache on set |
+| `routing-key` | any string, or `""` to clear | Adds `baggage: routingKey=<v>` header for local-api-proxy debugging |
+
+```sh
+mcli config set output-mode terse
+mcli config set api-url https://api.mondaystaging.com/v2   # point at staging
+mcli config set api-url ""                                  # reset to production
+mcli config set api-version 2026-08   # fetches and caches schema
+mcli config set api-version default   # revert to built-in schema
+mcli config set routing-key arnonro   # enable local-api-proxy routing
+mcli config set routing-key ""        # disable
+mcli config get api-url
+```
+
+Environment variables override config file values — see the table in [Authentication](#authentication).
 
 ## Dynamic API (`mcli api`)
 
@@ -313,8 +340,14 @@ make schema        # Refresh monday.com GraphQL schema (requires token)
 ### Running against staging
 
 ```sh
-export MONDAY_API_URL=https://api.mondaystaging.com/v2
-export MONDAY_API_TOKEN=<staging-token>
+# Persistent (survives new shells)
+mcli config set api-url https://api.mondaystaging.com/v2
+MONDAY_API_TOKEN=<staging-token> bin/mcli board list
+mcli config set api-url ""   # reset when done
+
+# Or per-command via env
+MONDAY_API_URL=https://api.mondaystaging.com/v2 \
+MONDAY_API_TOKEN=<staging-token> \
 bin/mcli board list
 ```
 
