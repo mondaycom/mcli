@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -196,7 +195,7 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 	var out itemWriteOutput
 
 	if parentID != "" {
-		resp, apiErr := gen.SubitemCreate(context.Background(), gql, parentID, name, colValuesStr)
+		resp, apiErr := gen.SubitemCreate(cmd.Context(), gql, parentID, name, colValuesStr)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -213,7 +212,7 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 			out.ParentItem = &itemWriteParent{ID: it.Parent_item.Id, Name: it.Parent_item.Name}
 		}
 	} else {
-		resp, apiErr := gen.ItemCreate(context.Background(), gql, boardID, name, groupID, colValuesStr)
+		resp, apiErr := gen.ItemCreate(cmd.Context(), gql, boardID, name, groupID, colValuesStr)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -318,7 +317,7 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 		return err
 	}
 
-	resp, apiErr := gen.ItemUpdate(context.Background(), gql, boardID, itemID, colValuesStr)
+	resp, apiErr := gen.ItemUpdate(cmd.Context(), gql, boardID, itemID, colValuesStr)
 	if apiErr != nil {
 		return apiErr
 	}
@@ -424,7 +423,7 @@ func runItemPostUpdate(cmd *cobra.Command, itemID, bodyFlag, parentID string) er
 		return err
 	}
 
-	resp, apiErr := gen.ItemPostUpdate(context.Background(), gql, itemID, resolved, parentID)
+	resp, apiErr := gen.ItemPostUpdate(cmd.Context(), gql, itemID, resolved, parentID)
 	if apiErr != nil {
 		return apiErr
 	}
@@ -512,7 +511,7 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 	var out itemWriteOutput
 
 	if toGroup != "" {
-		resp, apiErr := gen.ItemMoveToGroup(context.Background(), gql, itemID, toGroup)
+		resp, apiErr := gen.ItemMoveToGroup(cmd.Context(), gql, itemID, toGroup)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -528,7 +527,7 @@ func runItemMove(cmd *cobra.Command, itemID, toGroup, toBoard, groupID string) e
 		if groupID == "" {
 			return errs.Usage("--group is required when using --to-board")
 		}
-		resp, apiErr := gen.ItemMoveToBoard(context.Background(), gql, itemID, toBoard, groupID)
+		resp, apiErr := gen.ItemMoveToBoard(cmd.Context(), gql, itemID, toBoard, groupID)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -599,7 +598,7 @@ func runItemDelete(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.ItemDelete(context.Background(), gql, id)
+	resp, err := gen.ItemDelete(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}
@@ -649,7 +648,7 @@ func runItemArchive(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.ItemArchive(context.Background(), gql, id)
+	resp, err := gen.ItemArchive(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}
@@ -884,7 +883,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 	var nextCursor string
 
 	if groupID != "" {
-		resp, apiErr := gen.ItemsListByGroup(context.Background(), gql, boardID, groupID, limit, cursor)
+		resp, apiErr := gen.ItemsListByGroup(cmd.Context(), gql, boardID, groupID, limit, cursor)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -897,7 +896,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 			}
 		}
 	} else {
-		resp, apiErr := gen.ItemsListByBoard(context.Background(), gql, boardID, limit, cursor)
+		resp, apiErr := gen.ItemsListByBoard(cmd.Context(), gql, boardID, limit, cursor)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -1017,7 +1016,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.ItemGet(context.Background(), gql, id)
+	resp, err := gen.ItemGet(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}

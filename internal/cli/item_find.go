@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -92,7 +91,7 @@ func runItemFind(cmd *cobra.Command, boardID, columnID, value string, limit int,
 		{Column_id: columnID, Column_values: []string{value}},
 	}
 
-	resp, apiErr := gen.ItemFindByColumnValue(context.Background(), gql, boardID, cols, limit, cursor)
+	resp, apiErr := gen.ItemFindByColumnValue(cmd.Context(), gql, boardID, cols, limit, cursor)
 	if apiErr != nil {
 		return apiErr
 	}

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -117,7 +116,7 @@ func runSearch(cmd *cobra.Command, query, searchType string, limit int) error {
 		return err
 	}
 
-	ctx := context.Background()
+	ctx := cmd.Context()
 	out := searchOutput{
 		Boards: []searchBoardItem{},
 		Items:  []searchItemItem{},

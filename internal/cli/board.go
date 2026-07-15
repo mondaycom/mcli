@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -124,7 +123,7 @@ func runBoardList(cmd *cobra.Command, workspaceID string, limit int, cursor stri
 		return err
 	}
 
-	resp, err := gen.BoardsList(context.Background(), gql, limit, page, workspaceIDs)
+	resp, err := gen.BoardsList(cmd.Context(), gql, limit, page, workspaceIDs)
 	if err != nil {
 		return err
 	}
@@ -295,7 +294,7 @@ func runBoardCreate(cmd *cobra.Command, name, workspaceID, kind, description str
 		return err
 	}
 
-	resp, err := gen.BoardCreate(context.Background(), gql, name, boardKind, workspaceID, description, empty)
+	resp, err := gen.BoardCreate(cmd.Context(), gql, name, boardKind, workspaceID, description, empty)
 	if err != nil {
 		return err
 	}
@@ -343,7 +342,7 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGet(context.Background(), gql, id)
+	resp, err := gen.BoardGet(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}
@@ -484,7 +483,7 @@ func runBoardRename(cmd *cobra.Command, id, name string) error {
 		return err
 	}
 
-	if _, err = gen.BoardRename(context.Background(), gql, id, name); err != nil {
+	if _, err = gen.BoardRename(cmd.Context(), gql, id, name); err != nil {
 		return err
 	}
 
@@ -536,7 +535,7 @@ func runBoardDelete(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.BoardDelete(context.Background(), gql, id)
+	resp, err := gen.BoardDelete(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}
@@ -584,7 +583,7 @@ func runBoardArchive(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.BoardArchive(context.Background(), gql, id)
+	resp, err := gen.BoardArchive(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}

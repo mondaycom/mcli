@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -132,7 +131,7 @@ func runWorkspaceList(cmd *cobra.Command, kind string, limit int, cursor string)
 		return err
 	}
 
-	resp, err := gen.WorkspacesList(context.Background(), gql, wsKind, limit, page)
+	resp, err := gen.WorkspacesList(cmd.Context(), gql, wsKind, limit, page)
 	if err != nil {
 		return err
 	}
@@ -207,7 +206,7 @@ func runWorkspaceGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.WorkspaceGet(context.Background(), gql, id)
+	resp, err := gen.WorkspaceGet(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}
@@ -291,7 +290,7 @@ func runWorkspaceCreate(cmd *cobra.Command, name, kind, description string) erro
 		return err
 	}
 
-	resp, err := gen.WorkspaceCreate(context.Background(), gql, name, wsKind, description)
+	resp, err := gen.WorkspaceCreate(cmd.Context(), gql, name, wsKind, description)
 	if err != nil {
 		return err
 	}
@@ -379,7 +378,7 @@ func runWorkspaceUpdate(cmd *cobra.Command, id, name, description, kind string) 
 		return err
 	}
 
-	resp, err := gen.WorkspaceUpdate(context.Background(), gql, id, attrs)
+	resp, err := gen.WorkspaceUpdate(cmd.Context(), gql, id, attrs)
 	if err != nil {
 		return err
 	}
@@ -440,7 +439,7 @@ func runWorkspaceDelete(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.WorkspaceDelete(context.Background(), gql, id)
+	resp, err := gen.WorkspaceDelete(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}

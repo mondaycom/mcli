@@ -2,6 +2,8 @@
 package cli
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 
 	apischema "github.com/mondaycom/mcli/internal/api/schema"
@@ -64,7 +66,8 @@ func init() {
 	apischema.SetConfigDir(resolveConfigDir())
 }
 
-// Execute runs the root command.
-func Execute() error {
+// Execute runs the root command with the given context.
+func Execute(ctx context.Context) error {
+	rootCmd.SetContext(ctx)
 	return rootCmd.Execute()
 }
