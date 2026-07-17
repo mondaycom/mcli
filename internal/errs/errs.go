@@ -26,6 +26,8 @@ const (
 	CodeInternal Code = "INTERNAL"
 	// CodeDaemonRequired indicates the mcli daemon is not running but is needed.
 	CodeDaemonRequired Code = "DAEMON_REQUIRED"
+	// CodeInterrupted indicates the operation was cancelled (SIGTERM/SIGINT/context cancel).
+	CodeInterrupted Code = "INTERRUPTED"
 )
 
 // Error is a structured error value carrying a Code, a human message, and an
@@ -84,6 +86,11 @@ func DaemonRequired(format string, args ...any) *Error {
 	return &Error{Code: CodeDaemonRequired, Message: fmt.Sprintf(format, args...)}
 }
 
+// Interrupted constructs a CodeInterrupted Error.
+func Interrupted(format string, args ...any) *Error {
+	return &Error{Code: CodeInterrupted, Message: fmt.Sprintf(format, args...)}
+}
+
 // ToExitCode maps an error to an exit code per ADR-002.
 // Returns 0 if err is nil.
 func ToExitCode(err error) int {
@@ -104,6 +111,8 @@ func ToExitCode(err error) int {
 			return 5
 		case CodeDaemonRequired:
 			return 6
+		case CodeInterrupted:
+			return 130
 		}
 	}
 	return 5

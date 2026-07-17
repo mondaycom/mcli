@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -73,7 +72,7 @@ func runItemGetUpdates(cmd *cobra.Command, id string, limit int) error {
 		return err
 	}
 
-	resp, apiErr := gen.ItemGetUpdates(context.Background(), gql, id, limit)
+	resp, apiErr := gen.ItemGetUpdates(cmd.Context(), gql, id, limit)
 	if apiErr != nil {
 		return apiErr
 	}

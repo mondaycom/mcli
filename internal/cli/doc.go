@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -57,7 +56,7 @@ func runDocRead(cmd *cobra.Command, docID string) error {
 		return err
 	}
 
-	resp, apiErr := gen.DocExportMarkdown(context.Background(), gql, docID)
+	resp, apiErr := gen.DocExportMarkdown(cmd.Context(), gql, docID)
 	if apiErr != nil {
 		return apiErr
 	}
@@ -121,7 +120,7 @@ func runDocWrite(cmd *cobra.Command, docID, content, filePath string) error {
 		return err
 	}
 
-	ctx := context.Background()
+	ctx := cmd.Context()
 
 	// Step 1: collect all existing block IDs.
 	blockResp, apiErr := gen.DocGetBlockIDs(ctx, gql, docID)
@@ -224,7 +223,7 @@ func runDocCreate(cmd *cobra.Command, workspace, name, kind, folderID string) er
 		return err
 	}
 
-	resp, apiErr := gen.DocCreateInWorkspace(context.Background(), gql, workspace, name, bk, folderID)
+	resp, apiErr := gen.DocCreateInWorkspace(cmd.Context(), gql, workspace, name, bk, folderID)
 	if apiErr != nil {
 		return apiErr
 	}

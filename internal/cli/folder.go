@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -117,7 +116,7 @@ func runFolderList(cmd *cobra.Command, workspaceID string, limit int, cursor str
 		return err
 	}
 
-	resp, err := gen.FoldersList(context.Background(), gql, limit, page, workspaceIDs)
+	resp, err := gen.FoldersList(cmd.Context(), gql, limit, page, workspaceIDs)
 	if err != nil {
 		return err
 	}
@@ -200,7 +199,7 @@ func runFolderCreate(cmd *cobra.Command, name, workspaceID, parentID string) err
 		return err
 	}
 
-	resp, err := gen.FolderCreate(context.Background(), gql, name, workspaceID, parentID)
+	resp, err := gen.FolderCreate(cmd.Context(), gql, name, workspaceID, parentID)
 	if err != nil {
 		return err
 	}
@@ -258,7 +257,7 @@ func runFolderRename(cmd *cobra.Command, id, name string) error {
 		return err
 	}
 
-	resp, err := gen.FolderRename(context.Background(), gql, id, name)
+	resp, err := gen.FolderRename(cmd.Context(), gql, id, name)
 	if err != nil {
 		return err
 	}
@@ -318,7 +317,7 @@ func runFolderDelete(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.FolderDelete(context.Background(), gql, id)
+	resp, err := gen.FolderDelete(cmd.Context(), gql, id)
 	if err != nil {
 		return err
 	}

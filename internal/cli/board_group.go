@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -70,7 +69,7 @@ func runBoardGroupList(cmd *cobra.Command, boardID string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGroupList(context.Background(), gql, boardID)
+	resp, err := gen.BoardGroupList(cmd.Context(), gql, boardID)
 	if err != nil {
 		return err
 	}
@@ -153,7 +152,7 @@ func runBoardGroupCreate(cmd *cobra.Command, boardID, name, color string) error 
 		return err
 	}
 
-	resp, err := gen.BoardGroupCreate(context.Background(), gql, boardID, name, color)
+	resp, err := gen.BoardGroupCreate(cmd.Context(), gql, boardID, name, color)
 	if err != nil {
 		return err
 	}
@@ -227,7 +226,7 @@ func runBoardGroupDelete(cmd *cobra.Command, boardID, groupID string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGroupDelete(context.Background(), gql, boardID, groupID)
+	resp, err := gen.BoardGroupDelete(cmd.Context(), gql, boardID, groupID)
 	if err != nil {
 		return err
 	}
@@ -290,7 +289,7 @@ func runBoardGroupArchive(cmd *cobra.Command, boardID, groupID string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGroupArchive(context.Background(), gql, boardID, groupID)
+	resp, err := gen.BoardGroupArchive(cmd.Context(), gql, boardID, groupID)
 	if err != nil {
 		return err
 	}
@@ -359,7 +358,7 @@ func runBoardGroupRename(cmd *cobra.Command, boardID, groupID, name string) erro
 		return err
 	}
 
-	resp, err := gen.BoardGroupRename(context.Background(), gql, boardID, groupID, name)
+	resp, err := gen.BoardGroupRename(cmd.Context(), gql, boardID, groupID, name)
 	if err != nil {
 		return err
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"github.com/mondaycom/mcli/internal/config"
+	"github.com/mondaycom/mcli/internal/errs"
 	"github.com/mondaycom/mcli/internal/httpx"
 )
 
@@ -110,7 +111,7 @@ func (n *normalisingClient) MakeRequest(
 			wait := complexityWait(lastErr, attempt)
 			select {
 			case <-ctx.Done():
-				return ctx.Err()
+				return errs.Interrupted("operation cancelled")
 			case <-time.After(wait):
 			}
 		}

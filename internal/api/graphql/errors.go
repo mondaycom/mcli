@@ -2,6 +2,7 @@
 package graphql
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -45,6 +46,11 @@ func Normalize(err error) error {
 	// Check for a GraphQL error list (200-with-errors).
 	if gqlList, ok := errors.AsType[gqlerror.List](err); ok {
 		return normalizeGQLErrors(gqlList)
+	}
+
+	// context cancellation → interrupted
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return errs.Interrupted("operation cancelled")
 	}
 
 	// Wrap unknown errors transparently.

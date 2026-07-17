@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -132,7 +131,7 @@ func runBoardColumnList(cmd *cobra.Command, boardID string) error {
 		return err
 	}
 
-	resp, err := gen.BoardColumnList(context.Background(), gql, boardID)
+	resp, err := gen.BoardColumnList(cmd.Context(), gql, boardID)
 	if err != nil {
 		return err
 	}
@@ -240,7 +239,7 @@ func runBoardColumnCreate(cmd *cobra.Command, boardID, title, columnType, descri
 		return err
 	}
 
-	resp, err := gen.BoardColumnCreate(context.Background(), gql, boardID, title, ct, description, defaults)
+	resp, err := gen.BoardColumnCreate(cmd.Context(), gql, boardID, title, ct, description, defaults)
 	if err != nil {
 		return err
 	}
@@ -316,7 +315,7 @@ func runBoardColumnDelete(cmd *cobra.Command, boardID, columnID string) error {
 		return err
 	}
 
-	resp, err := gen.BoardColumnDelete(context.Background(), gql, boardID, columnID)
+	resp, err := gen.BoardColumnDelete(cmd.Context(), gql, boardID, columnID)
 	if err != nil {
 		return err
 	}
@@ -385,7 +384,7 @@ func runBoardColumnRename(cmd *cobra.Command, boardID, columnID, title string) e
 		return err
 	}
 
-	resp, err := gen.BoardColumnRename(context.Background(), gql, boardID, columnID, title)
+	resp, err := gen.BoardColumnRename(cmd.Context(), gql, boardID, columnID, title)
 	if err != nil {
 		return err
 	}
@@ -461,7 +460,7 @@ func runBoardColumnDescribe(cmd *cobra.Command, boardID, columnID, description s
 		return err
 	}
 
-	resp, err := gen.BoardColumnDescribe(context.Background(), gql, boardID, columnID, description)
+	resp, err := gen.BoardColumnDescribe(cmd.Context(), gql, boardID, columnID, description)
 	if err != nil {
 		return err
 	}

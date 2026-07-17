@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"os"
@@ -58,7 +57,7 @@ func runItemDescription(cmd *cobra.Command, itemID, setMarkdown, setFile string)
 			return err
 		}
 
-		resp, apiErr := gen.DocSetItemDescription(context.Background(), gql, itemID, md)
+		resp, apiErr := gen.DocSetItemDescription(cmd.Context(), gql, itemID, md)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -81,7 +80,7 @@ func runItemDescription(cmd *cobra.Command, itemID, setMarkdown, setFile string)
 		return err
 	}
 
-	docsResp, apiErr := gen.DocGetByObjectID(context.Background(), gql, itemID)
+	docsResp, apiErr := gen.DocGetByObjectID(cmd.Context(), gql, itemID)
 	if apiErr != nil {
 		return apiErr
 	}
@@ -91,7 +90,7 @@ func runItemDescription(cmd *cobra.Command, itemID, setMarkdown, setFile string)
 
 	docID := docsResp.Docs[0].Id
 
-	exportResp, apiErr := gen.DocExportMarkdown(context.Background(), gql, docID)
+	exportResp, apiErr := gen.DocExportMarkdown(cmd.Context(), gql, docID)
 	if apiErr != nil {
 		return apiErr
 	}

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -71,7 +70,7 @@ func runMe(cmd *cobra.Command, _ []string) error {
 
 	c := apigraphql.New(token, version)
 
-	resp, err := gen.Me(context.Background(), c.GQL())
+	resp, err := gen.Me(cmd.Context(), c.GQL())
 	if err != nil {
 		return err
 	}
