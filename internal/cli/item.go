@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -680,6 +681,7 @@ func runItemArchive(cmd *cobra.Command, id string) error {
 // renderedColumn is the clean output shape for a single column value.
 type renderedColumn struct {
 	ID    string `json:"id"`
+	Title string `json:"title"`
 	Type  string `json:"type"`
 	Value any    `json:"value"`
 }
@@ -752,6 +754,7 @@ type itemGetOutput struct {
 // around the pointer-receiver vs value-type mismatch in the generated code.
 type columnEntry struct {
 	id          string
+	title       string
 	columnType  string
 	settingsStr string
 	rawValue    string
@@ -775,6 +778,7 @@ func renderColumns(entries []columnEntry) ([]renderedColumn, error) {
 		}
 		out = append(out, renderedColumn{
 			ID:    ce.id,
+			Title: ce.title,
 			Type:  decoded.Type,
 			Value: decoded.Value,
 		})
@@ -791,6 +795,7 @@ func extractBoardColumnEntries(
 		col := cv.GetColumn()
 		entries = append(entries, columnEntry{
 			id:          cv.GetId(),
+			title:       col.Title,
 			columnType:  string(cv.GetType()),
 			settingsStr: col.Settings_str,
 			rawValue:    cv.GetValue(),
@@ -808,6 +813,7 @@ func extractGroupColumnEntries(
 		col := cv.GetColumn()
 		entries = append(entries, columnEntry{
 			id:          cv.GetId(),
+			title:       col.Title,
 			columnType:  string(cv.GetType()),
 			settingsStr: col.Settings_str,
 			rawValue:    cv.GetValue(),
@@ -825,6 +831,7 @@ func extractGetColumnEntries(
 		col := cv.GetColumn()
 		entries = append(entries, columnEntry{
 			id:          cv.GetId(),
+			title:       col.Title,
 			columnType:  string(cv.GetType()),
 			settingsStr: col.Settings_str,
 			rawValue:    cv.GetValue(),
@@ -925,30 +932,83 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 		return modeErr
 	}
 
-	if mode == ModeJSON {
+	switch mode {
+	case ModeJSON:
 		data, mErr := json.Marshal(out)
 		if mErr != nil {
 			return errs.Internal("marshal output: %v", mErr)
 		}
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), string(data))
 		return err
-	}
 
-	// Pretty output: tab-aligned table.
-	w := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(w, "ID\tNAME\tSTATE\tGROUP\tCOLUMNS")
-	for _, item := range rawItems {
-		colSummary := fmt.Sprintf("%d column(s)", len(item.Columns))
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
-			item.ID, item.Name, item.State, item.Group.Title, colSummary)
+	case ModeCSV:
+		return writeItemListCSV(cmd, out)
+
+	case ModeTerse:
+		return writeItemListTerse(cmd, out)
+
+	default: // ModePretty
+		return writeItemListPretty(cmd, out)
 	}
-	if err := w.Flush(); err != nil {
+}
+
+// writeItemListPretty renders items as a tab-aligned table with one table
+// column per board column.
+func writeItemListPretty(cmd *cobra.Command, out itemListOutput) error {
+	o := cmd.OutOrStdout()
+	if err := writeItemsTable(o, out.Items); err != nil {
 		return errs.Internal("flush table: %v", err)
 	}
-	if nextCursor != "" {
-		_, err = fmt.Fprintf(cmd.OutOrStdout(), "\nnext cursor: %s\n", nextCursor)
+	if out.Cursor != "" {
+		if _, err := fmt.Fprintf(o, "\nnext cursor: %s\n", out.Cursor); err != nil {
+			return err
+		}
 	}
-	return err
+	return nil
+}
+
+// writeItemListTerse renders one item per line as a compact, values-only
+// summary (column labels are dropped — they live in pretty/JSON output).
+func writeItemListTerse(cmd *cobra.Command, out itemListOutput) error {
+	o := cmd.OutOrStdout()
+	for _, it := range out.Items {
+		fields := make([]string, 0, len(it.Columns)+2)
+		fields = append(fields, it.State, it.Group.Title)
+		for _, c := range it.Columns {
+			fields = append(fields, formatColumnValue(c))
+		}
+		if _, err := fmt.Fprintf(o, "#%s %s · %s\n", it.ID, it.Name, strings.Join(fields, " · ")); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// writeItemListCSV renders items as CSV with one data column per board column.
+func writeItemListCSV(cmd *cobra.Command, out itemListOutput) error {
+	headers := collectItemColumns(out.Items)
+	w := csv.NewWriter(cmd.OutOrStdout())
+
+	rec := []string{"id", "name", "state", "group"}
+	for _, h := range headers {
+		rec = append(rec, h.label)
+	}
+	_ = w.Write(rec)
+
+	for _, it := range out.Items {
+		vals := itemColumnValues(it)
+		rec = []string{it.ID, it.Name, it.State, it.Group.Title}
+		for _, h := range headers {
+			rec = append(rec, vals[h.id])
+		}
+		_ = w.Write(rec)
+	}
+
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return errs.Internal("write csv: %v", err)
+	}
+	return nil
 }
 
 // convertItemsListByBoard converts genqlient board-query items to output items.
@@ -1112,10 +1172,9 @@ func runItemGet(cmd *cobra.Command, id string) error {
 	if len(out.Columns) > 0 {
 		_, _ = fmt.Fprintf(o, "\nColumns (%d):\n", len(out.Columns))
 		tw := tabwriter.NewWriter(o, 0, 0, 2, ' ', 0)
-		_, _ = fmt.Fprintln(tw, "  ID\tTYPE\tVALUE")
+		_, _ = fmt.Fprintln(tw, "  ID\tTITLE\tTYPE\tVALUE")
 		for _, c := range out.Columns {
-			valStr := fmt.Sprintf("%v", c.Value)
-			_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\n", c.ID, c.Type, valStr)
+			_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\t%s\n", c.ID, c.Title, c.Type, formatColumnValue(c))
 		}
 		_ = tw.Flush()
 	}

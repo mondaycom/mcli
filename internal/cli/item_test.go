@@ -69,6 +69,21 @@ func execItemList(t *testing.T, args ...string) (string, error) {
 	return buf.String(), err
 }
 
+// execItemListMode runs 'item list' with an explicit output mode via globals.
+func execItemListMode(t *testing.T, g GlobalFlags, args ...string) (string, error) {
+	t.Helper()
+	globals = g
+	defer func() { globals = GlobalFlags{} }()
+
+	var buf bytes.Buffer
+	cmd := newItemCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(io.Discard)
+	cmd.SetArgs(append([]string{"list"}, args...))
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
 // execItemGet runs 'item get <id>' and returns stdout, exit err.
 func execItemGet(t *testing.T, id string, extraArgs ...string) (string, error) {
 	t.Helper()
@@ -233,6 +248,93 @@ func TestItemList_WithItems(t *testing.T) {
 	}
 	if dateCol["value"] != "2026-05-10" {
 		t.Errorf("expected value '2026-05-10', got %v", dateCol["value"])
+	}
+}
+
+func TestItemList_JSON_HasColumnTitle(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(itemsPageResponse("", sampleItems()))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemList(t, "--board", "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v", err)
+	}
+	items, _ := result["items"].([]any)
+	statusCol := items[0].(map[string]any)["columns"].([]any)[0].(map[string]any)
+	if statusCol["title"] != "Status" {
+		t.Errorf("expected column title 'Status', got %v", statusCol["title"])
+	}
+}
+
+func TestItemList_Pretty_ShowsColumnValues(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(itemsPageResponse("", sampleItems()))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemListMode(t, GlobalFlags{Pretty: true}, "--board", "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if strings.Contains(out, "column(s)") {
+		t.Errorf("pretty output still shows the column count summary:\n%s", out)
+	}
+	for _, want := range []string{"Status", "Due Date", "Done", "2026-05-10"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("pretty output missing %q:\n%s", want, out)
+		}
+	}
+}
+
+func TestItemList_Terse_ShowsColumnValues(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(itemsPageResponse("", sampleItems()))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemListMode(t, GlobalFlags{Terse: true}, "--board", "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	want := "#1234567890 Build feature · active · Sprint 1 · Done · 2026-05-10\n"
+	if out != want {
+		t.Errorf("terse output:\n got %q\nwant %q", out, want)
+	}
+	// Labels belong to pretty/JSON, not terse.
+	if strings.Contains(out, "Status=") || strings.Contains(out, "=") {
+		t.Errorf("terse output should be values-only, got:\n%s", out)
+	}
+}
+
+func TestItemList_CSV_HasDynamicColumns(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(itemsPageResponse("", sampleItems()))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemListMode(t, GlobalFlags{CSV: true}, "--board", "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected header + 1 row, got %d lines:\n%s", len(lines), out)
+	}
+	if lines[0] != "id,name,state,group,Status,Due Date" {
+		t.Errorf("unexpected CSV header: %q", lines[0])
+	}
+	if lines[1] != "1234567890,Build feature,active,Sprint 1,Done,2026-05-10" {
+		t.Errorf("unexpected CSV row: %q", lines[1])
 	}
 }
 
