@@ -840,6 +840,24 @@ func extractGetColumnEntries(
 	return entries
 }
 
+// extractBoardGetColumnEntries converts BoardGet (--items) column values to columnEntries.
+func extractBoardGetColumnEntries(
+	vals []gen.BoardGetBoardsBoardItems_pageItemsResponseItemsItemColumn_valuesColumnValue,
+) []columnEntry {
+	entries := make([]columnEntry, 0, len(vals))
+	for _, cv := range vals {
+		col := cv.GetColumn()
+		entries = append(entries, columnEntry{
+			id:          cv.GetId(),
+			title:       col.Title,
+			columnType:  string(cv.GetType()),
+			settingsStr: col.Settings_str,
+			rawValue:    cv.GetValue(),
+		})
+	}
+	return entries
+}
+
 // --- item list ---
 
 func newItemListCmd() *cobra.Command {
@@ -1018,6 +1036,27 @@ func convertItemsListByBoard(
 	out := make([]itemListOutputItem, 0, len(items))
 	for _, it := range items {
 		cols, err := renderColumns(extractBoardColumnEntries(it.Column_values))
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, itemListOutputItem{
+			ID:      it.Id,
+			Name:    it.Name,
+			State:   string(it.State),
+			Group:   itemGroup{ID: it.Group.Id, Title: it.Group.Title},
+			Columns: cols,
+		})
+	}
+	return out, nil
+}
+
+// convertBoardGetItems converts genqlient BoardGet (--items) items to output items.
+func convertBoardGetItems(
+	items []gen.BoardGetBoardsBoardItems_pageItemsResponseItemsItem,
+) ([]itemListOutputItem, error) {
+	out := make([]itemListOutputItem, 0, len(items))
+	for _, it := range items {
+		cols, err := renderColumns(extractBoardGetColumnEntries(it.Column_values))
 		if err != nil {
 			return nil, err
 		}
