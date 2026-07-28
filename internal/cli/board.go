@@ -343,7 +343,7 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGet(cmd.Context(), gql, id)
+	resp, err := gen.BoardGet(cmd.Context(), gql, id, false, 25, "")
 	if err != nil {
 		return err
 	}

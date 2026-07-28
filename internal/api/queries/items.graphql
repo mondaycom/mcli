@@ -6,6 +6,7 @@ query ItemsListByBoard(
   $limit: Int! = 25,
   # @genqlient(omitempty: true)
   $cursor: String,
+  $withSubitems: Boolean! = false,
 ) {
   boards(ids: [$boardId]) {
     items_page(limit: $limit, cursor: $cursor) {
@@ -22,6 +23,18 @@ query ItemsListByBoard(
           text
           column { id title settings_str }
         }
+        subitems @include(if: $withSubitems) {
+          id
+          name
+          state
+          column_values {
+            id
+            type
+            value
+            text
+            column { id title settings_str }
+          }
+        }
       }
     }
   }
@@ -34,6 +47,7 @@ query ItemsListByGroup(
   $limit: Int! = 25,
   # @genqlient(omitempty: true)
   $cursor: String,
+  $withSubitems: Boolean! = false,
 ) {
   boards(ids: [$boardId]) {
     groups(ids: [$groupId]) {
@@ -52,6 +66,18 @@ query ItemsListByGroup(
             text
             column { id title settings_str }
           }
+          subitems @include(if: $withSubitems) {
+            id
+            name
+            state
+            column_values {
+              id
+              type
+              value
+              text
+              column { id title settings_str }
+            }
+          }
         }
       }
     }
@@ -59,7 +85,9 @@ query ItemsListByGroup(
 }
 
 # ItemGet fetches a single item by ID with full detail.
-query ItemGet($id: ID!) {
+# When $withSubitems is true, each subitem also carries its column values;
+# otherwise only id/name/state are returned (default, unchanged cost).
+query ItemGet($id: ID!, $withSubitems: Boolean! = false) {
   items(ids: [$id]) {
     id
     name
@@ -70,7 +98,18 @@ query ItemGet($id: ID!) {
     group { id title }
     board { id name }
     parent_item { id name }
-    subitems { id name state }
+    subitems {
+      id
+      name
+      state
+      column_values @include(if: $withSubitems) {
+        id
+        type
+        value
+        text
+        column { id title settings_str }
+      }
+    }
     column_values {
       id
       type

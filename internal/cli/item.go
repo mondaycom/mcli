@@ -891,7 +891,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 	var nextCursor string
 
 	if groupID != "" {
-		resp, apiErr := gen.ItemsListByGroup(cmd.Context(), gql, boardID, groupID, limit, cursor)
+		resp, apiErr := gen.ItemsListByGroup(cmd.Context(), gql, boardID, groupID, limit, cursor, false)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -904,7 +904,7 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 			}
 		}
 	} else {
-		resp, apiErr := gen.ItemsListByBoard(cmd.Context(), gql, boardID, limit, cursor)
+		resp, apiErr := gen.ItemsListByBoard(cmd.Context(), gql, boardID, limit, cursor, false)
 		if apiErr != nil {
 			return apiErr
 		}
@@ -1077,7 +1077,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.ItemGet(cmd.Context(), gql, id)
+	resp, err := gen.ItemGet(cmd.Context(), gql, id, false)
 	if err != nil {
 		return err
 	}
