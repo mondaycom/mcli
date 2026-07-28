@@ -61,7 +61,7 @@ func TestText_MalformedJSON(t *testing.T) {
 	}
 }
 
-// ---- long-text ----
+// ---- long_text ----
 
 func TestLongText(t *testing.T) {
 	t.Parallel()
@@ -75,7 +75,7 @@ func TestLongText(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			d := mustDecode(t, "long-text", "", tc.valueJSON)
+			d := mustDecode(t, "long_text", "", tc.valueJSON)
 			if d.Value != tc.want {
 				t.Errorf("Value = %q, want %q", d.Value, tc.want)
 			}
@@ -85,7 +85,7 @@ func TestLongText(t *testing.T) {
 
 func TestLongText_Null(t *testing.T) {
 	t.Parallel()
-	d := mustDecode(t, "long-text", "", "null")
+	d := mustDecode(t, "long_text", "", "null")
 	if d.Value != nil {
 		t.Errorf("Value = %v, want nil", d.Value)
 	}
@@ -93,7 +93,7 @@ func TestLongText_Null(t *testing.T) {
 
 func TestLongText_Malformed(t *testing.T) {
 	t.Parallel()
-	_, err := columns.Decode("long-text", "", `{bad json}`)
+	_, err := columns.Decode("long_text", "", `{bad json}`)
 	if err == nil {
 		t.Error("expected error")
 	}
@@ -361,7 +361,7 @@ func TestDropdown_Malformed(t *testing.T) {
 	}
 }
 
-// ---- numeric ----
+// ---- numbers ----
 
 func TestNumeric(t *testing.T) {
 	t.Parallel()
@@ -376,10 +376,11 @@ func TestNumeric(t *testing.T) {
 		{"negative", `"-7"`, int64(-7)},
 		{"raw float", `3.14`, 3.14},
 		{"raw integer", `100`, int64(100)},
+		{"quoted thousands", `"8000"`, int64(8000)},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			d := mustDecode(t, "numeric", "", tc.valueJSON)
+			d := mustDecode(t, "numbers", "", tc.valueJSON)
 			if d.Value != tc.want {
 				t.Errorf("Value = %v (%T), want %v (%T)", d.Value, d.Value, tc.want, tc.want)
 			}
@@ -389,7 +390,7 @@ func TestNumeric(t *testing.T) {
 
 func TestNumeric_Null(t *testing.T) {
 	t.Parallel()
-	d := mustDecode(t, "numeric", "", "null")
+	d := mustDecode(t, "numbers", "", "null")
 	if d.Value != nil {
 		t.Errorf("Value = %v, want nil", d.Value)
 	}
@@ -397,7 +398,7 @@ func TestNumeric_Null(t *testing.T) {
 
 func TestNumeric_Malformed(t *testing.T) {
 	t.Parallel()
-	_, err := columns.Decode("numeric", "", `"not-a-number"`)
+	_, err := columns.Decode("numbers", "", `"not-a-number"`)
 	if err == nil {
 		t.Error("expected error for non-numeric string")
 	}
@@ -729,8 +730,8 @@ func TestUnknownTypeNullValue(t *testing.T) {
 
 func TestNullAndEmptyAcrossTypes(t *testing.T) {
 	t.Parallel()
-	types := []string{"text", "long-text", "status", "date", "datetime",
-		"people", "dropdown", "numeric", "link", "email",
+	types := []string{"text", "long_text", "status", "date", "datetime",
+		"people", "dropdown", "numbers", "link", "email",
 		"phone", "timeline", "tags", "checkbox"}
 	for _, ct := range types {
 		for _, vj := range []string{"", "null"} {

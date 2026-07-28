@@ -55,13 +55,13 @@ type decoderFn func(settingsStr, valueJSON string) (any, error)
 // registry maps monday column type strings to decoder functions.
 var registry = map[string]decoderFn{
 	"text":      decodeText,
-	"long-text": decodeLongText,
+	"long_text": decodeLongText,
 	"status":    decodeStatus,
 	"date":      decodeDate,
-	"datetime":  decodeDate, // same column type as date but with time present
+	"datetime":  decodeDate, // synthetic alias; real date-with-time arrives as "date"
 	"people":    decodePeople,
 	"dropdown":  decodeDropdown,
-	"numeric":   decodeNumeric,
+	"numbers":   decodeNumeric,
 	"link":      decodeLink,
 	"email":     decodeEmail,
 	"phone":     decodePhone,
