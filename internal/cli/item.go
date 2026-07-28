@@ -41,8 +41,9 @@ func newItemClient() (gqlclient.Client, error) {
 // newItemCmd returns the 'mcli item' parent command.
 func newItemCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "item",
-		Short: "Manage monday.com items",
+		Use:     "item",
+		Aliases: []string{"items"},
+		Short:   "Manage monday.com items",
 	}
 	cmd.AddCommand(newItemListCmd())
 	cmd.AddCommand(newItemGetCmd())

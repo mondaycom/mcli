@@ -38,8 +38,9 @@ func newBoardClient() (gqlclient.Client, error) {
 // newBoardCmd returns the 'mcli board' parent command.
 func newBoardCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "board",
-		Short: "Manage monday.com boards",
+		Use:     "board",
+		Aliases: []string{"boards"},
+		Short:   "Manage monday.com boards",
 	}
 	cmd.AddCommand(newBoardListCmd())
 	cmd.AddCommand(newBoardGetCmd())
