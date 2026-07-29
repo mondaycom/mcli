@@ -48,7 +48,7 @@ Workspace → Folder → Board → { Group, Column } → Item → Subitem
 
 ### Discover board structure
 
-- ` + "`mcli board get <id>`" + ` — full detail (groups + columns + settings)
+- ` + "`mcli board get <id>`" + ` — full detail (groups + columns + settings); add ` + "`--items`" + ` to also get the first page of items with column values (` + "`--items-limit N`" + `, ` + "`--items-cursor`" + `)
 - ` + "`mcli board group list --board <id>`" + ` — just groups
 - ` + "`mcli board column list --board <id>`" + ` — just columns (includes settings_str with labels/options)
 
@@ -62,8 +62,8 @@ Search all entity types at once or restrict with ` + "`-t`" + `. Returns a JSON 
 ### CRUD items
 
 - Create: ` + "`mcli item create --board <id> --name ... [--group <id>] [--col <col_id>=<json>]...`" + `
-- Read list: ` + "`mcli item list --board <id> [--group <id>] [--limit N] [--cursor ...]`" + `
-- Read one: ` + "`mcli item get <id>`" + ` — includes decoded column values, subitems, creator
+- Read list: ` + "`mcli item list --board <id> [--group <id>] [--limit N] [--cursor ...] [--subitems]`" + ` — ` + "`--subitems`" + ` adds each item's subitems with column values (JSON output)
+- Read one: ` + "`mcli item get <id> [--subitems]`" + ` — includes decoded column values, subitems, creator; ` + "`--subitems`" + ` adds each subitem's column values (` + "`--subitem-count N`" + ` caps them)
 - Find by column value: ` + "`mcli item find --board <id> --column <col_id> --value <text>`" + `
 - Update: ` + "`mcli item update <id> --board <id> [--name ...] [--col <col_id>=<json>]...`" + `
 - Move: ` + "`mcli item move <id> --to-group <id>`" + ` or ` + "`--to-board <id> --group <id>`" + `

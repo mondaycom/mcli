@@ -24,11 +24,16 @@ mcli me
 # List your boards
 mcli board list
 
-# Get board structure
+# Get board structure (add --items for the first page of items with column values)
 mcli board get 9832181507
+mcli board get 9832181507 --items --items-limit 50
 
-# List items with decoded column values
+# List items with decoded column values (add --subitems to include each item's subitems)
 mcli item list --board 9832181507
+mcli item list --board 9832181507 --subitems
+
+# Get a single item, including its subitems with column values
+mcli item get 1234567890 --subitems
 
 # Create an item with column values
 mcli item create --board 9832181507 --name "Ship feature" \
@@ -271,6 +276,18 @@ mcli item create --board 123 --name "Task" \
 ```
 
 Use `mcli board column list --board <id>` to discover column IDs, types, and settings.
+
+### Fetching nested data in one call
+
+To save round-trips, several read commands can pull related records with their decoded column values in a single request:
+
+| Command | Flag | Adds |
+|---------|------|------|
+| `board get <id>` | `--items` | first page of items (`items[]`, `items_cursor`); `--items-limit` (default 25, max 500), `--items-cursor` |
+| `item get <id>` | `--subitems` | each subitem's column values; `--subitem-count` caps the count (default 25) and sets `subitems_truncated` when it drops rows |
+| `item list --board <id>` | `--subitems` | each item's subitems with column values (JSON output only) |
+
+Without these flags the queries stay cheap — the extra selections are `@include`-gated so default cost is unchanged. Nested column values decode the same way as top-level ones.
 
 ## Saved Queries & Mutations
 

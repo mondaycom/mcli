@@ -950,7 +950,7 @@ func newItemListCmd() *cobra.Command {
 	cmd.Flags().StringVar(&groupID, "group", "", "group ID (optional; omit for all groups)")
 	cmd.Flags().IntVar(&limit, "limit", itemListDefaultLimit, "max items per page (max 500)")
 	cmd.Flags().StringVar(&cursor, "cursor", "", "opaque page cursor (omit for first page)")
-	cmd.Flags().BoolVar(&withSubitems, "subitems", false, "include each item's subitems with their column values")
+	cmd.Flags().BoolVar(&withSubitems, "subitems", false, "include each item's subitems with their column values (JSON output only)")
 	cmd.Flags().IntVar(&subitemCount, "subitem-count", subitemDefaultCount, "max subitems per item with --subitems")
 	_ = cmd.MarkFlagRequired("board")
 
