@@ -1,9 +1,76 @@
 package cli
 
 import (
+	"bytes"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/mondaycom/mcli/internal/errs"
 )
+
+func TestRenderError_JSONToStdout(t *testing.T) {
+	t.Parallel()
+
+	var out, errBuf bytes.Buffer
+	renderError(ModeJSON, &out, &errBuf, errs.Usage("bad id %q", "abc"))
+
+	if errBuf.Len() != 0 {
+		t.Errorf("JSON mode must not write to stderr, got %q", errBuf.String())
+	}
+	got := out.String()
+	if !strings.Contains(got, `"code":"USAGE"`) || !strings.Contains(got, `bad id \"abc\"`) {
+		t.Errorf("expected structured JSON error on stdout, got %q", got)
+	}
+}
+
+// TestRenderError_NonJSONModesSurfaceError guards the A5 regression: terse and
+// csv modes previously fell through PrintError's switch and dropped the error
+// entirely. Every non-JSON mode must render a human-readable message to stderr.
+func TestRenderError_NonJSONModesSurfaceError(t *testing.T) {
+	t.Parallel()
+
+	for _, mode := range []OutputMode{ModePretty, ModeTerse, ModeCSV} {
+		mode := mode
+		t.Run(modeName(mode), func(t *testing.T) {
+			t.Parallel()
+			var out, errBuf bytes.Buffer
+			renderError(mode, &out, &errBuf, errs.Usage("nope"))
+
+			if out.Len() != 0 {
+				t.Errorf("non-JSON mode must not write to stdout, got %q", out.String())
+			}
+			if got := errBuf.String(); !strings.Contains(got, "Error [USAGE]: nope") {
+				t.Errorf("expected human-readable error on stderr, got %q", got)
+			}
+		})
+	}
+}
+
+func TestRenderError_NilIsNoop(t *testing.T) {
+	t.Parallel()
+
+	var out, errBuf bytes.Buffer
+	renderError(ModeTerse, &out, &errBuf, nil)
+	if out.Len() != 0 || errBuf.Len() != 0 {
+		t.Errorf("nil error must produce no output, got stdout=%q stderr=%q", out.String(), errBuf.String())
+	}
+}
+
+func modeName(m OutputMode) string {
+	switch m {
+	case ModeJSON:
+		return "json"
+	case ModePretty:
+		return "pretty"
+	case ModeTerse:
+		return "terse"
+	case ModeCSV:
+		return "csv"
+	default:
+		return "unknown"
+	}
+}
 
 func TestResolveOutputMode_FlagConflict(t *testing.T) {
 	t.Parallel()

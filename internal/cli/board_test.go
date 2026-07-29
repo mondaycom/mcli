@@ -337,6 +337,122 @@ func TestBoardGet_WithWorkspaceAndOwners(t *testing.T) {
 	}
 }
 
+// boardWithItemsResponse builds a BoardGet response whose board carries an
+// items_page (as returned when --items is set).
+func boardWithItemsResponse(cursor string, items []map[string]any) map[string]any {
+	board := map[string]any{
+		"id":           "9832181507",
+		"name":         "Test Board",
+		"board_kind":   "public",
+		"state":        "active",
+		"description":  "",
+		"workspace_id": "42",
+		"workspace":    map[string]any{"id": "42", "name": "Main WS", "kind": "open"},
+		"owners":       []map[string]any{},
+		"groups":       []map[string]any{},
+		"columns":      []map[string]any{},
+		"items_page":   map[string]any{"cursor": cursor, "items": items},
+	}
+	return map[string]any{"boards": []any{board}}
+}
+
+func TestBoardGet_WithItems_DecodesColumnsAndCursor(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(boardWithItemsResponse("next123", sampleItems()))
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardGet(t, "9832181507", "--items", "--items-limit", "10")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// The query must request items with the given limit.
+	if capturedVars["withItems"] != true {
+		t.Errorf("expected withItems=true, got %v", capturedVars["withItems"])
+	}
+	if capturedVars["itemsLimit"] != float64(10) {
+		t.Errorf("expected itemsLimit=10, got %v", capturedVars["itemsLimit"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if result["items_cursor"] != "next123" {
+		t.Errorf("expected items_cursor 'next123', got %v", result["items_cursor"])
+	}
+	items, _ := result["items"].([]any)
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(items))
+	}
+	cols, _ := items[0].(map[string]any)["columns"].([]any)
+	if len(cols) != 2 {
+		t.Fatalf("expected 2 decoded columns, got %d", len(cols))
+	}
+	if cols[0].(map[string]any)["value"] != "Done" {
+		t.Errorf("expected status value 'Done', got %v", cols[0].(map[string]any)["value"])
+	}
+}
+
+func TestBoardGet_WithoutItems_OmitsItemsKeys(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(boardWithItemsResponse("", nil))
+	})
+	installBoardFactory(t, srv.URL)
+
+	out, err := execBoardGet(t, "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["withItems"] != false {
+		t.Errorf("expected withItems=false, got %v", capturedVars["withItems"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	if _, ok := result["items"]; ok {
+		t.Error("items key should be absent without --items")
+	}
+	if _, ok := result["items_cursor"]; ok {
+		t.Error("items_cursor key should be absent without --items")
+	}
+}
+
+func TestBoardGet_ItemsCursorImpliesItems(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(boardWithItemsResponse("", sampleItems()))
+	})
+	installBoardFactory(t, srv.URL)
+
+	// Only --items-cursor is passed; it must imply --items.
+	if _, err := execBoardGet(t, "9832181507", "--items-cursor", "abc"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["withItems"] != true {
+		t.Errorf("expected withItems=true from cursor, got %v", capturedVars["withItems"])
+	}
+	if capturedVars["itemsCursor"] != "abc" {
+		t.Errorf("expected itemsCursor 'abc', got %v", capturedVars["itemsCursor"])
+	}
+}
+
 // execBoardCreate runs 'board create' with the given flags and returns stdout, exit err.
 func execBoardCreate(t *testing.T, args ...string) (string, error) {
 	t.Helper()

@@ -3,10 +3,12 @@ package cli
 
 import (
 	"context"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	apischema "github.com/mondaycom/mcli/internal/api/schema"
+	"github.com/mondaycom/mcli/internal/errs"
 )
 
 // GlobalFlags holds the values of flags available on every command.
@@ -63,11 +65,55 @@ func init() {
 	rootCmd.AddCommand(newDocCmd())
 	rootCmd.AddCommand(newAPICmd())
 
+	requireKnownSubcommands(rootCmd)
+
 	apischema.SetConfigDir(resolveConfigDir())
+}
+
+// unknownCommandHint is appended to every unknown-command error so a typo points
+// the user (or an LLM) at the command index.
+const unknownCommandHint = "Run 'mcli help' to see available commands."
+
+// requireKnownSubcommands makes every namespace command (one with subcommands
+// but no action of its own) reject unknown subcommands. Cobra's default shows
+// the namespace's help and exits 0, so a typo like `mcli item lst` looks like a
+// success. Giving the namespace a RunE makes it runnable, so cobra dispatches
+// the stray arg here instead of bailing to help: no args → show help (the prior
+// behavior), any arg → an "unknown command" usage error. The root command is
+// left untouched — it already errors on unknown commands, with "Did you mean …?"
+// suggestions.
+func requireKnownSubcommands(parent *cobra.Command) {
+	for _, cmd := range parent.Commands() {
+		if cmd.Run == nil && cmd.RunE == nil && cmd.HasSubCommands() {
+			cmd.RunE = func(c *cobra.Command, args []string) error {
+				if len(args) > 0 {
+					return errs.Usage("unknown command %q for %q\n%s", args[0], c.CommandPath(), unknownCommandHint)
+				}
+				return c.Help()
+			}
+		}
+		requireKnownSubcommands(cmd)
+	}
 }
 
 // Execute runs the root command with the given context.
 func Execute(ctx context.Context) error {
 	rootCmd.SetContext(ctx)
-	return rootCmd.Execute()
+	return friendlyUnknownCommand(rootCmd.Execute())
+}
+
+// friendlyUnknownCommand rewrites cobra's bare "unknown command …" error (raised
+// for an unknown top-level command) into a usage error that points at
+// `mcli help`. This gives a typo an actionable message and exit code 1 (usage)
+// instead of a generic exit 5, while preserving any "Did you mean …?" suggestion
+// cobra already put in the message. Unknown subcommands are handled in
+// requireKnownSubcommands and already carry the hint, so they don't match here.
+func friendlyUnknownCommand(err error) error {
+	if err == nil {
+		return nil
+	}
+	if strings.HasPrefix(err.Error(), "unknown command ") {
+		return errs.Usage("%s\n%s", err.Error(), unknownCommandHint)
+	}
+	return err
 }

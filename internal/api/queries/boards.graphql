@@ -39,7 +39,16 @@ mutation BoardCreate(
 }
 
 # BoardGet fetches a single board by ID with full detail.
-query BoardGet($id: ID!) {
+# When $withItems is true, the first page of items (with column values) is
+# fetched in the same round trip; otherwise items_page is skipped so the
+# default query cost is unchanged.
+query BoardGet(
+  $id: ID!,
+  $withItems: Boolean! = false,
+  $itemsLimit: Int! = 25,
+  # @genqlient(omitempty: true)
+  $itemsCursor: String,
+) {
   boards(ids: [$id]) {
     id
     name
@@ -69,6 +78,22 @@ query BoardGet($id: ID!) {
       settings_str
       width
       archived
+    }
+    items_page(limit: $itemsLimit, cursor: $itemsCursor) @include(if: $withItems) {
+      cursor
+      items {
+        id
+        name
+        state
+        group { id title }
+        column_values {
+          id
+          type
+          value
+          text
+          column { id title settings_str }
+        }
+      }
     }
   }
 }

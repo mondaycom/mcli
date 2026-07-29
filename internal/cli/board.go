@@ -38,8 +38,9 @@ func newBoardClient() (gqlclient.Client, error) {
 // newBoardCmd returns the 'mcli board' parent command.
 func newBoardCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "board",
-		Short: "Manage monday.com boards",
+		Use:     "board",
+		Aliases: []string{"boards"},
+		Short:   "Manage monday.com boards",
 	}
 	cmd.AddCommand(newBoardListCmd())
 	cmd.AddCommand(newBoardGetCmd())
@@ -190,6 +191,10 @@ type boardGetOutput struct {
 	Owners      []boardOwner    `json:"owners"`
 	Groups      []boardGroup    `json:"groups"`
 	Columns     []boardColumn   `json:"columns"`
+	// Items and ItemsCursor are populated only with --items; both are omitted
+	// otherwise (additive per axiom A6).
+	Items       []itemListOutputItem `json:"items,omitempty"`
+	ItemsCursor string               `json:"items_cursor,omitempty"`
 }
 
 type boardWorkspace struct {
@@ -220,15 +225,27 @@ type boardColumn struct {
 }
 
 func newBoardGetCmd() *cobra.Command {
-	return &cobra.Command{
+	var (
+		withItems   bool
+		itemsLimit  int
+		itemsCursor string
+	)
+
+	cmd := &cobra.Command{
 		Use:   "get <id>",
 		Short: "Get a board by ID",
 		Long:  "Fetch full details for a monday.com board by its numeric ID.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runBoardGet(cmd, args[0])
+			return runBoardGet(cmd, args[0], withItems, itemsLimit, itemsCursor)
 		},
 	}
+
+	cmd.Flags().BoolVar(&withItems, "items", false, "also fetch the first page of items with their column values")
+	cmd.Flags().IntVar(&itemsLimit, "items-limit", itemListDefaultLimit, "max items to fetch with --items (max 500)")
+	cmd.Flags().StringVar(&itemsCursor, "items-cursor", "", "opaque cursor for the items page (implies --items)")
+
+	return cmd
 }
 
 // boardCreateOutput is the JSON shape for 'mcli board create'.
@@ -331,10 +348,21 @@ func runBoardCreate(cmd *cobra.Command, name, workspaceID, kind, description str
 	return err
 }
 
-func runBoardGet(cmd *cobra.Command, id string) error {
+func runBoardGet(cmd *cobra.Command, id string, withItems bool, itemsLimit int, itemsCursor string) error {
 	// Monday IDs are numeric strings; validate before hitting the API.
 	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
 		return errs.Usage("board id must be a numeric string, got %q", id)
+	}
+
+	// A cursor is meaningless without fetching items; treat it as implying --items.
+	if itemsCursor != "" {
+		withItems = true
+	}
+	if itemsLimit < 1 {
+		itemsLimit = itemListDefaultLimit
+	}
+	if itemsLimit > itemListMaxLimit {
+		itemsLimit = itemListMaxLimit
 	}
 
 	gql, err := newBoardClient()
@@ -342,7 +370,7 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.BoardGet(cmd.Context(), gql, id)
+	resp, err := gen.BoardGet(cmd.Context(), gql, id, withItems, itemsLimit, itemsCursor)
 	if err != nil {
 		return err
 	}
@@ -396,6 +424,15 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 		}
 	}
 
+	if withItems {
+		items, cErr := convertBoardGetItems(b.Items_page.Items)
+		if cErr != nil {
+			return cErr
+		}
+		out.Items = items
+		out.ItemsCursor = b.Items_page.Cursor
+	}
+
 	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
 		return modeErr
@@ -447,6 +484,18 @@ func runBoardGet(cmd *cobra.Command, id string) error {
 			_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\t%v\n", c.ID, c.Title, c.Type, c.Archived)
 		}
 		_ = tw.Flush()
+	}
+
+	if withItems {
+		_, _ = fmt.Fprintf(o, "\nItems (%d):\n", len(out.Items))
+		if len(out.Items) > 0 {
+			if err := writeItemsTable(o, out.Items); err != nil {
+				return errs.Internal("flush items table: %v", err)
+			}
+		}
+		if out.ItemsCursor != "" {
+			_, _ = fmt.Fprintf(o, "next items cursor: %s\n", out.ItemsCursor)
+		}
 	}
 
 	return nil

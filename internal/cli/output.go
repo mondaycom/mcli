@@ -93,7 +93,7 @@ func configOutputMode() string {
 
 // PrintError renders err per ADR-002:
 //   - In ModeJSON the structured JSON object is the last line of stdout.
-//   - In ModePretty a human-readable message is written to stderr.
+//   - In every other mode a human-readable message is written to stderr.
 //
 // This is intended for use from main after Execute() returns a non-nil error.
 func PrintError(err error) {
@@ -107,11 +107,22 @@ func PrintError(err error) {
 		writeJSONError(os.Stderr, modeErr)
 		return
 	}
+	renderError(mode, os.Stdout, os.Stderr, err)
+}
+
+// renderError writes err in the given mode: the structured JSON object to
+// jsonOut in ModeJSON, a human-readable message to textErr in every other mode.
+// Only JSON emits the structured object (ADR-002); the terse and csv modes must
+// still surface a message so an error is never silently dropped (axiom A5).
+func renderError(mode OutputMode, jsonOut, textErr io.Writer, err error) {
+	if err == nil {
+		return
+	}
 	switch mode {
 	case ModeJSON:
-		writeJSONError(os.Stdout, err)
-	case ModePretty:
-		writePrettyError(os.Stderr, err)
+		writeJSONError(jsonOut, err)
+	default:
+		writePrettyError(textErr, err)
 	}
 }
 
