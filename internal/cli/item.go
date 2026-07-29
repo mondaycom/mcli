@@ -22,6 +22,10 @@ import (
 const (
 	itemListDefaultLimit = 25
 	itemListMaxLimit     = 500
+	// subitemDefaultCount caps how many subitems --subitems renders per item.
+	// subitems has no server-side limit, so the cap is applied client-side and
+	// signaled via subitems_truncated (axiom A5: never silently drop).
+	subitemDefaultCount = 25
 )
 
 // itemClientFactory is an unexported seam that lets tests inject a fake
@@ -699,6 +703,10 @@ type itemListOutputItem struct {
 	State   string           `json:"state"`
 	Group   itemGroup        `json:"group"`
 	Columns []renderedColumn `json:"columns"`
+	// Subitems is populated only with --subitems; SubitemsTruncated is set when
+	// --subitem-count dropped some (additive per axiom A6).
+	Subitems          []itemSubitem `json:"subitems,omitempty"`
+	SubitemsTruncated bool          `json:"subitems_truncated,omitempty"`
 }
 
 // itemListOutput is the JSON envelope for 'mcli item list'.
@@ -707,11 +715,13 @@ type itemListOutput struct {
 	Cursor string               `json:"cursor"`
 }
 
-// itemSubitem is a subitem reference in item get output.
+// itemSubitem is a subitem reference in item output. Columns is populated only
+// with --subitems (additive per axiom A6).
 type itemSubitem struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	State string `json:"state"`
+	ID      string           `json:"id"`
+	Name    string           `json:"name"`
+	State   string           `json:"state"`
+	Columns []renderedColumn `json:"columns,omitempty"`
 }
 
 // itemGetBoard is the board reference in item get output.
@@ -734,17 +744,19 @@ type itemGetParent struct {
 
 // itemGetOutput is the JSON shape for 'mcli item get'.
 type itemGetOutput struct {
-	ID         string           `json:"id"`
-	Name       string           `json:"name"`
-	State      string           `json:"state"`
-	CreatedAt  string           `json:"created_at,omitempty"`
-	UpdatedAt  string           `json:"updated_at,omitempty"`
-	Creator    *itemGetCreator  `json:"creator,omitempty"`
-	Group      *itemGroup       `json:"group,omitempty"`
-	Board      *itemGetBoard    `json:"board,omitempty"`
-	ParentItem *itemGetParent   `json:"parent_item,omitempty"`
-	Subitems   []itemSubitem    `json:"subitems"`
-	Columns    []renderedColumn `json:"columns"`
+	ID         string          `json:"id"`
+	Name       string          `json:"name"`
+	State      string          `json:"state"`
+	CreatedAt  string          `json:"created_at,omitempty"`
+	UpdatedAt  string          `json:"updated_at,omitempty"`
+	Creator    *itemGetCreator `json:"creator,omitempty"`
+	Group      *itemGroup      `json:"group,omitempty"`
+	Board      *itemGetBoard   `json:"board,omitempty"`
+	ParentItem *itemGetParent  `json:"parent_item,omitempty"`
+	Subitems   []itemSubitem   `json:"subitems"`
+	// SubitemsTruncated is set when --subitem-count dropped some subitems.
+	SubitemsTruncated bool             `json:"subitems_truncated,omitempty"`
+	Columns           []renderedColumn `json:"columns"`
 }
 
 // --- column rendering helper ---
@@ -858,14 +870,70 @@ func extractBoardGetColumnEntries(
 	return entries
 }
 
+// extractItemGetSubitemColumnEntries converts ItemGet subitem column values to columnEntries.
+func extractItemGetSubitemColumnEntries(
+	vals []gen.ItemGetItemsItemSubitemsItemColumn_valuesColumnValue,
+) []columnEntry {
+	entries := make([]columnEntry, 0, len(vals))
+	for _, cv := range vals {
+		col := cv.GetColumn()
+		entries = append(entries, columnEntry{
+			id:          cv.GetId(),
+			title:       col.Title,
+			columnType:  string(cv.GetType()),
+			settingsStr: col.Settings_str,
+			rawValue:    cv.GetValue(),
+		})
+	}
+	return entries
+}
+
+// extractBoardSubitemColumnEntries converts ItemsListByBoard subitem column values to columnEntries.
+func extractBoardSubitemColumnEntries(
+	vals []gen.ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemSubitemsItemColumn_valuesColumnValue,
+) []columnEntry {
+	entries := make([]columnEntry, 0, len(vals))
+	for _, cv := range vals {
+		col := cv.GetColumn()
+		entries = append(entries, columnEntry{
+			id:          cv.GetId(),
+			title:       col.Title,
+			columnType:  string(cv.GetType()),
+			settingsStr: col.Settings_str,
+			rawValue:    cv.GetValue(),
+		})
+	}
+	return entries
+}
+
+// extractGroupSubitemColumnEntries converts ItemsListByGroup subitem column values to columnEntries.
+func extractGroupSubitemColumnEntries(
+	vals []gen.ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemSubitemsItemColumn_valuesColumnValue,
+) []columnEntry {
+	entries := make([]columnEntry, 0, len(vals))
+	for _, cv := range vals {
+		col := cv.GetColumn()
+		entries = append(entries, columnEntry{
+			id:          cv.GetId(),
+			title:       col.Title,
+			columnType:  string(cv.GetType()),
+			settingsStr: col.Settings_str,
+			rawValue:    cv.GetValue(),
+		})
+	}
+	return entries
+}
+
 // --- item list ---
 
 func newItemListCmd() *cobra.Command {
 	var (
-		boardID string
-		groupID string
-		limit   int
-		cursor  string
+		boardID      string
+		groupID      string
+		limit        int
+		cursor       string
+		withSubitems bool
+		subitemCount int
 	)
 
 	cmd := &cobra.Command{
@@ -874,7 +942,7 @@ func newItemListCmd() *cobra.Command {
 		Long:  "List monday.com items, optionally filtered to a group.",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return runItemList(cmd, boardID, groupID, limit, cursor)
+			return runItemList(cmd, boardID, groupID, limit, cursor, withSubitems, subitemCount)
 		},
 	}
 
@@ -882,12 +950,14 @@ func newItemListCmd() *cobra.Command {
 	cmd.Flags().StringVar(&groupID, "group", "", "group ID (optional; omit for all groups)")
 	cmd.Flags().IntVar(&limit, "limit", itemListDefaultLimit, "max items per page (max 500)")
 	cmd.Flags().StringVar(&cursor, "cursor", "", "opaque page cursor (omit for first page)")
+	cmd.Flags().BoolVar(&withSubitems, "subitems", false, "include each item's subitems with their column values")
+	cmd.Flags().IntVar(&subitemCount, "subitem-count", subitemDefaultCount, "max subitems per item with --subitems")
 	_ = cmd.MarkFlagRequired("board")
 
 	return cmd
 }
 
-func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor string) error {
+func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor string, withSubitems bool, subitemCount int) error {
 	if _, err := strconv.ParseUint(boardID, 10, 64); err != nil {
 		return errs.Usage("board id must be a numeric string, got %q", boardID)
 	}
@@ -909,27 +979,27 @@ func runItemList(cmd *cobra.Command, boardID, groupID string, limit int, cursor 
 	var nextCursor string
 
 	if groupID != "" {
-		resp, apiErr := gen.ItemsListByGroup(cmd.Context(), gql, boardID, groupID, limit, cursor, false)
+		resp, apiErr := gen.ItemsListByGroup(cmd.Context(), gql, boardID, groupID, limit, cursor, withSubitems)
 		if apiErr != nil {
 			return apiErr
 		}
 		if len(resp.Boards) > 0 && len(resp.Boards[0].Groups) > 0 {
 			page := resp.Boards[0].Groups[0].Items_page
 			nextCursor = page.Cursor
-			rawItems, err = convertItemsListByGroup(page.Items)
+			rawItems, err = convertItemsListByGroup(page.Items, withSubitems, subitemCount)
 			if err != nil {
 				return err
 			}
 		}
 	} else {
-		resp, apiErr := gen.ItemsListByBoard(cmd.Context(), gql, boardID, limit, cursor, false)
+		resp, apiErr := gen.ItemsListByBoard(cmd.Context(), gql, boardID, limit, cursor, withSubitems)
 		if apiErr != nil {
 			return apiErr
 		}
 		if len(resp.Boards) > 0 {
 			page := resp.Boards[0].Items_page
 			nextCursor = page.Cursor
-			rawItems, err = convertItemsListByBoard(page.Items)
+			rawItems, err = convertItemsListByBoard(page.Items, withSubitems, subitemCount)
 			if err != nil {
 				return err
 			}
@@ -1030,8 +1100,11 @@ func writeItemListCSV(cmd *cobra.Command, out itemListOutput) error {
 }
 
 // convertItemsListByBoard converts genqlient board-query items to output items.
+// When withSubitems is set, each item's subitems (with column values) are
+// attached, capped to subitemCap.
 func convertItemsListByBoard(
 	items []gen.ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItem,
+	withSubitems bool, subitemCap int,
 ) ([]itemListOutputItem, error) {
 	out := make([]itemListOutputItem, 0, len(items))
 	for _, it := range items {
@@ -1039,13 +1112,22 @@ func convertItemsListByBoard(
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, itemListOutputItem{
+		oi := itemListOutputItem{
 			ID:      it.Id,
 			Name:    it.Name,
 			State:   string(it.State),
 			Group:   itemGroup{ID: it.Group.Id, Title: it.Group.Title},
 			Columns: cols,
-		})
+		}
+		if withSubitems {
+			subs, truncated, sErr := convertBoardSubitems(it.Subitems, subitemCap)
+			if sErr != nil {
+				return nil, sErr
+			}
+			oi.Subitems = subs
+			oi.SubitemsTruncated = truncated
+		}
+		out = append(out, oi)
 	}
 	return out, nil
 }
@@ -1072,8 +1154,11 @@ func convertBoardGetItems(
 }
 
 // convertItemsListByGroup converts genqlient group-query items to output items.
+// When withSubitems is set, each item's subitems (with column values) are
+// attached, capped to subitemCap.
 func convertItemsListByGroup(
 	items []gen.ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItem,
+	withSubitems bool, subitemCap int,
 ) ([]itemListOutputItem, error) {
 	out := make([]itemListOutputItem, 0, len(items))
 	for _, it := range items {
@@ -1081,32 +1166,112 @@ func convertItemsListByGroup(
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, itemListOutputItem{
+		oi := itemListOutputItem{
 			ID:      it.Id,
 			Name:    it.Name,
 			State:   string(it.State),
 			Group:   itemGroup{ID: it.Group.Id, Title: it.Group.Title},
 			Columns: cols,
-		})
+		}
+		if withSubitems {
+			subs, truncated, sErr := convertGroupSubitems(it.Subitems, subitemCap)
+			if sErr != nil {
+				return nil, sErr
+			}
+			oi.Subitems = subs
+			oi.SubitemsTruncated = truncated
+		}
+		out = append(out, oi)
 	}
 	return out, nil
+}
+
+// capSubitemCount reports how many of n subitems to keep given max, and whether
+// any were dropped. max <= 0 disables the cap. This is the client-side guard
+// for the unbounded subitems field (axiom A5).
+func capSubitemCount(n, max int) (keep int, truncated bool) {
+	if max > 0 && n > max {
+		return max, true
+	}
+	return n, false
+}
+
+// convertItemGetSubitems builds output subitems (with column values) from
+// ItemGet subitems, capped to max.
+func convertItemGetSubitems(
+	subs []gen.ItemGetItemsItemSubitemsItem, max int,
+) ([]itemSubitem, bool, error) {
+	keep, truncated := capSubitemCount(len(subs), max)
+	out := make([]itemSubitem, 0, keep)
+	for _, s := range subs[:keep] {
+		cols, err := renderColumns(extractItemGetSubitemColumnEntries(s.Column_values))
+		if err != nil {
+			return nil, false, err
+		}
+		out = append(out, itemSubitem{ID: s.Id, Name: s.Name, State: string(s.State), Columns: cols})
+	}
+	return out, truncated, nil
+}
+
+// convertBoardSubitems builds output subitems (with column values) from
+// ItemsListByBoard subitems, capped to max.
+func convertBoardSubitems(
+	subs []gen.ItemsListByBoardBoardsBoardItems_pageItemsResponseItemsItemSubitemsItem, max int,
+) ([]itemSubitem, bool, error) {
+	keep, truncated := capSubitemCount(len(subs), max)
+	out := make([]itemSubitem, 0, keep)
+	for _, s := range subs[:keep] {
+		cols, err := renderColumns(extractBoardSubitemColumnEntries(s.Column_values))
+		if err != nil {
+			return nil, false, err
+		}
+		out = append(out, itemSubitem{ID: s.Id, Name: s.Name, State: string(s.State), Columns: cols})
+	}
+	return out, truncated, nil
+}
+
+// convertGroupSubitems builds output subitems (with column values) from
+// ItemsListByGroup subitems, capped to max.
+func convertGroupSubitems(
+	subs []gen.ItemsListByGroupBoardsBoardGroupsGroupItems_pageItemsResponseItemsItemSubitemsItem, max int,
+) ([]itemSubitem, bool, error) {
+	keep, truncated := capSubitemCount(len(subs), max)
+	out := make([]itemSubitem, 0, keep)
+	for _, s := range subs[:keep] {
+		cols, err := renderColumns(extractGroupSubitemColumnEntries(s.Column_values))
+		if err != nil {
+			return nil, false, err
+		}
+		out = append(out, itemSubitem{ID: s.Id, Name: s.Name, State: string(s.State), Columns: cols})
+	}
+	return out, truncated, nil
 }
 
 // --- item get ---
 
 func newItemGetCmd() *cobra.Command {
-	return &cobra.Command{
+	var (
+		withSubitems bool
+		subitemCount int
+	)
+
+	cmd := &cobra.Command{
 		Use:   "get <id>",
 		Short: "Get an item by ID",
 		Long:  "Fetch full details for a monday.com item by its numeric ID.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runItemGet(cmd, args[0])
+			return runItemGet(cmd, args[0], withSubitems, subitemCount)
 		},
 	}
+
+	cmd.Flags().BoolVar(&withSubitems, "subitems", false, "include each subitem's column values")
+	cmd.Flags().IntVar(&subitemCount, "subitem-count", subitemDefaultCount, "max subitems to render with --subitems")
+
+	return cmd
 }
 
-func runItemGet(cmd *cobra.Command, id string) error {
+func runItemGet(cmd *cobra.Command, id string, withSubitems bool, subitemCount int) error {
 	if _, err := strconv.ParseUint(id, 10, 64); err != nil {
 		return errs.Usage("item id must be a numeric string, got %q", id)
 	}
@@ -1116,7 +1281,7 @@ func runItemGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	resp, err := gen.ItemGet(cmd.Context(), gql, id, false)
+	resp, err := gen.ItemGet(cmd.Context(), gql, id, withSubitems)
 	if err != nil {
 		return err
 	}
@@ -1132,19 +1297,30 @@ func runItemGet(cmd *cobra.Command, id string) error {
 		return err
 	}
 
-	subitems := make([]itemSubitem, len(it.Subitems))
-	for i, s := range it.Subitems {
-		subitems[i] = itemSubitem{ID: s.Id, Name: s.Name, State: string(s.State)}
+	var subitems []itemSubitem
+	var subitemsTruncated bool
+	if withSubitems {
+		subitems, subitemsTruncated, err = convertItemGetSubitems(it.Subitems, subitemCount)
+		if err != nil {
+			return err
+		}
+	} else {
+		// Default: subitems carry id/name/state only (unchanged, uncapped).
+		subitems = make([]itemSubitem, len(it.Subitems))
+		for i, s := range it.Subitems {
+			subitems[i] = itemSubitem{ID: s.Id, Name: s.Name, State: string(s.State)}
+		}
 	}
 
 	out := itemGetOutput{
-		ID:        it.Id,
-		Name:      it.Name,
-		State:     string(it.State),
-		CreatedAt: it.Created_at,
-		UpdatedAt: it.Updated_at,
-		Subitems:  subitems,
-		Columns:   cols,
+		ID:                it.Id,
+		Name:              it.Name,
+		State:             string(it.State),
+		CreatedAt:         it.Created_at,
+		UpdatedAt:         it.Updated_at,
+		Subitems:          subitems,
+		SubitemsTruncated: subitemsTruncated,
+		Columns:           cols,
 	}
 
 	if it.Creator.Id != "" {
@@ -1200,12 +1376,21 @@ func runItemGet(cmd *cobra.Command, id string) error {
 
 	if len(out.Subitems) > 0 {
 		_, _ = fmt.Fprintf(o, "\nSubitems (%d):\n", len(out.Subitems))
-		tw := tabwriter.NewWriter(o, 0, 0, 2, ' ', 0)
-		_, _ = fmt.Fprintln(tw, "  ID\tNAME\tSTATE")
-		for _, s := range out.Subitems {
-			_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\n", s.ID, s.Name, s.State)
+		if withSubitems {
+			if err := writeSubitemsTable(o, out.Subitems); err != nil {
+				return errs.Internal("flush subitems table: %v", err)
+			}
+		} else {
+			tw := tabwriter.NewWriter(o, 0, 0, 2, ' ', 0)
+			_, _ = fmt.Fprintln(tw, "  ID\tNAME\tSTATE")
+			for _, s := range out.Subitems {
+				_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\n", s.ID, s.Name, s.State)
+			}
+			_ = tw.Flush()
 		}
-		_ = tw.Flush()
+		if out.SubitemsTruncated {
+			_, _ = fmt.Fprintf(o, "  … more subitems omitted (raise --subitem-count)\n")
+		}
 	}
 
 	if len(out.Columns) > 0 {

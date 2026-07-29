@@ -83,14 +83,14 @@ type itemColumnHeader struct {
 	label string
 }
 
-// collectItemColumns returns the columns present across items in first-seen
-// order, so a board's items render as a uniform table even when individual
-// items omit an (empty) column value.
-func collectItemColumns(items []itemListOutputItem) []itemColumnHeader {
+// collectColumnHeaders returns the columns present across the given column sets
+// in first-seen order, so rows render as a uniform table even when individual
+// rows omit an (empty) column value.
+func collectColumnHeaders(colsets [][]renderedColumn) []itemColumnHeader {
 	seen := make(map[string]bool)
 	var headers []itemColumnHeader
-	for _, it := range items {
-		for _, c := range it.Columns {
+	for _, cols := range colsets {
+		for _, c := range cols {
 			if seen[c.ID] {
 				continue
 			}
@@ -99,6 +99,15 @@ func collectItemColumns(items []itemListOutputItem) []itemColumnHeader {
 		}
 	}
 	return headers
+}
+
+// collectItemColumns returns the columns present across items in first-seen order.
+func collectItemColumns(items []itemListOutputItem) []itemColumnHeader {
+	colsets := make([][]renderedColumn, len(items))
+	for i, it := range items {
+		colsets[i] = it.Columns
+	}
+	return collectColumnHeaders(colsets)
 }
 
 // itemColumnValues maps column id → formatted value for a single item.
@@ -126,6 +135,37 @@ func writeItemsTable(w io.Writer, items []itemListOutputItem) error {
 	for _, it := range items {
 		vals := itemColumnValues(it)
 		row := []string{it.ID, it.Name, it.State, it.Group.Title}
+		for _, h := range headers {
+			row = append(row, vals[h.id])
+		}
+		_, _ = fmt.Fprintln(tw, strings.Join(row, "\t"))
+	}
+	return tw.Flush()
+}
+
+// writeSubitemsTable writes a tab-aligned table of subitems with one table
+// column per subitem column (values formatted, blank when unset). Rows are
+// indented to sit under an item's "Subitems (N):" header.
+func writeSubitemsTable(w io.Writer, subs []itemSubitem) error {
+	colsets := make([][]renderedColumn, len(subs))
+	for i, s := range subs {
+		colsets[i] = s.Columns
+	}
+	headers := collectColumnHeaders(colsets)
+
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	cols := []string{"  ID", "NAME", "STATE"}
+	for _, h := range headers {
+		cols = append(cols, h.label)
+	}
+	_, _ = fmt.Fprintln(tw, strings.Join(cols, "\t"))
+
+	for _, s := range subs {
+		vals := make(map[string]string, len(s.Columns))
+		for _, c := range s.Columns {
+			vals[c.ID] = formatColumnValue(c)
+		}
+		row := []string{"  " + s.ID, s.Name, s.State}
 		for _, h := range headers {
 			row = append(row, vals[h.id])
 		}

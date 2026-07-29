@@ -600,6 +600,201 @@ func TestItemGet_Subitems(t *testing.T) {
 	}
 }
 
+// subitemsWithColumns returns n subitem maps, each carrying a decodable
+// "status" column value ("Done").
+func subitemsWithColumns(n int) []map[string]any {
+	subs := make([]map[string]any, n)
+	for i := 0; i < n; i++ {
+		subs[i] = map[string]any{
+			"id":    fmt.Sprintf("90000000%02d", i),
+			"name":  fmt.Sprintf("Sub %d", i),
+			"state": "active",
+			"column_values": []map[string]any{
+				{
+					"__typename": "StatusValue",
+					"id":         "status",
+					"type":       "status",
+					"value":      `{"label":"Done","index":1}`,
+					"text":       "Done",
+					"column":     map[string]any{"id": "status", "title": "Status", "settings_str": `{"labels":{"1":"Done"}}`},
+				},
+			},
+		}
+	}
+	return subs
+}
+
+func itemGetWithSubitems(subs []map[string]any) map[string]any {
+	item := map[string]any{
+		"id":            "1234567890",
+		"name":          "Parent item",
+		"state":         "active",
+		"created_at":    "2026-05-01",
+		"updated_at":    "2026-05-09",
+		"creator":       map[string]any{"id": "1001", "name": "Alice"},
+		"group":         map[string]any{"id": "topics", "title": "Sprint 1"},
+		"board":         map[string]any{"id": "9832181507", "name": "Dev Board"},
+		"parent_item":   map[string]any{"id": "", "name": ""},
+		"subitems":      subs,
+		"column_values": []map[string]any{},
+	}
+	return map[string]any{"items": []any{item}}
+}
+
+func TestItemGet_Subitems_DecodesColumns(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(itemGetWithSubitems(subitemsWithColumns(2)))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemGet(t, "1234567890", "--subitems")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["withSubitems"] != true {
+		t.Errorf("expected withSubitems=true, got %v", capturedVars["withSubitems"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	subs, _ := result["subitems"].([]any)
+	if len(subs) != 2 {
+		t.Fatalf("expected 2 subitems, got %d", len(subs))
+	}
+	cols, _ := subs[0].(map[string]any)["columns"].([]any)
+	if len(cols) != 1 {
+		t.Fatalf("expected 1 subitem column, got %d", len(cols))
+	}
+	if cols[0].(map[string]any)["value"] != "Done" {
+		t.Errorf("expected subitem status 'Done', got %v", cols[0].(map[string]any)["value"])
+	}
+	if _, ok := result["subitems_truncated"]; ok {
+		t.Error("subitems_truncated should be absent when nothing dropped")
+	}
+}
+
+func TestItemGet_Subitems_TruncatedFlag(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		return mustMarshal(itemGetWithSubitems(subitemsWithColumns(3)))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemGet(t, "1234567890", "--subitems", "--subitem-count", "2")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	subs, _ := result["subitems"].([]any)
+	if len(subs) != 2 {
+		t.Fatalf("expected 2 subitems (capped), got %d", len(subs))
+	}
+	if result["subitems_truncated"] != true {
+		t.Errorf("expected subitems_truncated=true, got %v", result["subitems_truncated"])
+	}
+}
+
+func TestItemGet_WithoutSubitems_NoColumns(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		return mustMarshal(itemGetWithSubitems(subitemsWithColumns(3)))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemGet(t, "1234567890")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["withSubitems"] != false {
+		t.Errorf("expected withSubitems=false, got %v", capturedVars["withSubitems"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	subs, _ := result["subitems"].([]any)
+	if len(subs) != 3 {
+		t.Fatalf("expected 3 subitems (uncapped), got %d", len(subs))
+	}
+	if _, ok := subs[0].(map[string]any)["columns"]; ok {
+		t.Error("subitem columns key should be absent without --subitems")
+	}
+}
+
+func TestItemList_Subitems_DecodesColumns(t *testing.T) {
+	var capturedVars map[string]any
+	srv := newTestServer(t, func(body map[string]any) string {
+		if vars, ok := body["variables"].(map[string]any); ok {
+			capturedVars = vars
+		}
+		items := sampleItems()
+		items[0]["subitems"] = subitemsWithColumns(2)
+		return mustMarshal(itemsPageResponse("", items))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemList(t, "--board", "9832181507", "--subitems")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if capturedVars["withSubitems"] != true {
+		t.Errorf("expected withSubitems=true, got %v", capturedVars["withSubitems"])
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	items, _ := result["items"].([]any)
+	subs, _ := items[0].(map[string]any)["subitems"].([]any)
+	if len(subs) != 2 {
+		t.Fatalf("expected 2 subitems, got %d", len(subs))
+	}
+	cols, _ := subs[0].(map[string]any)["columns"].([]any)
+	if len(cols) != 1 || cols[0].(map[string]any)["value"] != "Done" {
+		t.Errorf("expected subitem status 'Done', got %v", cols)
+	}
+}
+
+func TestItemList_WithoutSubitems_OmitsSubitems(t *testing.T) {
+	srv := newTestServer(t, func(_ map[string]any) string {
+		items := sampleItems()
+		items[0]["subitems"] = subitemsWithColumns(2)
+		return mustMarshal(itemsPageResponse("", items))
+	})
+	installItemFactory(t, srv.URL)
+
+	out, err := execItemList(t, "--board", "9832181507")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var result map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(out)), &result); err != nil {
+		t.Fatalf("parse output: %v\nraw: %s", err, out)
+	}
+	items, _ := result["items"].([]any)
+	if _, ok := items[0].(map[string]any)["subitems"]; ok {
+		t.Error("subitems key should be absent without --subitems")
+	}
+}
+
 // ---- parseColFlags unit tests ----
 
 func TestParseColFlags_Single(t *testing.T) {
