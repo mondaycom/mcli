@@ -20,10 +20,6 @@ jobs:
             goos: linux
             goarch: arm64
             cgo_enabled: "0"
-          - os: macos-13
-            goos: darwin
-            goarch: amd64
-            cgo_enabled: "1"
           - os: macos-latest
             goos: darwin
             goarch: arm64
@@ -88,6 +84,5 @@ jobs:
             --generate-notes \
             dist/mcli-linux-amd64 \
             dist/mcli-linux-arm64 \
-            dist/mcli-darwin-amd64 \
             dist/mcli-darwin-arm64 \
             dist/checksums.txt
