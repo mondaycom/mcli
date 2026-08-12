@@ -134,8 +134,8 @@ mcli config set api-url https://api.mondaystaging.com/v2   # point at staging
 mcli config set api-url ""                                  # reset to production
 mcli config set api-version 2026-08   # fetches and caches schema
 mcli config set api-version default   # revert to built-in schema
-mcli config set routing-key arnonro   # enable local-api-proxy routing
-mcli config set routing-key ""        # disable
+mcli config set routing-key <your-key>   # enable local API proxy routing
+mcli config set routing-key ""           # disable
 mcli config get api-url
 ```
 
@@ -174,8 +174,8 @@ mcli api boards --arg limit=5 --select "id,name,state"
 
 ```sh
 mcli config set api-version 2026-08   # fetch + cache schema for this version; "default" to reset
-mcli config set routing-key arnonro   # add baggage: routingKey=arnonro header (local-api-proxy)
-mcli config set routing-key ""        # clear routing key
+mcli config set routing-key <your-key>   # add baggage: routingKey=<your-key> header
+mcli config set routing-key ""           # clear routing key
 ```
 
 ## Output Modes
@@ -368,26 +368,26 @@ MONDAY_API_TOKEN=<staging-token> \
 bin/mcli board list
 ```
 
-### Debugging with local-api-proxy
+### Debugging with a local API proxy
 
-[local-api-proxy](~/projects/local-api-proxy) lets you intercept API calls locally. Set a routing key so requests are routed through your local mirror instance:
+mcli supports routing requests through a local API proxy via a routing key. When set, every request includes a `baggage: routingKey=<value>` header that a compatible proxy can use to intercept or route the call.
 
 ```sh
 # Persist for the session (stored in ~/.config/mcli/config.yaml)
-mcli config set routing-key <your-username>
+mcli config set routing-key <your-key>
 
 # Or per-command via env
-MONDAY_ROUTING_KEY=<your-username> bin/mcli board list
+MONDAY_ROUTING_KEY=<your-key> bin/mcli board list
 
 # Clear when done
 mcli config set routing-key ""
 ```
 
-Combine with staging for local end-to-end debugging:
+Combine with a staging endpoint for local end-to-end debugging:
 
 ```sh
 MONDAY_API_URL=https://api.mondaystaging.com/v2 \
-MONDAY_ROUTING_KEY=<your-username> \
+MONDAY_ROUTING_KEY=<your-key> \
 bin/mcli board list
 ```
 
