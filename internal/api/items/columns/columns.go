@@ -1,7 +1,12 @@
-// Package columns decodes monday.com column values from their raw JSON representation
-// into clean, typed Go values suitable for JSON output.
+// Package columns converts monday.com column values between their raw JSON wire
+// representation and clean Go values.
 //
-// The write path is JSON-passthrough (handled elsewhere). This package is read-path only.
+// Decode (this file) is the read path: raw column JSON → typed value for output.
+// Encode (encode.go) is the write path for the CLI's typed shorthands: a scalar like
+// "Done" or "2026-05-10" → the wire JSON monday expects. The two share one set of
+// column types on purpose, so a shape documented on the read side is the shape
+// written on the write side. Column types with no encoder are still written as raw
+// JSON by the caller (mcli's --col escape hatch).
 package columns
 
 import (
