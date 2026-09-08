@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"text/tabwriter"
+	"unicode/utf8"
 
 	"github.com/spf13/cobra"
 
@@ -116,8 +117,10 @@ func runAPIList(cmd *cobra.Command, typeFilter string, noBuiltins bool, jsonOut 
 func truncate(s string, max int) string {
 	// Collapse whitespace / newlines in descriptions.
 	s = strings.Join(strings.Fields(s), " ")
-	if len(s) <= max {
+	// Count runes, not bytes: column descriptions are user-authored and may be
+	// non-ASCII, where byte slicing would split a rune and emit a replacement char.
+	if utf8.RuneCountInString(s) <= max {
 		return s
 	}
-	return s[:max-1] + "…"
+	return string([]rune(s)[:max-1]) + "…"
 }

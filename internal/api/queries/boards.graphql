@@ -75,6 +75,7 @@ query BoardGet(
       id
       title
       type
+      description
       settings_str
       width
       archived
@@ -181,6 +182,7 @@ query BoardColumnList($boardId: ID!) {
       id
       title
       type
+      description
       settings_str
       width
       archived
@@ -202,6 +204,7 @@ mutation BoardColumnCreate(
     id
     title
     type
+    description
     settings_str
     width
     archived
@@ -222,6 +225,7 @@ mutation BoardColumnRename($boardId: ID!, $columnId: String!, $title: String!) {
     id
     title
     type
+    description
     settings_str
     width
     archived
@@ -234,6 +238,7 @@ mutation BoardColumnDescribe($boardId: ID!, $columnId: String!, $description: St
     id
     title
     type
+    description
     settings_str
     width
     archived

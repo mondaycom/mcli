@@ -190,7 +190,7 @@ type boardGetOutput struct {
 	Workspace   *boardWorkspace `json:"workspace,omitempty"`
 	Owners      []boardOwner    `json:"owners"`
 	Groups      []boardGroup    `json:"groups"`
-	Columns     []boardColumn   `json:"columns"`
+	Columns     []columnOutput  `json:"columns"`
 	// Items and ItemsCursor are populated only with --items; both are omitted
 	// otherwise (additive per axiom A6).
 	Items       []itemListOutputItem `json:"items,omitempty"`
@@ -213,15 +213,6 @@ type boardGroup struct {
 	Title    string `json:"title"`
 	Color    string `json:"color"`
 	Position string `json:"position"`
-}
-
-type boardColumn struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Type        string `json:"type"`
-	SettingsStr string `json:"settings_str"`
-	Width       int    `json:"width"`
-	Archived    bool   `json:"archived"`
 }
 
 func newBoardGetCmd() *cobra.Command {
@@ -391,7 +382,7 @@ func runBoardGet(cmd *cobra.Command, id string, withItems bool, itemsLimit int, 
 		WorkspaceID: b.Workspace_id,
 		Owners:      make([]boardOwner, len(b.Owners)),
 		Groups:      make([]boardGroup, len(b.Groups)),
-		Columns:     make([]boardColumn, len(b.Columns)),
+		Columns:     make([]columnOutput, len(b.Columns)),
 	}
 
 	if b.Workspace.Id != "" {
@@ -414,10 +405,11 @@ func runBoardGet(cmd *cobra.Command, id string, withItems bool, itemsLimit int, 
 		}
 	}
 	for i, c := range b.Columns {
-		out.Columns[i] = boardColumn{
+		out.Columns[i] = columnOutput{
 			ID:          c.Id,
 			Title:       c.Title,
 			Type:        string(c.Type),
+			Description: c.Description,
 			SettingsStr: c.Settings_str,
 			Width:       c.Width,
 			Archived:    c.Archived,
@@ -478,12 +470,9 @@ func runBoardGet(cmd *cobra.Command, id string, withItems bool, itemsLimit int, 
 
 	if len(out.Columns) > 0 {
 		_, _ = fmt.Fprintf(o, "\nColumns (%d):\n", len(out.Columns))
-		tw := tabwriter.NewWriter(o, 0, 0, 2, ' ', 0)
-		_, _ = fmt.Fprintln(tw, "  ID\tTITLE\tTYPE\tARCHIVED")
-		for _, c := range out.Columns {
-			_, _ = fmt.Fprintf(tw, "  %s\t%s\t%s\t%v\n", c.ID, c.Title, c.Type, c.Archived)
+		if err := writeColumnsTable(o, out.Columns, "  "); err != nil {
+			return errs.Internal("flush columns table: %v", err)
 		}
-		_ = tw.Flush()
 	}
 
 	if withItems {

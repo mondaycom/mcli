@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
@@ -91,6 +92,7 @@ type columnOutput struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Type        string `json:"type"`
+	Description string `json:"description,omitempty"`
 	SettingsStr string `json:"settings_str"`
 	Width       int    `json:"width"`
 	Archived    bool   `json:"archived"`
@@ -147,6 +149,7 @@ func runBoardColumnList(cmd *cobra.Command, boardID string) error {
 			ID:          c.Id,
 			Title:       c.Title,
 			Type:        string(c.Type),
+			Description: c.Description,
 			SettingsStr: c.Settings_str,
 			Width:       c.Width,
 			Archived:    c.Archived,
@@ -169,10 +172,30 @@ func runBoardColumnList(cmd *cobra.Command, boardID string) error {
 		return err
 	}
 
-	w := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(w, "ID\tTITLE\tTYPE\tARCHIVED")
-	for _, c := range items {
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%v\n", c.ID, c.Title, c.Type, c.Archived)
+	return writeColumnsTable(cmd.OutOrStdout(), items, "")
+}
+
+// writeColumnDescriptionLine renders a column's description under a single-object
+// summary, matching between 'column create' and 'column describe'. Unlike the table
+// it is not truncated: there is one column in view and room to read it.
+func writeColumnDescriptionLine(o io.Writer, description string) error {
+	if description == "" {
+		return nil
+	}
+	_, err := fmt.Fprintf(o, "  description: %s\n", description)
+	return err
+}
+
+// writeColumnsTable renders the column table shared by 'board column list' and
+// 'board get', so the two views cannot drift apart. DESCRIPTION comes last: it is
+// the only free-text field, and trailing it keeps a long description from widening
+// every column to its left. indent prefixes each row ('board get' nests its tables).
+func writeColumnsTable(o io.Writer, cols []columnOutput, indent string) error {
+	w := tabwriter.NewWriter(o, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintf(w, "%sID\tTITLE\tTYPE\tARCHIVED\tDESCRIPTION\n", indent)
+	for _, c := range cols {
+		_, _ = fmt.Fprintf(w, "%s%s\t%s\t%s\t%v\t%s\n",
+			indent, c.ID, c.Title, c.Type, c.Archived, truncate(c.Description, 55))
 	}
 	return w.Flush()
 }
@@ -249,6 +272,7 @@ func runBoardColumnCreate(cmd *cobra.Command, boardID, title, columnType, descri
 		ID:          c.Id,
 		Title:       c.Title,
 		Type:        string(c.Type),
+		Description: c.Description,
 		SettingsStr: c.Settings_str,
 		Width:       c.Width,
 		Archived:    c.Archived,
@@ -268,8 +292,10 @@ func runBoardColumnCreate(cmd *cobra.Command, boardID, title, columnType, descri
 		return err
 	}
 
-	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Created column %s: %s (%s)\n", out.ID, out.Title, out.Type)
-	return err
+	if _, err = fmt.Fprintf(cmd.OutOrStdout(), "Created column %s: %s (%s)\n", out.ID, out.Title, out.Type); err != nil {
+		return err
+	}
+	return writeColumnDescriptionLine(cmd.OutOrStdout(), out.Description)
 }
 
 // columnDeleteOutput is the JSON shape for column delete.
@@ -394,6 +420,7 @@ func runBoardColumnRename(cmd *cobra.Command, boardID, columnID, title string) e
 		ID:          c.Id,
 		Title:       c.Title,
 		Type:        string(c.Type),
+		Description: c.Description,
 		SettingsStr: c.Settings_str,
 		Width:       c.Width,
 		Archived:    c.Archived,
@@ -470,6 +497,7 @@ func runBoardColumnDescribe(cmd *cobra.Command, boardID, columnID, description s
 		ID:          c.Id,
 		Title:       c.Title,
 		Type:        string(c.Type),
+		Description: c.Description,
 		SettingsStr: c.Settings_str,
 		Width:       c.Width,
 		Archived:    c.Archived,
@@ -489,6 +517,8 @@ func runBoardColumnDescribe(cmd *cobra.Command, boardID, columnID, description s
 		return err
 	}
 
-	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Updated description for column %s: %s\n", out.ID, out.Title)
-	return err
+	if _, err = fmt.Fprintf(cmd.OutOrStdout(), "Updated description for column %s: %s\n", out.ID, out.Title); err != nil {
+		return err
+	}
+	return writeColumnDescriptionLine(cmd.OutOrStdout(), out.Description)
 }

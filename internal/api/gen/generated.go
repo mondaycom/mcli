@@ -72,6 +72,8 @@ type BoardColumnCreateCreate_columnColumn struct {
 	Title string `json:"title"`
 	// The column's type.
 	Type ColumnType `json:"type"`
+	// The column's description.
+	Description string `json:"description"`
 	// The column's settings in a string form.
 	Settings_str string `json:"settings_str"`
 	// The column's width.
@@ -88,6 +90,9 @@ func (v *BoardColumnCreateCreate_columnColumn) GetTitle() string { return v.Titl
 
 // GetType returns BoardColumnCreateCreate_columnColumn.Type, and is useful for accessing the field via an interface.
 func (v *BoardColumnCreateCreate_columnColumn) GetType() ColumnType { return v.Type }
+
+// GetDescription returns BoardColumnCreateCreate_columnColumn.Description, and is useful for accessing the field via an interface.
+func (v *BoardColumnCreateCreate_columnColumn) GetDescription() string { return v.Description }
 
 // GetSettings_str returns BoardColumnCreateCreate_columnColumn.Settings_str, and is useful for accessing the field via an interface.
 func (v *BoardColumnCreateCreate_columnColumn) GetSettings_str() string { return v.Settings_str }
@@ -142,6 +147,8 @@ type BoardColumnDescribeChange_column_metadataColumn struct {
 	Title string `json:"title"`
 	// The column's type.
 	Type ColumnType `json:"type"`
+	// The column's description.
+	Description string `json:"description"`
 	// The column's settings in a string form.
 	Settings_str string `json:"settings_str"`
 	// The column's width.
@@ -158,6 +165,11 @@ func (v *BoardColumnDescribeChange_column_metadataColumn) GetTitle() string { re
 
 // GetType returns BoardColumnDescribeChange_column_metadataColumn.Type, and is useful for accessing the field via an interface.
 func (v *BoardColumnDescribeChange_column_metadataColumn) GetType() ColumnType { return v.Type }
+
+// GetDescription returns BoardColumnDescribeChange_column_metadataColumn.Description, and is useful for accessing the field via an interface.
+func (v *BoardColumnDescribeChange_column_metadataColumn) GetDescription() string {
+	return v.Description
+}
 
 // GetSettings_str returns BoardColumnDescribeChange_column_metadataColumn.Settings_str, and is useful for accessing the field via an interface.
 func (v *BoardColumnDescribeChange_column_metadataColumn) GetSettings_str() string {
@@ -208,6 +220,8 @@ type BoardColumnListBoardsBoardColumnsColumn struct {
 	Title string `json:"title"`
 	// The column's type.
 	Type ColumnType `json:"type"`
+	// The column's description.
+	Description string `json:"description"`
 	// The column's settings in a string form.
 	Settings_str string `json:"settings_str"`
 	// The column's width.
@@ -224,6 +238,9 @@ func (v *BoardColumnListBoardsBoardColumnsColumn) GetTitle() string { return v.T
 
 // GetType returns BoardColumnListBoardsBoardColumnsColumn.Type, and is useful for accessing the field via an interface.
 func (v *BoardColumnListBoardsBoardColumnsColumn) GetType() ColumnType { return v.Type }
+
+// GetDescription returns BoardColumnListBoardsBoardColumnsColumn.Description, and is useful for accessing the field via an interface.
+func (v *BoardColumnListBoardsBoardColumnsColumn) GetDescription() string { return v.Description }
 
 // GetSettings_str returns BoardColumnListBoardsBoardColumnsColumn.Settings_str, and is useful for accessing the field via an interface.
 func (v *BoardColumnListBoardsBoardColumnsColumn) GetSettings_str() string { return v.Settings_str }
@@ -251,6 +268,8 @@ type BoardColumnRenameChange_column_titleColumn struct {
 	Title string `json:"title"`
 	// The column's type.
 	Type ColumnType `json:"type"`
+	// The column's description.
+	Description string `json:"description"`
 	// The column's settings in a string form.
 	Settings_str string `json:"settings_str"`
 	// The column's width.
@@ -267,6 +286,9 @@ func (v *BoardColumnRenameChange_column_titleColumn) GetTitle() string { return 
 
 // GetType returns BoardColumnRenameChange_column_titleColumn.Type, and is useful for accessing the field via an interface.
 func (v *BoardColumnRenameChange_column_titleColumn) GetType() ColumnType { return v.Type }
+
+// GetDescription returns BoardColumnRenameChange_column_titleColumn.Description, and is useful for accessing the field via an interface.
+func (v *BoardColumnRenameChange_column_titleColumn) GetDescription() string { return v.Description }
 
 // GetSettings_str returns BoardColumnRenameChange_column_titleColumn.Settings_str, and is useful for accessing the field via an interface.
 func (v *BoardColumnRenameChange_column_titleColumn) GetSettings_str() string { return v.Settings_str }
@@ -432,6 +454,8 @@ type BoardGetBoardsBoardColumnsColumn struct {
 	Title string `json:"title"`
 	// The column's type.
 	Type ColumnType `json:"type"`
+	// The column's description.
+	Description string `json:"description"`
 	// The column's settings in a string form.
 	Settings_str string `json:"settings_str"`
 	// The column's width.
@@ -448,6 +472,9 @@ func (v *BoardGetBoardsBoardColumnsColumn) GetTitle() string { return v.Title }
 
 // GetType returns BoardGetBoardsBoardColumnsColumn.Type, and is useful for accessing the field via an interface.
 func (v *BoardGetBoardsBoardColumnsColumn) GetType() ColumnType { return v.Type }
+
+// GetDescription returns BoardGetBoardsBoardColumnsColumn.Description, and is useful for accessing the field via an interface.
+func (v *BoardGetBoardsBoardColumnsColumn) GetDescription() string { return v.Description }
 
 // GetSettings_str returns BoardGetBoardsBoardColumnsColumn.Settings_str, and is useful for accessing the field via an interface.
 func (v *BoardGetBoardsBoardColumnsColumn) GetSettings_str() string { return v.Settings_str }
@@ -21662,6 +21689,7 @@ mutation BoardColumnCreate ($boardId: ID!, $title: String!, $columnType: ColumnT
 		id
 		title
 		type
+		description
 		settings_str
 		width
 		archived
@@ -21748,6 +21776,7 @@ mutation BoardColumnDescribe ($boardId: ID!, $columnId: String!, $description: S
 		id
 		title
 		type
+		description
 		settings_str
 		width
 		archived
@@ -21794,6 +21823,7 @@ query BoardColumnList ($boardId: ID!) {
 			id
 			title
 			type
+			description
 			settings_str
 			width
 			archived
@@ -21835,6 +21865,7 @@ mutation BoardColumnRename ($boardId: ID!, $columnId: String!, $title: String!) 
 		id
 		title
 		type
+		description
 		settings_str
 		width
 		archived
@@ -21985,6 +22016,7 @@ query BoardGet ($id: ID!, $withItems: Boolean! = false, $itemsLimit: Int! = 25, 
 			id
 			title
 			type
+			description
 			settings_str
 			width
 			archived
