@@ -24,6 +24,11 @@ echo "Orders board: $ORDERS_BOARD"
 echo ""
 echo "=== Phase 2: Define columns ==="
 
+# The typed shorthands used below (--text, --number) address the board's single column
+# of that type. A board created through the API starts with only a Name column, so each
+# board's shape is exactly what this script gives it. If a type is ever duplicated the
+# shorthand refuses, naming the candidates, rather than picking one.
+
 # Products: name (built-in), SKU, description, price
 PROD_SKU=$($MCLI board column create --board "$PRODUCTS_BOARD" --title "SKU" --type text | $JQ -r '.id')
 PROD_DESC=$($MCLI board column create --board "$PRODUCTS_BOARD" --title "Description" --type long_text | $JQ -r '.id')
@@ -95,38 +100,35 @@ echo "Saved mutation: update_order_status"
 echo ""
 echo "=== Phase 4: Seed data ==="
 
-# Products
+# Products. SKU is the board's only text column and Price its only numbers column,
+# so --text and --number address them without the caller knowing either column ID.
+# Description is long_text, which has no shorthand, so it stays on raw --col.
 ITEM_WIDGET=$($MCLI item create --board "$PRODUCTS_BOARD" --name "Widget Pro" \
-  --col "$PROD_SKU"='"WGT-001"' \
-  --col "$PROD_DESC"='{"text":"Premium widget with enhanced features"}' \
-  --col "$PROD_PRICE"='"29.99"' | $JQ -r '.id')
+  --text "WGT-001" \
+  --number 29.99 \
+  --col "$PROD_DESC"='{"text":"Premium widget with enhanced features"}' | $JQ -r '.id')
 echo "Created product: Widget Pro ($ITEM_WIDGET)"
 
 ITEM_GADGET=$($MCLI item create --board "$PRODUCTS_BOARD" --name "Gadget X" \
-  --col "$PROD_SKU"='"GDG-002"' \
-  --col "$PROD_DESC"='{"text":"Compact gadget for everyday use"}' \
-  --col "$PROD_PRICE"='"49.99"' | $JQ -r '.id')
+  --text "GDG-002" \
+  --number 49.99 \
+  --col "$PROD_DESC"='{"text":"Compact gadget for everyday use"}' | $JQ -r '.id')
 echo "Created product: Gadget X ($ITEM_GADGET)"
 
 ITEM_DOOHICK=$($MCLI item create --board "$PRODUCTS_BOARD" --name "Doohickey" \
-  --col "$PROD_SKU"='"DHK-003"' \
-  --col "$PROD_DESC"='{"text":"Multi-purpose doohickey"}' \
-  --col "$PROD_PRICE"='"9.99"' | $JQ -r '.id')
+  --text "DHK-003" \
+  --number 9.99 \
+  --col "$PROD_DESC"='{"text":"Multi-purpose doohickey"}' | $JQ -r '.id')
 echo "Created product: Doohickey ($ITEM_DOOHICK)"
 
-# Inventory
-INV_W=$($MCLI item create --board "$INVENTORY_BOARD" --name "WGT-001" \
-  --col "$INV_SKU"='"WGT-001"' \
-  --col "$INV_QTY"='"100"' | $JQ -r '.id')
-
-INV_G=$($MCLI item create --board "$INVENTORY_BOARD" --name "GDG-002" \
-  --col "$INV_SKU"='"GDG-002"' \
-  --col "$INV_QTY"='"50"' | $JQ -r '.id')
-
-INV_D=$($MCLI item create --board "$INVENTORY_BOARD" --name "DHK-003" \
-  --col "$INV_SKU"='"DHK-003"' \
-  --col "$INV_QTY"='"200"' | $JQ -r '.id')
-echo "Inventory seeded for 3 SKUs"
+# Inventory — one batch instead of three round-trips. Rows are read from stdin and
+# written sequentially, so seeding N SKUs costs one command against monday's
+# complexity budget rather than N invocations racing it.
+$MCLI item create --board "$INVENTORY_BOARD" - --json <<'ROWS' | $JQ -r '"Inventory: written=\(.written) failed=\(.failed)"'
+[{"name": "WGT-001", "text": "WGT-001", "number": 100},
+ {"name": "GDG-002", "text": "GDG-002", "number": 50},
+ {"name": "DHK-003", "text": "DHK-003", "number": 200}]
+ROWS
 
 # ─── Phase 5: Place an Order ─────────────────────────────────────────────────
 

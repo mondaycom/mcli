@@ -51,9 +51,11 @@ Top-level shape (schema version `1`):
     "2": "api error",
     "3": "auth error",
     "4": "rate limited",
-    "5": "internal error"
+    "5": "internal error",
+    "6": "daemon required",
+    "130": "interrupted"
   },
-  "errorCodes": ["USAGE", "AUTH", "API", "RATE_LIMITED", "NOT_FOUND", "CONFLICT", "INTERNAL"],
+  "errorCodes": ["USAGE", "AUTH", "API", "RATE_LIMITED", "NOT_FOUND", "INTERNAL", "DAEMON_REQUIRED", "INTERRUPTED"],
   "globalFlags": [ { "name": "json", "type": "bool", "description": "..." } ],
   "commands": [
     {

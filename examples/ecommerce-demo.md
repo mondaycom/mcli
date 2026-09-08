@@ -87,12 +87,14 @@ mcli mutation save create_order --query \
 
 ## Phase 4: Seed Data
 
-Using the structured `item create` command (more ergonomic for setup):
+Using the structured `item create` command (more ergonomic for setup). SKU is the
+Products board's only `text` column and Price its only `numbers` column, so the typed
+shorthands address them without the caller knowing either column ID:
 
 ```sh
 mcli item create --board $PRODUCTS_BOARD --name "Widget Pro" \
-  --col "$PROD_SKU"='"WGT-001"' \
-  --col "$PROD_PRICE"='"29.99"'
+  --text "WGT-001" \
+  --number 29.99
 ```
 
 Or using the semantic layer:
@@ -103,6 +105,32 @@ mcli mutation run create_product \
   --var name="Widget Pro" \
   --var cols='{"sku":"WGT-001","price":"29.99"}'
 ```
+
+Seeding many rows one command at a time walks straight into monday's complexity
+budget. Pass `-` instead and `item create` reads rows from stdin, writing them
+sequentially in one invocation:
+
+```sh
+mcli item create --board $INVENTORY_BOARD - <<'ROWS'
+[{"name": "WGT-001", "text": "WGT-001", "number": 100},
+ {"name": "GDG-002", "text": "GDG-002", "number": 50},
+ {"name": "DHK-003", "text": "DHK-003", "number": 200}]
+ROWS
+```
+
+Rows take the same shorthand keys as the flags, plus `cols` for the raw escape hatch.
+Every row is validated before the first request, so a bad status label fails the whole
+batch with nothing written. The result is one JSON object:
+
+```json
+{ "written": 3, "failed": 0, "verb": "created", "items": [ ... ], "errors": [] }
+```
+
+On a partial failure the exit code is 2 — **retry only the rows named in
+`errors[].index`**, because `create_item` has no dedupe key and re-sending the batch
+would duplicate the rows that already succeeded. `--dry-run` prints the exact
+`column_values` per row without writing anything, and needs no API call at all unless
+a shorthand has to be resolved.
 
 ## Phase 5: Place an Order
 
@@ -146,6 +174,8 @@ mcli query run get_order --var itemId="[$ORDER_ID]" --pretty
 ## Key Takeaways
 
 - **Generic commands** (`board create`, `item create`) handle setup
+- **Typed shorthands** (`--text`, `--number`, `--status`, …) address a board's single column of that type, so no column IDs or wire JSON for the common cases
+- **Batch writes** (`item create --board <id> -`) seed many rows in one invocation instead of racing the rate limit
 - **Saved queries/mutations** create a domain-specific API layer
 - **JSON coercion** — variables declared as `JSON` in the query are auto-stringified, so `--var cols='{"key":"val"}'` just works without double-encoding
 - **LLM agents** can operate entirely through `mcli mutation run <name>` / `mcli query run <name>` without understanding monday.com internals or wire-format quirks
