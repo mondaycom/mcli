@@ -40,6 +40,36 @@ jobs:
           fi
           echo "flake.nix and tag agree on $want"
 
+      # The cask publishes after the GitHub release, and releases here are
+      # immutable, so a tap token that does not work means a release that can
+      # never get its cask -- only a new tag can fix it. That is what cost both
+      # v0.8.1 and v0.8.2. Validating the credential before anything is
+      # published turns that into a recoverable failure: nothing exists yet, so
+      # fixing the secret and re-running this job is enough.
+      - name: Check the tap token
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          # Kept in step with the repository under homebrew_casks in
+          # .goreleaser.yaml.
+          TAP: mondaycom/homebrew-tap
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::HOMEBREW_TAP_TOKEN is not set. It needs a PAT with Contents: read and write on $TAP."
+            exit 1
+          fi
+          # gh puts a one-line summary ("gh: Bad credentials (HTTP 401)") on
+          # stderr and the raw JSON body on stdout, so report the former.
+          if ! push="$(gh api "repos/$TAP" -q .permissions.push 2>"$RUNNER_TEMP/tap-err")"; then
+            echo "::error::HOMEBREW_TAP_TOKEN cannot read $TAP -- $(head -1 "$RUNNER_TEMP/tap-err")"
+            echo "::error::HTTP 401 means the token is invalid, expired, or was pasted incompletely; HTTP 404 means it is valid but has no access to that repository."
+            exit 1
+          fi
+          if [ "$push" != "true" ]; then
+            echo "::error::HOMEBREW_TAP_TOKEN can read $TAP but cannot push to it. Grant Contents: read and write."
+            exit 1
+          fi
+          echo "tap token can push to $TAP"
+
       - name: Set up Go
         uses: actions/setup-go@v7
         with:

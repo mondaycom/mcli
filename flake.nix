@@ -10,7 +10,7 @@
       # workflow before anything is published. Nix builds from a source tree with
       # no .git, so `git describe` is unavailable here and the version has to be
       # stated literally.
-      version = "0.8.2";
+      version = "0.8.3";
 
       systems = [
         "x86_64-linux"
