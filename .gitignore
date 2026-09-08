@@ -23,7 +23,11 @@ vendor/
 # Private memory-bank area (per setup-memory-bank convention)
 memory-bank/private/
 
-# Symlinks to external tooling (not part of this repo)
-.claude/
+# Symlinks to external tooling (not part of this repo).
+# Exception: .claude/skills/update-docs is a real, repo-specific skill we ship.
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/update-docs/
 CLAUDE.md
 AGENTS.md

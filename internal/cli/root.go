@@ -64,8 +64,12 @@ func init() {
 	rootCmd.AddCommand(newSearchCmd())
 	rootCmd.AddCommand(newDocCmd())
 	rootCmd.AddCommand(newAPICmd())
+	rootCmd.AddCommand(newSchemaCmd())
 
 	requireKnownSubcommands(rootCmd)
+
+	// Subcommands inherit this: cobra's FlagErrorFunc() walks up to the parent.
+	rootCmd.SetFlagErrorFunc(usageFlagError)
 
 	apischema.SetConfigDir(resolveConfigDir())
 }
@@ -73,6 +77,13 @@ func init() {
 // unknownCommandHint is appended to every unknown-command error so a typo points
 // the user (or an LLM) at the command index.
 const unknownCommandHint = "Run 'mcli help' to see available commands."
+
+// usageFlagError classifies a flag parse failure (unknown flag, missing value, bad
+// value) as a usage error. Cobra returns these as plain errors, which would otherwise
+// reach the exit-code translator unclassified and report INTERNAL.
+func usageFlagError(cmd *cobra.Command, err error) error {
+	return errs.Usage("%s\nRun '%s --help' for usage.", err.Error(), cmd.CommandPath())
+}
 
 // requireKnownSubcommands makes every namespace command (one with subcommands
 // but no action of its own) reject unknown subcommands. Cobra's default shows
@@ -102,18 +113,56 @@ func Execute(ctx context.Context) error {
 	return friendlyUnknownCommand(rootCmd.Execute())
 }
 
-// friendlyUnknownCommand rewrites cobra's bare "unknown command …" error (raised
-// for an unknown top-level command) into a usage error that points at
-// `mcli help`. This gives a typo an actionable message and exit code 1 (usage)
-// instead of a generic exit 5, while preserving any "Did you mean …?" suggestion
-// cobra already put in the message. Unknown subcommands are handled in
-// requireKnownSubcommands and already carry the hint, so they don't match here.
+// cobraArgErrorMarkers identify cobra's argument-count validation failures
+// (cobra.ExactArgs and friends). Cobra builds these with fmt.Errorf and exposes no
+// sentinel, so matching the message is the only hook available. The markers are the
+// invariant middles of those messages rather than their prefixes, which vary
+// ("accepts", "accepts at most", "accepts between … and …").
+var cobraArgErrorMarkers = []string{
+	" arg(s), received ",      // accepts N / at most N / between N and M
+	" arg(s), only received ", // requires at least N
+}
+
+// cobraFlagGroupMarker identifies all three of cobra's flag-group validation
+// failures (MarkFlagsMutuallyExclusive, RequiredTogether, OneRequired).
+const cobraFlagGroupMarker = "flags in the group ["
+
+// cobraRequiredFlagMarker identifies MarkFlagRequired violations, e.g.
+// `required flag(s) "board" not set`. Cobra raises these from ValidateRequiredFlags
+// after parsing succeeds, so they bypass the FlagErrorFunc entirely. This is the
+// most common malformed call mcli sees — nearly every item and column command
+// requires --board — which makes it the worst one to report as INTERNAL.
+const cobraRequiredFlagMarker = "required flag(s) "
+
+// friendlyUnknownCommand reclassifies cobra's own validation failures as usage
+// errors so they exit 1 instead of a generic 5.
+//
+// This matters more than it looks: mcli is driven by LLM agents in steady state, and
+// INTERNAL reads as "mcli broke, try again" while USAGE reads as "your call was
+// wrong, fix it". Leaving a malformed invocation on exit 5 invites an agent to retry
+// a call that can never succeed. Flag *parse* errors are handled by the FlagErrorFunc
+// set in init; this covers the checks cobra runs after parsing, which do not route
+// through it.
+//
+// The "unknown command" branch also keeps cobra's "Did you mean …?" suggestion.
+// Unknown subcommands are handled in requireKnownSubcommands and already carry the
+// hint, so they do not reach here.
 func friendlyUnknownCommand(err error) error {
 	if err == nil {
 		return nil
 	}
-	if strings.HasPrefix(err.Error(), "unknown command ") {
-		return errs.Usage("%s\n%s", err.Error(), unknownCommandHint)
+	msg := err.Error()
+
+	if strings.HasPrefix(msg, "unknown command ") {
+		return errs.Usage("%s\n%s", msg, unknownCommandHint)
+	}
+	if strings.Contains(msg, cobraFlagGroupMarker) || strings.HasPrefix(msg, cobraRequiredFlagMarker) {
+		return errs.Usage("%s", msg)
+	}
+	for _, marker := range cobraArgErrorMarkers {
+		if strings.Contains(msg, marker) {
+			return errs.Usage("%s", msg)
+		}
 	}
 	return err
 }

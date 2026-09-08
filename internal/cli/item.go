@@ -130,110 +130,202 @@ type itemWriteOutput struct {
 	ParentItem *itemWriteParent `json:"parent_item,omitempty"`
 }
 
+// itemCreateToOutput converts a create_item response to the shared output shape.
+func itemCreateToOutput(resp *gen.ItemCreateResponse) itemWriteOutput {
+	it := resp.Create_item
+	out := itemWriteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+	if it.Board.Id != "" {
+		out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+	}
+	if it.Group.Id != "" {
+		out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+	}
+	return out
+}
+
+// subitemCreateToOutput converts a create_subitem response to the shared output shape.
+func subitemCreateToOutput(resp *gen.SubitemCreateResponse) itemWriteOutput {
+	it := resp.Create_subitem
+	out := itemWriteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+	if it.Board.Id != "" {
+		out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+	}
+	if it.Parent_item.Id != "" {
+		out.ParentItem = &itemWriteParent{ID: it.Parent_item.Id, Name: it.Parent_item.Name}
+	}
+	return out
+}
+
+// itemUpdateToOutput converts a change_multiple_column_values response to the shared
+// output shape.
+func itemUpdateToOutput(resp *gen.ItemUpdateResponse) itemWriteOutput {
+	it := resp.Change_multiple_column_values
+	out := itemWriteOutput{ID: it.Id, Name: it.Name, State: string(it.State)}
+	if it.Board.Id != "" {
+		out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
+	}
+	if it.Group.Id != "" {
+		out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
+	}
+	return out
+}
+
+// checkBatchArgs validates the positional argument of a write command: either none,
+// or the batch sentinel. Anything else is a caller mistake worth naming, since a bare
+// item name as a positional arg is an easy thing to try.
+func checkBatchArgs(args []string) error {
+	if len(args) == 0 || isBatchArg(args) {
+		return nil
+	}
+	return errs.Usage("unexpected argument %q: pass %q to read rows from stdin", args[0], batchStdinSentinel)
+}
+
 // --- item create ---
 
+// itemCreateOpts holds the flags of 'mcli item create'.
+type itemCreateOpts struct {
+	boardID    string
+	parentID   string
+	name       string
+	groupID    string
+	colFlags   []string
+	dryRun     bool
+	shorthands map[string]*string
+}
+
 func newItemCreateCmd() *cobra.Command {
-	var (
-		boardID  string
-		parentID string
-		name     string
-		groupID  string
-		colFlags []string
-	)
+	opts := &itemCreateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
+		Use:   "create [-]",
 		Short: "Create an item (or subitem with --parent)",
 		Long: `Create a monday.com item on a board, or a subitem under a parent item.
 
 Exactly one of --board or --parent must be provided.
-Use --col <id>=<json> to set column values; the JSON must match monday's
-column-value wire shape for the column type. Repeated --col flags are
-order-preserving; if the same column id appears twice, the last value wins.`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			return runItemCreate(cmd, boardID, parentID, name, groupID, colFlags)
+
+Typed shorthands (--status, --date/--due, --number, --text, --checkbox) address the
+board's single column of that type, so no column id is needed. They are validated
+before anything is sent: a status label that is not on the column is rejected rather
+than created. If a board has more than one column of the type, the shorthand is
+ambiguous and errors — use --col for that write.
+
+Use --col <id>=<json> to set any column, including types with no shorthand; the JSON
+must match monday's column-value wire shape for the column type. Repeated --col flags
+are order-preserving; if the same column id appears twice, the last value wins.
+
+Pass - as the only argument to create many items from stdin, as a JSON array or one
+JSON object per line. Each row takes "name", optional "group", optional "cols", and
+the same shorthands as flags:
+
+  echo '[{"name":"Ship v1","status":"Working on it","due":"2026-05-10"}]' \
+    | mcli item create --board 123 -
+
+Rows are validated up front and sent sequentially. On partial failure the exit code is
+2 and errors[].index names the rows to retry — do not re-send the whole batch, item
+creation has no dedupe key.`,
+		Args: cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runItemCreate(cmd, args, opts)
 		},
 	}
 
-	cmd.Flags().StringVar(&boardID, "board", "", "board ID (required unless --parent is given)")
-	cmd.Flags().StringVar(&parentID, "parent", "", "parent item ID; creates a subitem when set")
-	cmd.Flags().StringVar(&name, "name", "", "item name (required)")
-	cmd.Flags().StringVar(&groupID, "group", "", "group ID (optional; ignored when --parent is given)")
-	cmd.Flags().StringArrayVar(&colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+	cmd.Flags().StringVar(&opts.boardID, "board", "", "board ID (required unless --parent is given)")
+	cmd.Flags().StringVar(&opts.parentID, "parent", "", "parent item ID; creates a subitem when set")
+	cmd.Flags().StringVar(&opts.name, "name", "", "item name (required unless reading rows from stdin)")
+	cmd.Flags().StringVar(&opts.groupID, "group", "", "group ID (optional; ignored when --parent is given)")
+	cmd.Flags().StringArrayVar(&opts.colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+	cmd.Flags().BoolVar(&opts.dryRun, "dry-run", false, "print what would be sent without creating anything")
+	opts.shorthands = addShorthandFlags(cmd)
 
 	cmd.MarkFlagsMutuallyExclusive("board", "parent")
-	_ = cmd.MarkFlagRequired("name")
 
 	return cmd
 }
 
-func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, colFlags []string) error {
-	if boardID == "" && parentID == "" {
+func runItemCreate(cmd *cobra.Command, args []string, opts *itemCreateOpts) error {
+	if err := checkBatchArgs(args); err != nil {
+		return err
+	}
+
+	if opts.boardID == "" && opts.parentID == "" {
 		return errs.Usage("one of --board or --parent is required")
 	}
-
-	if boardID != "" {
-		if _, err := strconv.ParseUint(boardID, 10, 64); err != nil {
-			return errs.Usage("board id must be a numeric string, got %q", boardID)
+	if opts.boardID != "" {
+		if _, err := strconv.ParseUint(opts.boardID, 10, 64); err != nil {
+			return errs.Usage("board id must be a numeric string, got %q", opts.boardID)
 		}
 	}
-	if parentID != "" {
-		if _, err := strconv.ParseUint(parentID, 10, 64); err != nil {
-			return errs.Usage("parent id must be a numeric string, got %q", parentID)
+	if opts.parentID != "" {
+		if _, err := strconv.ParseUint(opts.parentID, 10, 64); err != nil {
+			return errs.Usage("parent id must be a numeric string, got %q", opts.parentID)
 		}
 	}
 
-	cols, err := parseColFlags(colFlags)
+	set := setShorthands(cmd, opts.shorthands)
+
+	// Shorthands resolve against a board's columns. A subitem lives on its own
+	// hidden subitems board, which we would have to look up separately, so --parent
+	// keeps the raw path only.
+	if len(set) > 0 && opts.parentID != "" {
+		return errs.Usage("typed shorthands need --board; for a subitem use --col <id>=<json>")
+	}
+
+	if isBatchArg(args) {
+		if opts.parentID != "" {
+			return errs.Usage("batch mode needs --board; subitems cannot be created from stdin")
+		}
+		if opts.name != "" || len(opts.colFlags) > 0 || len(set) > 0 {
+			return errs.Usage("batch mode takes every field from stdin: drop --name, --col, and the shorthand flags")
+		}
+		return runItemCreateBatch(cmd, opts.boardID, opts.dryRun)
+	}
+
+	if strings.TrimSpace(opts.name) == "" {
+		return errs.Usage("--name is required")
+	}
+
+	cols, err := parseColFlags(opts.colFlags)
 	if err != nil {
 		return err
 	}
+
+	// A dry run only needs the API to resolve shorthands.
+	var gql gqlclient.Client
+	if !opts.dryRun || len(set) > 0 {
+		gql, err = newItemClient()
+		if err != nil {
+			return err
+		}
+	}
+
+	enc, err := applyShorthands(cmd.Context(), gql, opts.boardID, cols, set)
+	if err != nil {
+		return err
+	}
+
 	colValuesStr, err := buildColumnValues(cols)
 	if err != nil {
 		return err
 	}
 
-	gql, err := newItemClient()
-	if err != nil {
-		return err
+	if opts.dryRun {
+		row := batchRow{Name: opts.name, Group: opts.groupID}
+		return writeBatchDryRun(cmd, "created", []batchRow{row}, []string{colValuesStr})
 	}
 
 	var out itemWriteOutput
-
-	if parentID != "" {
-		resp, apiErr := gen.SubitemCreate(cmd.Context(), gql, parentID, name, colValuesStr)
+	if opts.parentID != "" {
+		resp, apiErr := gen.SubitemCreate(cmd.Context(), gql, opts.parentID, opts.name, colValuesStr)
 		if apiErr != nil {
 			return apiErr
 		}
-		it := resp.Create_subitem
-		out = itemWriteOutput{
-			ID:    it.Id,
-			Name:  it.Name,
-			State: string(it.State),
-		}
-		if it.Board.Id != "" {
-			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
-		}
-		if it.Parent_item.Id != "" {
-			out.ParentItem = &itemWriteParent{ID: it.Parent_item.Id, Name: it.Parent_item.Name}
-		}
+		out = subitemCreateToOutput(resp)
 	} else {
-		resp, apiErr := gen.ItemCreate(cmd.Context(), gql, boardID, name, groupID, colValuesStr)
+		resp, apiErr := gen.ItemCreate(cmd.Context(), gql, opts.boardID, opts.name, opts.groupID, colValuesStr)
 		if apiErr != nil {
 			return apiErr
 		}
-		it := resp.Create_item
-		out = itemWriteOutput{
-			ID:    it.Id,
-			Name:  it.Name,
-			State: string(it.State),
-		}
-		if it.Board.Id != "" {
-			out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
-		}
-		if it.Group.Id != "" {
-			out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
-		}
+		out = itemCreateToOutput(resp)
 	}
 
 	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
@@ -251,65 +343,119 @@ func runItemCreate(cmd *cobra.Command, boardID, parentID, name, groupID string, 
 	}
 
 	kind := "item"
-	if parentID != "" {
+	if opts.parentID != "" {
 		kind = "subitem"
 	}
-	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Created %s %s: %s\n", kind, out.ID, out.Name)
-	return err
+	o := cmd.OutOrStdout()
+	if _, err = fmt.Fprintf(o, "Created %s %s: %s\n", kind, out.ID, out.Name); err != nil {
+		return err
+	}
+	writeShorthandTrace(o, enc)
+	return nil
+}
+
+// writeShorthandTrace reports which column each shorthand landed on. Pretty output is
+// for humans, and "--status went to status_1 (Stage)" is the one thing a human cannot
+// see from the command they typed.
+func writeShorthandTrace(o io.Writer, enc []encodedShorthand) {
+	for _, e := range enc {
+		_, _ = fmt.Fprintf(o, "  --%s → %s (%s) = %s\n", e.flag, e.colID, e.title, string(e.value))
+	}
 }
 
 // --- item update ---
 
+// itemUpdateOpts holds the flags of 'mcli item update'.
+type itemUpdateOpts struct {
+	boardID    string
+	name       string
+	colFlags   []string
+	dryRun     bool
+	shorthands map[string]*string
+}
+
 func newItemUpdateCmd() *cobra.Command {
-	var (
-		boardID  string
-		name     string
-		colFlags []string
-	)
+	opts := &itemUpdateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "update <id>",
+		Use:   "update <id> | -",
 		Short: "Update column values on an item",
 		Long: `Update one or more column values on a monday.com item.
 
-Provide --name to rename the item. Use --col <id>=<json> to update columns;
-the JSON must match monday's column-value wire shape. At least one of --name
-or --col must be given.`,
+Provide --name to rename the item. Typed shorthands (--status, --date/--due,
+--number, --text, --checkbox) address the board's single column of that type and are
+validated before anything is sent. Use --col <id>=<json> for any other column; the
+JSON must match monday's column-value wire shape. At least one of --name, --col, or a
+shorthand must be given.
+
+Pass - instead of an item id to update many items from stdin, as a JSON array or one
+JSON object per line. Each row needs "id" and takes optional "name", "cols", and the
+same shorthands as flags:
+
+  echo '{"id":"456","status":"Done"}' | mcli item update --board 123 -
+
+Rows are validated up front and sent sequentially. On partial failure the exit code is
+2 and errors[].index names the rows to retry.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runItemUpdate(cmd, args[0], boardID, name, colFlags)
+			return runItemUpdate(cmd, args[0], opts)
 		},
 	}
 
-	cmd.Flags().StringVar(&boardID, "board", "", "board ID (required)")
-	cmd.Flags().StringVar(&name, "name", "", "new item name (optional)")
-	cmd.Flags().StringArrayVar(&colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+	cmd.Flags().StringVar(&opts.boardID, "board", "", "board ID (required)")
+	cmd.Flags().StringVar(&opts.name, "name", "", "new item name (optional)")
+	cmd.Flags().StringArrayVar(&opts.colFlags, "col", nil, "column value: <id>=<json> (repeatable)")
+	cmd.Flags().BoolVar(&opts.dryRun, "dry-run", false, "print what would be sent without updating anything")
+	opts.shorthands = addShorthandFlags(cmd)
+
 	_ = cmd.MarkFlagRequired("board")
 
 	return cmd
 }
 
-func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []string) error {
+func runItemUpdate(cmd *cobra.Command, itemID string, opts *itemUpdateOpts) error {
+	if _, err := strconv.ParseUint(opts.boardID, 10, 64); err != nil {
+		return errs.Usage("board id must be a numeric string, got %q", opts.boardID)
+	}
+
+	set := setShorthands(cmd, opts.shorthands)
+
+	if itemID == batchStdinSentinel {
+		if opts.name != "" || len(opts.colFlags) > 0 || len(set) > 0 {
+			return errs.Usage("batch mode takes every field from stdin: drop --name, --col, and the shorthand flags")
+		}
+		return runItemUpdateBatch(cmd, opts.boardID, opts.dryRun)
+	}
+
 	if _, err := strconv.ParseUint(itemID, 10, 64); err != nil {
 		return errs.Usage("item id must be a numeric string, got %q", itemID)
 	}
-	if _, err := strconv.ParseUint(boardID, 10, 64); err != nil {
-		return errs.Usage("board id must be a numeric string, got %q", boardID)
+	if opts.name == "" && len(opts.colFlags) == 0 && len(set) == 0 {
+		return errs.Usage("nothing to update: provide --name, at least one --col, or a shorthand")
 	}
 
-	if name == "" && len(colFlags) == 0 {
-		return errs.Usage("nothing to update: provide --name and/or at least one --col")
+	cols, err := parseColFlags(opts.colFlags)
+	if err != nil {
+		return err
 	}
 
-	cols, err := parseColFlags(colFlags)
+	var gql gqlclient.Client
+	if !opts.dryRun || len(set) > 0 {
+		gql, err = newItemClient()
+		if err != nil {
+			return err
+		}
+	}
+
+	enc, err := applyShorthands(cmd.Context(), gql, opts.boardID, cols, set)
 	if err != nil {
 		return err
 	}
 
 	// If --name is provided, inject the name column. Monday expects a bare
 	// JSON string for the "name" column in change_multiple_column_values.
-	if name != "" {
-		nameVal, _ := json.Marshal(name)
+	if opts.name != "" {
+		nameVal, _ := json.Marshal(opts.name)
 		cols["name"] = json.RawMessage(nameVal)
 	}
 
@@ -318,28 +464,16 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 		return err
 	}
 
-	gql, err := newItemClient()
-	if err != nil {
-		return err
+	if opts.dryRun {
+		row := batchRow{ID: itemID, Name: opts.name}
+		return writeBatchDryRun(cmd, "updated", []batchRow{row}, []string{colValuesStr})
 	}
 
-	resp, apiErr := gen.ItemUpdate(cmd.Context(), gql, boardID, itemID, colValuesStr)
+	resp, apiErr := gen.ItemUpdate(cmd.Context(), gql, opts.boardID, itemID, colValuesStr)
 	if apiErr != nil {
 		return apiErr
 	}
-
-	it := resp.Change_multiple_column_values
-	out := itemWriteOutput{
-		ID:    it.Id,
-		Name:  it.Name,
-		State: string(it.State),
-	}
-	if it.Board.Id != "" {
-		out.Board = &itemWriteBoard{ID: it.Board.Id, Name: it.Board.Name}
-	}
-	if it.Group.Id != "" {
-		out.Group = &itemWriteGroup{ID: it.Group.Id, Title: it.Group.Title}
-	}
+	out := itemUpdateToOutput(resp)
 
 	mode, modeErr := resolveOutputMode(os.Stdout, globals, configOutputMode())
 	if modeErr != nil {
@@ -356,14 +490,17 @@ func runItemUpdate(cmd *cobra.Command, itemID, boardID, name string, colFlags []
 	}
 
 	o := cmd.OutOrStdout()
-	_, err = fmt.Fprintf(o, "Updated item %s\n", out.ID)
-	if name != "" {
-		_, _ = fmt.Fprintf(o, "  name → %s\n", name)
+	if _, err = fmt.Fprintf(o, "Updated item %s\n", out.ID); err != nil {
+		return err
 	}
-	for _, f := range colFlags {
+	if opts.name != "" {
+		_, _ = fmt.Fprintf(o, "  name → %s\n", opts.name)
+	}
+	for _, f := range opts.colFlags {
 		_, _ = fmt.Fprintf(o, "  col  → %s\n", f)
 	}
-	return err
+	writeShorthandTrace(o, enc)
+	return nil
 }
 
 // --- item post-update ---

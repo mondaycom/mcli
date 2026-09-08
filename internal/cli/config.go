@@ -10,7 +10,6 @@ import (
 	apischema "github.com/mondaycom/mcli/internal/api/schema"
 	"github.com/mondaycom/mcli/internal/config"
 	"github.com/mondaycom/mcli/internal/errs"
-	"github.com/mondaycom/mcli/internal/secrets"
 )
 
 // apiVersionRE accepts YYYY-MM calendar versions (e.g. 2026-07) or named
@@ -129,14 +128,7 @@ func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Confi
 	}
 
 	// Resolve token to fetch the schema. Missing token is non-fatal: warn and return.
-	var store config.Store
-	if cfg.SecretStore != "" {
-		st, openErr := secrets.Open(cfg.SecretStore, resolveConfigDir())
-		if openErr == nil {
-			store = st
-		}
-	}
-	token, tokenErr := config.ResolveToken(cfg, globals.Token, store)
+	token, tokenErr := resolveAPIToken(cfg)
 	if tokenErr != nil {
 		_, _ = fmt.Fprintf(cmd.ErrOrStderr(),
 			"api-version saved; run 'mcli auth login' then 'mcli config set api-version %s' to refresh schema\n",
@@ -144,7 +136,7 @@ func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Confi
 		return nil
 	}
 
-	sdl, fetchErr := apischema.FetchSchema(cmd.Context(), token, config.ResolveEndpoint(cfg), value)
+	schemaPath, fetchErr := fetchAndCacheSchema(cmd.Context(), cfg, value, token)
 	if fetchErr != nil {
 		// Revert the saved version.
 		cfg.APIVersion = ""
@@ -154,13 +146,6 @@ func runConfigSetAPIVersion(cmd *cobra.Command, cfgPath string, cfg config.Confi
 		return errs.Usage("api version %q not available: %v — reverted to default (%s)",
 			value, fetchErr, config.ResolveAPIVersion(config.Config{}))
 	}
-
-	schemaPath := apischema.CachedSchemaPath(resolveConfigDir())
-	if err := os.WriteFile(schemaPath, []byte(sdl), 0o600); err != nil {
-		return errs.Internal("write schema cache: %v", err)
-	}
-
-	apischema.SetConfigDir(resolveConfigDir())
 
 	_, err := fmt.Fprintf(cmd.OutOrStdout(), "fetched schema for %s → %s\n", value, schemaPath)
 	return err

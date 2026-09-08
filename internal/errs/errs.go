@@ -20,8 +20,6 @@ const (
 	CodeRateLimited Code = "RATE_LIMITED"
 	// CodeNotFound indicates a resource was not found.
 	CodeNotFound Code = "NOT_FOUND"
-	// CodeConflict indicates a resource conflict.
-	CodeConflict Code = "CONFLICT"
 	// CodeInternal indicates an unexpected internal error.
 	CodeInternal Code = "INTERNAL"
 	// CodeDaemonRequired indicates the mcli daemon is not running but is needed.
@@ -29,6 +27,22 @@ const (
 	// CodeInterrupted indicates the operation was cancelled (SIGTERM/SIGINT/context cancel).
 	CodeInterrupted Code = "INTERRUPTED"
 )
+
+// AllCodes lists every Code mcli can report. It exists so documentation can be
+// verified against the real set of codes: adding a Code here without also
+// documenting it (see internal/cli skill doc) fails the test suite.
+func AllCodes() []Code {
+	return []Code{
+		CodeUsage,
+		CodeAPI,
+		CodeNotFound,
+		CodeAuth,
+		CodeRateLimited,
+		CodeInternal,
+		CodeDaemonRequired,
+		CodeInterrupted,
+	}
+}
 
 // Error is a structured error value carrying a Code, a human message, and an
 // optional wrapped cause.

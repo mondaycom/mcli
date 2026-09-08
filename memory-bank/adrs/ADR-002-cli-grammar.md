@@ -60,10 +60,12 @@ Decisions in this document cover:
 |-----:|:--------|
 | 0 | Success |
 | 1 | Usage / input error (bad flag, invalid argument) |
-| 2 | API error (Monday returned GraphQL errors or non-2xx) |
+| 2 | API error (Monday returned GraphQL errors or non-2xx), or resource not found |
 | 3 | Auth error (missing or invalid token) |
 | 4 | Rate-limit / complexity-budget exceeded after retries |
-| 5 | Internal / unexpected error |
+| 5 | Internal / unexpected error, and the fallback for any unclassified error |
+| 6 | Daemon required but not running (see the daemon amendment below) |
+| 130 | Interrupted (SIGINT / SIGTERM / context cancellation) |
 
 ### Error format
 When any command fails and `--json` is active (or stdout is non-TTY), the last line of stdout is a single JSON object:
@@ -72,7 +74,22 @@ When any command fails and `--json` is active (or stdout is non-TTY), the last l
 {"error": {"code": "RATE_LIMITED", "message": "Complexity budget exceeded", "retryAfter": 30, "requestId": "..."}}
 ```
 
-`code` is drawn from a stable enumeration (`USAGE`, `AUTH`, `API`, `RATE_LIMITED`, `NOT_FOUND`, `CONFLICT`, `INTERNAL`). The same codes map to exit codes above. Human mode prints a red, structured error to stderr and exits.
+`code` is drawn from a stable enumeration (`USAGE`, `AUTH`, `API`, `RATE_LIMITED`, `NOT_FOUND`, `INTERNAL`, `DAEMON_REQUIRED`, `INTERRUPTED`). The same codes map to exit codes above. Human mode prints a red, structured error to stderr and exits.
+
+`internal/errs` is the single source of truth: `errs.AllCodes()` enumerates the codes and
+`errs.ToExitCode` performs the mapping. A test asserts the generated skill doc agrees with
+both, so this table cannot drift from the implementation unnoticed.
+
+#### Amendment (2026-09-08)
+
+Two codes were added after this ADR was first written, when the daemon landed:
+`DAEMON_REQUIRED` (exit 6) and `INTERRUPTED` (exit 130). They are now included in the
+table and enumeration above.
+
+A `CONFLICT` code was also originally specified here. It was never emitted — no
+constructor was ever written for it — and it has been removed from `internal/errs` rather
+than left as unreachable API surface. Resource conflicts surface as `API` (exit 2), which
+is what monday actually returns them as.
 
 ### Stdin / piping
 - Commands that accept bulk input (e.g. `mcli item create`) accept JSON on stdin when `-` is passed as a positional or when no positional is given and stdin is non-TTY.

@@ -35,10 +35,18 @@ mcli item list --board 9832181507 --subitems
 # Get a single item, including its subitems with column values
 mcli item get 1234567890 --subitems
 
-# Create an item with column values
+# Create an item with typed column shorthands
+mcli item create --board 9832181507 --name "Ship feature" \
+  --status "Working on it" --due 2026-06-01
+
+# Or with raw column JSON, for any column type
 mcli item create --board 9832181507 --name "Ship feature" \
   --col 'status={"label":"Working on it"}' \
   --col 'due_date={"date":"2026-06-01"}'
+
+# Create or update many items in one command (rate-limit friendly)
+echo '[{"name":"Ship v1","status":"Done"},{"name":"Write docs","due":"2026-06-10"}]' \
+  | mcli item create --board 9832181507 -
 
 # Run a raw GraphQL query
 mcli query 'query { me { id name } }'
@@ -88,6 +96,9 @@ mcli board group list/create/rename/archive/delete
 mcli board column list/create/rename/describe/delete
 
 mcli item list/get/create/update/move/archive/delete
+mcli item create/update ... --status/--due/--date/--number/--text/--checkbox
+                                                            Typed column shorthands
+mcli item create/update --board <id> -                      Batch write, rows on stdin
 mcli item find --board <id> --column <col> --value <text>   Find by column value
 mcli item post-update <id> --body <text>                    Post a comment
 mcli item get-updates <id> [--limit N]                      Read comments/updates
@@ -99,6 +110,9 @@ mcli doc write <id> --content <md>   Replace document content
 mcli api list [--type query|mutation]        Browse all ~250 API operations from the schema
 mcli api describe <operation|type>          Inspect signature and argument types
 mcli api <operation> [--arg k=v]...         Execute any operation; JSON args auto-coerced
+
+mcli schema status                   Report which schema is in use and how old it is
+mcli schema refresh                  Fetch the live schema with your token and cache it
 
 mcli query '<graphql>'               Raw GraphQL queries (inline, -f file, -f -)
 mcli query save/list/run/delete      Saved query management
@@ -178,6 +192,24 @@ mcli config set routing-key <your-key>   # add baggage: routingKey=<your-key> he
 mcli config set routing-key ""           # clear routing key
 ```
 
+### Keeping the schema fresh
+
+The embedded schema is a snapshot taken when the binary was built, so a long-lived
+install gradually falls behind the live API. `mcli schema refresh` introspects the API
+with your own token and caches the result in `~/.config/mcli/schema.graphql`, which takes
+precedence over the embedded copy — no rebuild, no release wait.
+
+```sh
+mcli schema status                        # source, api-version, age, type count
+mcli schema refresh                       # fetch + cache; prints the type delta
+mcli schema refresh --api-version 2026-08 # one-off fetch, not persisted to config
+```
+
+`mcli api` warns on stderr (never stdout) when the schema in use is more than 30 days
+old. Refreshing is always explicit: no mcli command fetches a schema behind your back.
+To drop the cache and go back to the embedded schema, delete the cached file or run
+`mcli config set api-version default`.
+
 ## Output Modes
 
 Control output format with a global flag or persist a default:
@@ -211,7 +243,7 @@ mcli daemon start --url https://your-server.example.com
 ```
 
 The daemon:
-- Listens for webhook payloads on an HTTP port (default 6780)
+- Listens for webhook payloads on an HTTP port (default 8420)
 - Exposes a Unix socket IPC for CLI commands
 - Opens a Cloudflare Quick Tunnel for a public URL (requires `cloudflared` in PATH)
 - Re-registers webhooks automatically when the tunnel URL changes
@@ -266,20 +298,113 @@ This outputs a concise goal-oriented guide that tells the LLM what commands exis
 
 On **read**, column values are decoded to human-readable form (status labels, ISO dates, etc.).
 
-On **write**, pass monday's raw column-value JSON via `--col <id>=<json>`:
+On **write** there are two paths: typed shorthands for the common types, and raw
+`--col <id>=<json>` for everything else.
+
+### Typed shorthands
+
+| Flag | Column type | Accepts |
+|------|-------------|---------|
+| `--status <label>` | `status` | a label configured on the column, matched case-insensitively |
+| `--date` / `--due` | `date` | `2026-05-10`, `2026-05-10T14:30`, or an RFC3339 timestamp (converted to UTC) |
+| `--number <n>` | `numbers` | any number; empty string clears the column |
+| `--text <s>` | `text` | any string; empty string clears the column |
+| `--checkbox <b>` | `checkbox` | `true`/`false`, `yes`/`no`, `1`/`0` |
+
+```sh
+mcli item create --board 123 --name "Task" --status Done --due 2026-05-10 --number 3
+mcli item update 456 --board 123 --status "Working on it"
+```
+
+A shorthand carries no column id: it addresses **the board's single column of that
+type**, looked up live. That is a deliberate trade:
+
+- If the board has no column of the type, or more than one, the shorthand errors and
+  names the candidates. It never picks one for you — writing a correct value to the
+  wrong column is a silent, expensive mistake.
+- Values are validated before anything is sent. This matters most for `--status`: every
+  mcli item mutation sends `create_labels_if_missing`, so an unvalidated typo would
+  quietly add a new label to the board instead of failing. A bad label is rejected with
+  the column's real labels listed.
+- Using a shorthand costs one extra request (the board's column list) per command — or
+  per *batch*, not per row.
+- `--date` and `--due` are the same flag; passing both is an error.
+
+Shorthands are not available with `--parent` (a subitem lives on its own board, which
+would need a second lookup) — use `--col` there.
+
+### Raw column JSON
+
+`--col <id>=<json>` writes any column, including types with no shorthand:
 
 ```sh
 mcli item create --board 123 --name "Task" \
   --col 'status={"label":"Done"}' \
   --col 'date={"date":"2026-05-10"}' \
-  --col 'priority={"label":"High"}'
+  --col 'people={"personsAndTeams":[{"id":123,"kind":"person"}]}'
 ```
+
+Repeated `--col` flags are order-preserving; if the same column id appears twice the
+last value wins. A shorthand and a `--col` that target the same column is an error, not
+a precedence rule.
 
 Use `mcli board column list --board <id>` to discover column IDs, types, and settings.
 
-### Fetching nested data in one call
+## Batch Writes
 
-To save round-trips, several read commands can pull related records with their decoded column values in a single request:
+`mcli item create --board <id> -` and `mcli item update --board <id> -` read rows from
+stdin instead of flags — a JSON array or one JSON object per line (NDJSON), up to 500
+rows. Create rows need `name`; update rows need `id`. Both accept `group`, `cols`, and
+the same typed shorthands as flags.
+
+```sh
+# JSON array
+echo '[{"name":"Ship v1","status":"Done","due":"2026-05-10"},
+       {"name":"Write docs","number":3,"cols":{"text_9":"draft"}}]' \
+  | mcli item create --board 123 -
+
+# NDJSON, e.g. straight out of jq
+mcli item list --board 999 | jq -c '.items[] | {id, status:"Done"}' \
+  | mcli item update --board 123 -
+```
+
+Row fields are JSON scalars, so `"number": 42` and `"number": "42"` both work.
+
+**Validation happens up front.** Every row is parsed, checked, and encoded before the
+first request fires, so a bad status label in row 40 fails the whole batch with `USAGE`
+and nothing is written. Unknown row fields are rejected too — a mistyped `"columns"`
+instead of `"cols"` would otherwise drop the row's values and report success.
+
+**Rows are sent sequentially.** monday's rate limit is a complexity budget per minute,
+so parallelism would not raise throughput, only reach the ceiling sooner.
+
+Output is a single JSON object:
+
+```json
+{
+  "written": 2,
+  "failed": 1,
+  "verb": "created",
+  "items": [ ... ],
+  "errors": [{"index": 1, "code": "API", "message": "column not found"}]
+}
+```
+
+**On partial failure the exit code is 2 and you should retry only the rows named in
+`errors[].index`.** Item creation has no dedupe key, so re-sending the whole payload
+duplicates every row that succeeded.
+
+`--dry-run` prints the exact `column_values` that would be sent for each row without
+writing anything. It works on single-item create/update too, and needs no API access at
+all unless a shorthand has to be resolved:
+
+```sh
+echo '{"name":"Check me","status":"Done"}' | mcli item create --board 123 - --dry-run
+```
+
+## Fetching nested data in one call
+
+Batch writes save round-trips on the write path; on the read path, several commands can pull related records with their decoded column values in a single request:
 
 | Command | Flag | Adds |
 |---------|------|------|
@@ -341,7 +466,18 @@ mcli mutation run update_order_status --var board=456 --var item=789 \
   --var cols='{"status":{"label":"Ordered"}}'
 ```
 
-See [`examples/ecommerce-demo.md`](examples/ecommerce-demo.md) for a full walkthrough and [`examples/ecommerce-demo.sh`](examples/ecommerce-demo.sh) for a runnable script that sets up Products, Inventory, and Orders boards with a complete semantic layer.
+Each domain below has a full walkthrough (`.md`) and a runnable script (`.sh`) that
+creates the boards, defines a semantic layer, and exercises the workflow end to end:
+
+| Domain | Boards | Walkthrough |
+|---|---|---|
+| E-commerce | Products, Inventory, Orders | [`examples/ecommerce-demo.md`](examples/ecommerce-demo.md) · [`.sh`](examples/ecommerce-demo.sh) |
+| CRM | Companies, Contacts, Deals | [`examples/crm-demo.md`](examples/crm-demo.md) · [`.sh`](examples/crm-demo.sh) |
+| Project portfolio | Portfolios, Projects, Milestones | [`examples/portfolio-demo.md`](examples/portfolio-demo.md) · [`.sh`](examples/portfolio-demo.sh) |
+
+They also exercise the write ergonomics against real board shapes: the e-commerce demo
+seeds inventory with one batch write, and the portfolio demo shows the case a shorthand
+*cannot* serve — a board with two `date` columns, where `--col` takes over.
 
 ## Development
 
@@ -353,6 +489,21 @@ make vet           # go vet
 make fmt-check     # Check formatting
 make schema        # Refresh monday.com GraphQL schema (requires token)
 ```
+
+`make schema` rewrites `schema/monday.graphql` and stamps `schema/fetched_at.txt` with
+today's date. That stamp is what `mcli schema status` reports as the embedded schema's
+age, so never edit either file by hand.
+
+### Before cutting a release
+
+```sh
+make schema          # refresh the embedded schema + provenance stamp
+go generate ./...    # regenerate genqlient code against the new schema
+make test lint vet   # must be green
+```
+
+Shipping a release without refreshing means every user starts out with a schema as old
+as the last refresh, and sees the staleness warning sooner.
 
 ### Running against staging
 

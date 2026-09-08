@@ -56,6 +56,11 @@ Example:
     --arg column_id=status --arg value='{"label":"Done"}'`,
 		Args:               cobra.ArbitraryArgs,
 		DisableFlagParsing: false,
+		// Every 'api' operation is generated from the schema, so a stale schema
+		// silently misrepresents the API surface. Warn on stderr, never stdout.
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			warnIfSchemaStale(cmd)
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return errs.Usage("provide an operation name, or use 'mcli api list'")
