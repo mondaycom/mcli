@@ -67,3 +67,20 @@ jobs:
           version: "~> v2"
           args: build --snapshot --clean
 
+  nix:
+    name: Nix flake
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: cachix/install-nix-action@v31
+
+      # Guards vendorHash, which goes stale whenever go.mod or go.sum changes.
+      # Nothing else would catch it: the Go build is unaffected, so the flake
+      # would stay broken until someone ran `nix run`. This also runs the test
+      # suite inside the Nix sandbox, which has no network.
+      - name: Build the flake
+        run: nix build .#mcli
+
+      - name: Smoke-test the built binary
+        run: ./result/bin/mcli version
