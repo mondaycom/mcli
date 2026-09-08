@@ -24,9 +24,10 @@ import (
 )
 
 const (
-	endpoint    = "https://api.monday.com/v2"
-	outFile     = "schema/monday.graphql"
-	httpTimeout = 60 * time.Second
+	endpoint      = "https://api.monday.com/v2"
+	outFile       = "schema/monday.graphql"
+	fetchedAtFile = "schema/fetched_at.txt"
+	httpTimeout   = 60 * time.Second
 )
 
 func main() {
@@ -62,7 +63,14 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("write %s: %w", outPath, err)
 	}
 
+	// Record when this SDL was fetched so the CLI can warn when the embedded
+	// schema has gone stale (see schema.FetchedAt).
+	fetchedAt := time.Now().UTC().Format("2006-01-02") + "\n"
+	if err := os.WriteFile(fetchedAtFile, []byte(fetchedAt), 0o644); err != nil {
+		return fmt.Errorf("write %s: %w", fetchedAtFile, err)
+	}
+
 	lines := strings.Count(sdl, "\n")
-	fmt.Fprintf(os.Stderr, "introspect: wrote %s (%d lines)\n", outPath, lines)
+	fmt.Fprintf(os.Stderr, "introspect: wrote %s (%d lines), %s\n", outPath, lines, fetchedAtFile)
 	return nil
 }

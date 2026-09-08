@@ -64,6 +64,7 @@ func init() {
 	rootCmd.AddCommand(newSearchCmd())
 	rootCmd.AddCommand(newDocCmd())
 	rootCmd.AddCommand(newAPICmd())
+	rootCmd.AddCommand(newSchemaCmd())
 
 	requireKnownSubcommands(rootCmd)
 

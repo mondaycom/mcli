@@ -33,12 +33,21 @@ type ArgDef struct {
 	DefaultValue string
 }
 
+// Source values reported by LoadedSource.
+const (
+	// SourceCached means a locally refreshed schema.graphql was parsed and used.
+	SourceCached = "cached"
+	// SourceEmbedded means the SDL compiled into the binary was used.
+	SourceEmbedded = "embedded"
+)
+
 var (
 	mu           sync.Mutex
 	cachedSchema *ast.Schema
 	cacheErr     error
 	cacheDir     string
 	cacheLoaded  bool
+	loadedSource string
 )
 
 // SetConfigDir sets the directory used to locate a cached schema.graphql file.
@@ -79,6 +88,8 @@ func Load() (*ast.Schema, error) {
 			s, err = gqlparser.LoadSchema(src)
 			if err != nil {
 				err = fmt.Errorf("parse local schema: %w", err)
+			} else {
+				loadedSource = SourceCached
 			}
 		}
 	}
@@ -89,6 +100,7 @@ func Load() (*ast.Schema, error) {
 		if err != nil {
 			err = fmt.Errorf("parse schema: %w", err)
 		}
+		loadedSource = SourceEmbedded
 	}
 
 	cachedSchema = s
@@ -96,6 +108,19 @@ func Load() (*ast.Schema, error) {
 	cacheLoaded = true
 
 	return cachedSchema, cacheErr
+}
+
+// LoadedSource reports which SDL Load actually parsed: SourceCached or
+// SourceEmbedded. It matters because a cached schema.graphql that exists but
+// fails to parse is silently ignored in favour of the embedded copy, so the
+// presence of the file is not proof that it is in use.
+func LoadedSource() (string, error) {
+	if _, err := Load(); err != nil {
+		return "", err
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	return loadedSource, nil
 }
 
 // QueryFields returns FieldDef for each field on the Query type.
