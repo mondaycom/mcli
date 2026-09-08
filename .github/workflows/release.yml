@@ -5,91 +5,36 @@ on:
     tags:
       - 'v*'
 
-jobs:
-  build:
-    name: Build ${{ matrix.goos }}/${{ matrix.goarch }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            goos: linux
-            goarch: amd64
-            cgo_enabled: "0"
-          - os: ubuntu-latest
-            goos: linux
-            goarch: arm64
-            cgo_enabled: "0"
-          - os: macos-latest
-            goos: darwin
-            goarch: arm64
-            cgo_enabled: "1"
+permissions:
+  contents: write
 
+jobs:
+  goreleaser:
+    name: Build and publish
+    # Every target cross-compiles from this one runner because the build needs no
+    # cgo. The previous matrix required a macOS runner for darwin, which is what
+    # made the Intel build queue indefinitely (no macos-13 runner) and left tags
+    # unpublished.
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
+          # goreleaser derives the version and changelog from tags.
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: "1.26"
 
-      - name: Build
+      - name: Release
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          args: release --clean
         env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: ${{ matrix.cgo_enabled }}
-        run: |
-          VERSION=$(git describe --tags --always)
-          BINARY=mcli-${{ matrix.goos }}-${{ matrix.goarch }}
-          go build \
-            -ldflags "-X github.com/mondaycom/mcli/internal/cli.version=${VERSION}" \
-            -o "${BINARY}" \
-            ./cmd/mcli
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mcli-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: mcli-${{ matrix.goos }}-${{ matrix.goarch }}
-          if-no-files-found: error
-
-  release:
-    name: Create Release
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-          merge-multiple: true
-
-      # Run inside dist/ so the recorded names are flat (mcli-linux-amd64, not
-      # dist/mcli-linux-amd64). Users download the assets side by side, where a
-      # dist/ prefix makes `sha256sum -c checksums.txt` fail to find every file —
-      # and it exits 0 when no file is found, so a scripted install that thinks it
-      # verifies checksums would silently verify nothing.
-      - name: Checksums
-        working-directory: dist
-        run: sha256sum mcli-* > checksums.txt
-
-      - name: Create release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --generate-notes \
-            dist/mcli-linux-amd64 \
-            dist/mcli-linux-arm64 \
-            dist/mcli-darwin-arm64 \
-            dist/checksums.txt
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PAT with contents:write on mondaycom/homebrew-tap. The per-run
+          # GITHUB_TOKEN is scoped to this repository and cannot push the cask
+          # to another one.
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}

@@ -1,6 +1,9 @@
 # Build artifacts
 /bin/
 /dist/
+# `nix build` output symlinks
+/result
+/result-*
 /mcli
 /mcli.exe
 

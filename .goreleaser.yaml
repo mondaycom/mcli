@@ -1,0 +1,113 @@
+version: 2
+
+project_name: mcli
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: mcli
+    main: ./cmd/mcli
+    binary: mcli
+    # CGO is not needed on any target. The darwin keychain backend
+    # (zalando/go-keyring) shells out to /usr/bin/security via os/exec and
+    # contains no cgo at all, verified by a real set/get/delete round-trip from a
+    # CGO_ENABLED=0 binary. That is what lets every target cross-compile from one
+    # Linux runner, Intel macOS included.
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/mondaycom/mcli/internal/cli.version={{ .Version }}
+    # Reproducible builds: stamp binaries with the commit time rather than the
+    # build time, so rebuilding a tag produces identical bytes.
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  # Tarballs are what the Homebrew formula consumes, and they carry the LICENSE
+  # alongside the binary.
+  - id: archive
+    ids:
+      - mcli
+    formats:
+      - tar.gz
+    name_template: "mcli_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+  # Bare binaries under the same names v0.8.0 published, so existing
+  # `curl -LO .../mcli-darwin-arm64` instructions keep working.
+  - id: binary
+    ids:
+      - mcli
+    formats:
+      - binary
+    name_template: "mcli-{{ .Os }}-{{ .Arch }}"
+
+checksum:
+  # Flat names, so `sha256sum -c checksums.txt` works where the assets are
+  # actually downloaded. goreleaser does this correctly by default; the previous
+  # hand-rolled step recorded a dist/ prefix that matched nothing and still
+  # exited 0.
+  name_template: "checksums.txt"
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "Merge pull request"
+
+# Casks, not formulas: goreleaser deprecated `brews` in favour of
+# `homebrew_casks`, since what it generated for pre-compiled binaries were
+# "hackyish" formulas. The generated cask does declare on_linux URLs, but
+# Homebrew only supports casks on macOS, so Linux users install via Nix,
+# `go install`, or the tarballs above.
+homebrew_casks:
+  - name: mcli
+    # Build the cask from the tarball, not the bare binary.
+    ids:
+      - archive
+    # `binaries` defaults to the cask name (mcli), so it is left unset.
+    repository:
+      owner: mondaycom
+      name: homebrew-tap
+      # Needs a PAT with `contents: write` on mondaycom/homebrew-tap: the
+      # per-run GITHUB_TOKEN is scoped to this repo only and cannot push there.
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: "https://github.com/mondaycom/mcli"
+    description: "Command-line interface for monday.com's GraphQL API, built for LLM agents"
+    hooks:
+      post:
+        # These binaries are not signed or notarized, and Homebrew quarantines
+        # cask downloads, so without this macOS reports "mcli is damaged and
+        # cannot be opened" on first run. The proper fix is an Apple Developer
+        # signing identity plus notarization; until then, strip the attribute.
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mcli"]
+          end
+
+release:
+  prerelease: auto
+  footer: |
+    ## Install
+
+    ```sh
+    brew install mondaycom/tap/mcli
+    ```
+
+    Verify a manual download:
+
+    ```sh
+    sha256sum -c checksums.txt
+    ```
