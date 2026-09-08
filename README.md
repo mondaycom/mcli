@@ -5,11 +5,24 @@ A command-line interface for monday.com's GraphQL API. Single static binary, str
 ## Install
 
 ```sh
+# Homebrew (macOS)
+brew install mondaycom/tap/mcli
+
+# Nix
+nix profile install github:mondaycom/mcli
+
 # From source
 go install github.com/mondaycom/mcli/cmd/mcli@latest
 
 # Or build locally
 make build    # → bin/mcli
+```
+
+Or download a binary from the [latest release](https://github.com/mondaycom/mcli/releases/latest)
+and verify it against the published manifest:
+
+```sh
+sha256sum -c checksums.txt
 ```
 
 ## Quick Start
