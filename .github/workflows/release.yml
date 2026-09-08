@@ -22,6 +22,24 @@ jobs:
           # goreleaser derives the version and changelog from tags.
           fetch-depth: 0
 
+      # Releases in this repository are immutable: once a tag publishes, its
+      # assets cannot be replaced and re-running the job cannot fix a mistake --
+      # goreleaser fails fast with "already exists and is immutable". flake.nix
+      # states its version literally, because Nix builds from a source tree with
+      # no .git, so it is the one thing that can silently disagree with the tag.
+      # Catch that here, before anything becomes permanent.
+      - name: Check flake version matches the tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          want="${TAG#v}"
+          got="$(sed -n 's/^ *version = "\(.*\)";$/\1/p' flake.nix)"
+          if [ "$want" != "$got" ]; then
+            echo "::error file=flake.nix::flake.nix says $got but the tag is $want. Bump flake.nix and re-tag."
+            exit 1
+          fi
+          echo "flake.nix and tag agree on $want"
+
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
