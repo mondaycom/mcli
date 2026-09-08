@@ -72,8 +72,14 @@ jobs:
           path: dist/
           merge-multiple: true
 
+      # Run inside dist/ so the recorded names are flat (mcli-linux-amd64, not
+      # dist/mcli-linux-amd64). Users download the assets side by side, where a
+      # dist/ prefix makes `sha256sum -c checksums.txt` fail to find every file —
+      # and it exits 0 when no file is found, so a scripted install that thinks it
+      # verifies checksums would silently verify nothing.
       - name: Checksums
-        run: sha256sum dist/mcli-* > dist/checksums.txt
+        working-directory: dist
+        run: sha256sum mcli-* > checksums.txt
 
       - name: Create release
         env:
